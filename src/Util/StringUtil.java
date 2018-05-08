@@ -27,10 +27,18 @@ public class StringUtil {
 	}
 	
 	public static String encodeBase58(String input) {
-		return input;
+		try {
+			return Base58.encode(input.getBytes("UTF-8"));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public static String decodeBase58(String input) {
-		return input;
+		try {
+			return new String(Base58.decode(input), "UTF-8");
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

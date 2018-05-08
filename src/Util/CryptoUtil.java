@@ -56,9 +56,20 @@ public class CryptoUtil {
 		byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8); // requires jdk 1.7+
 		return SodiumLibrary.cryptoPwhashStrVerify(hashedPassword, passwordBytes);
 	}
-
-	public static void main(String[] args)
-	{
-		logger.info("libsodium version: " + SodiumLibrary.libsodiumVersionString());
+	
+	public static int crypto_sign_bytes() {
+		return SodiumLibrary.sodium().crypto_sign_bytes();
+	}
+	
+	public static int crypto_sign_publickeybytes() {
+		return (int) SodiumLibrary.sodium().crypto_sign_publickeybytes();
+	}
+	
+	public static int crypto_sign_verify_detached(String signature, String message, String signkey) {
+		try {
+			return SodiumLibrary.sodium().crypto_sign_detached(signature.getBytes(), signature.length(), message.getBytes("UTF-8"), message.length(), signkey.getBytes());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

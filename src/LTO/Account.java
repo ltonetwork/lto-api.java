@@ -63,7 +63,7 @@ public class Account {
 	{
 		return sign != null ? encode(sign.get("publickey").toString(), encoding) : null;
 	}
-	public String getPublicsignKey()
+	public String getPublicSignKey()
 	{
 		return getPublicSignKey("base58");
 	}

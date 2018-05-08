@@ -8,6 +8,7 @@ import org.json.simple.JSONArray;
 import java.util.Date;
 
 import LTO.Account;
+import Util.CryptoUtil;
 //import LTO.EventChain;
 import Util.JsonUtil;
 import Util.StringUtil;
@@ -29,7 +30,7 @@ public class Event {
      * 
      * @var int
      */
-	public int timestamp;
+	public Date timestamp;
 	
 	/**
      * Hash to the previous event
@@ -70,7 +71,7 @@ public class Event {
     {
     	if (body != null) {
     		this.body = StringUtil.encodeBase58(JsonUtil.jsonEncode(body));
-    		this.timestamp = (int) (new Date().getTime() / 1000);
+    		this.timestamp = new Date();
     	}
     	
     	this.previous = previous;
@@ -80,7 +81,7 @@ public class Event {
     {
     	if (body != null) {
     		this.body = JsonUtil.jsonEncode(body);
-    		this.timestamp = (int) (new Date().getTime() / 1000);
+    		this.timestamp = new Date();
     	}
     	
     	this.previous = previous;
@@ -101,7 +102,7 @@ public class Event {
     		throw new BadMethodCallException("First set signkey before creating message");
     	}
     	
-    	String message = String.join("\n", new String[] {body, Integer.toString(timestamp), previous, signkey});
+    	String message = String.join("\n", new String[] {body, Integer.toString((int) timestamp.getTime() / 1000), previous, signkey});
     	
     	return message;
     }
@@ -132,10 +133,9 @@ public class Event {
     	String _signature = StringUtil.decodeBase58(signature);
     	String _signkey = StringUtil.decodeBase58(signkey);
     	
-    	return _signature == _signkey;
-//    	return strlen($signature) === \sodium\CRYPTO_SIGN_BYTES &&
-//                strlen($signkey) === \sodium\CRYPTO_SIGN_PUBLICKEYBYTES &&
-//                \sodium\crypto_sign_verify_detached($signature, $this->getMessage(), $signkey);
+    	return	_signature.length() == CryptoUtil.crypto_sign_bytes() &&
+    			_signkey.length() == CryptoUtil.crypto_sign_publickeybytes() && 
+    			CryptoUtil.crypto_sign_verify_detached(_signature, getMessage(),_signkey) != 0;
     }
     
     /**
