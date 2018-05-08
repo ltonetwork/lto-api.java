@@ -145,10 +145,10 @@ public class Event {
      * @param Account $account
      * @return $this
      */
-//    public Event signWith(Account account)
-//    {
-//    	return account.signEvent(this);
-//    }
+    public Event signWith(Account account)
+    {
+    	return account.signEvent(this);
+    }
     
     /**
      * Add this event to the chain
