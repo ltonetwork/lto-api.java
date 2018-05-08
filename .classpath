@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/libsodium-jna-1.0.4.jar"/>
+	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/slf4j.jar"/>
+	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/jna-4.5.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
