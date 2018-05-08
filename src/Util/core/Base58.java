@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-package Util;
+package Util.core;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+
+import LTO.exceptions.AddressFormatException;
 
 /**
  * Base58 is a way to encode Bitcoin addresses (or arbitrary data) as alphanumeric strings.

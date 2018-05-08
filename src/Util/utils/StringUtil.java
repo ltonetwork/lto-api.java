@@ -1,9 +1,11 @@
 /**
  * 
  */
-package Util;
+package Util.utils;
 
 import java.security.MessageDigest;
+
+import Util.core.Base58;
 
 /**
  * @author moonbi

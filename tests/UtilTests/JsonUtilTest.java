@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.json.simple.JSONObject;
 import org.junit.Test;
 
-import Util.JsonUtil;
+import Util.utils.JsonUtil;
 
 public class JsonUtilTest {
 

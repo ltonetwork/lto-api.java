@@ -1,7 +1,7 @@
 /**
  * Failed to decrypt message
  */
-package LTO;
+package LTO.exceptions;
 
 /**
  * @author moonbi

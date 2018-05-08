@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-package Util;
+package LTO.exceptions;
+
+import Util.core.Base58;
 
 @SuppressWarnings("serial")
 public class AddressFormatException extends IllegalArgumentException {

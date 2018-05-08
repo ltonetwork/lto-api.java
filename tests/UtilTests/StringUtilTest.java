@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import Util.StringUtil;
+import Util.utils.StringUtil;
 
 public class StringUtilTest {
 

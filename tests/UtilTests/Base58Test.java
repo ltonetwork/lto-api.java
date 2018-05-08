@@ -7,11 +7,11 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import Util.AddressFormatException;
-import Util.Base58;
-import Util.AddressFormatException.InvalidCharacter;
-import Util.AddressFormatException.InvalidChecksum;
-import Util.AddressFormatException.InvalidDataLength;
+import LTO.exceptions.AddressFormatException;
+import LTO.exceptions.AddressFormatException.InvalidCharacter;
+import LTO.exceptions.AddressFormatException.InvalidChecksum;
+import LTO.exceptions.AddressFormatException.InvalidDataLength;
+import Util.core.Base58;
 
 public class Base58Test {
 

@@ -1,17 +1,18 @@
 /**
  * Live Contracts Event
  */
-package LTO;
+package LTO.core;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import java.util.Date;
 
-import LTO.Account;
-import Util.CryptoUtil;
-//import LTO.EventChain;
-import Util.JsonUtil;
-import Util.StringUtil;
+import LTO.exceptions.BadMethodCallException;
+
+import LTO.core.Account;
+import LTO.core.EventChain;
+
+import Util.utils.*;
 
 /**
  * @author moonbi
@@ -135,7 +136,7 @@ public class Event {
     	
     	return	_signature.length() == CryptoUtil.crypto_sign_bytes() &&
     			_signkey.length() == CryptoUtil.crypto_sign_publickeybytes() && 
-    			CryptoUtil.crypto_sign_verify_detached(_signature, getMessage(),_signkey) != 0;
+    			CryptoUtil.crypto_sign_verify_detached(_signature, getMessage(),_signkey);
     }
     
     /**

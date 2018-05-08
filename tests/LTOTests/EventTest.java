@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import LTO.Event;
+import LTO.core.Event;
 
 public class EventTest {
 

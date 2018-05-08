@@ -1,7 +1,7 @@
 /**
  * 
  */
-package Util;
+package Util.utils;
 
 import java.io.StringWriter;
 

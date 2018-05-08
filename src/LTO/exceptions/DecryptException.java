@@ -1,7 +1,7 @@
 /**
  * Failed to decrypt message
  */
-package LTO;
+package LTO.exceptions;
 
 /**
  * @author moonbi
@@ -9,5 +9,7 @@ package LTO;
  */
 @SuppressWarnings("serial")
 public class DecryptException extends RuntimeException {
-
+	public DecryptException(String message) {
+		super(message);
+	}
 }
