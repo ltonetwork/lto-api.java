@@ -22,7 +22,6 @@ public class CryptoUtil {
 	private static final Logger logger = LoggerFactory.getLogger(CryptoUtil.class);
 	static {
 		String libraryPath = null;
-		System.out.println("hi form static");
 		String platform = System.getProperty("os.name");
 		logger.info("Platform: " + platform);
 		if (Platform.isMac())

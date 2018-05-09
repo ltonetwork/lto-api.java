@@ -9,5 +9,8 @@
 	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/slf4j.jar"/>
 	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/jna-4.5.1.jar"/>
 	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/com.google.guava_1.6.0.jar"/>
+	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/wink-json4j-1.4.jar"/>
+	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/logback.jar"/>
+	<classpathentry kind="lib" path="/home/dalmi/legathings/lto-api.java/jars/easymock-3.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,9 +1,10 @@
 package Util.core;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 
 public class Sha256Hash {
-	public static String hash(String input) {
+	public static byte[] hash(String input) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			byte[] hash = digest.digest(input.getBytes("UTF-8"));
@@ -13,7 +14,8 @@ public class Sha256Hash {
 				if (hex.length() == 1) hexString.append('0');
 				hexString.append(hex);
 			}
-			return hexString.toString();
+			byte[] b = new BigInteger(hexString.toString(), 16).toByteArray();
+			return b;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -36,13 +38,13 @@ public class Sha256Hash {
 		
 	}
 	
-	public static String hashTwice(String input) {
-		return hash(hash(input));
-	}
+//	public static String hashTwice(String input) {
+//		return hash(hash(input));
+//	}
 	
-	public static String hashTwice(byte[] input) {
-		return hash(hash(input));
-	}
+//	public static String hashTwice(byte[] input) {
+//		return hash(hash(input));
+//	}
 	
 	public static byte[] hashTwice(byte[] input, int offset, int length) {
 		try {

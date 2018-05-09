@@ -4,29 +4,117 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 
-import org.json.simple.JSONObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import LTO.core.Event;
+import LTO.exceptions.BadMethodCallException;
+import Util.core.LTOJsonObject;
+import static org.easymock.EasyMock.*;
 
 public class EventTest {
+	private Event event;
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	@Before
-	public void setUp() throws Exception {
-		
-	}
-
-	@Test
-	public void testConstruct() {
-		JSONObject data = new JSONObject();
+	public void setUp() {
+		LTOJsonObject data = new LTOJsonObject();
 		data.put("foo", "bar");
 		data.put("color", "red");
-		Event event = new Event(data, "72gRWx4C1Egqz9xvUBCYVdgh7uLc5kmGbjXFhiknNCTW");
+		
+		event = new Event(data, "72gRWx4C1Egqz9xvUBCYVdgh7uLc5kmGbjXFhiknNCTW");
 		
 		assertEquals("HeFMDcuveZQYtBePVUugLyWtsiwsW4xp7xKdv", event.body);
 		assertTrue(event.timestamp instanceof Date);
 		assertEquals("72gRWx4C1Egqz9xvUBCYVdgh7uLc5kmGbjXFhiknNCTW", event.previous);
 	}
 
+	@Test
+    public void testGetMessage()
+    {
+        event.timestamp = new Date(1519862400);
+        event.signkey = "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y";
+        
+        String expected = String.join("\n", new String[] {
+            "HeFMDcuveZQYtBePVUugLyWtsiwsW4xp7xKdv",
+            "1519862400",
+            "72gRWx4C1Egqz9xvUBCYVdgh7uLc5kmGbjXFhiknNCTW",
+            "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"
+        });
+        assertEquals(expected, event.getMessage());
+    }
+	
+	@Test
+    public void testGetMessageNoBody()
+    {
+		thrown.expect(BadMethodCallException.class);
+        thrown.expectMessage("Body unknown");
+        
+        Event _event = new Event();
+        _event.getMessage();
+    }
+	
+	@Test
+	public void testGetMessageNoSignkey()
+    {
+		thrown.expect(BadMethodCallException.class);
+        thrown.expectMessage("First set signkey before creating message");
+        
+		LTOJsonObject data = new LTOJsonObject();
+		data.put("foo", "bar");
+		data.put("color", "red");
+		
+        Event _event = new Event(data);
+        _event.getMessage();
+    }
+	
+	@Test
+	public void testGetHash()
+    {
+		event.timestamp = new Date(1519862400);
+        event.signkey = "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y";
+
+        assertEquals("Bpq9rZt12Gv44dkXFw8RmLYzbaH2HBwPQJ6KihdLe5LG", event.getHash());
+    }
+	
+	@Test
+	public void testVerifySignatureFail()
+	{
+		event.timestamp = new Date(1519862400);
+        event.signkey = "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y";
+        event.timestamp = new Date(1519084800);
+        event.signature = "258KnaZxcx4cA9DUWSPw8QwBokRGzFDQmB4BH9MRJhoPJghsXoAZ7KnQ2DWR7ihtjXzUjbsXtSeup4UDcQ2L6RDL";
+        assertFalse(event.verifySignature());
+	}
+	
+	@Test
+	public void testVerifySignatureNoSignature()
+	{
+		thrown.expect(BadMethodCallException.class);
+		Event _event = new Event();
+		event.signkey = "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y";
+		
+		event.verifySignature();
+	}
+	
+	@Test
+	public void testVerifySignatureNoSignkey()
+	{
+		thrown.expect(BadMethodCallException.class);
+		Event _event = new Event();
+		event.signature = "258KnaZxcx4cA9DUWSPw8QwBokRGzFDQmB4BH9MRJhoPJghsXoAZ7KnQ2DWR7ihtjXzUjbsXtSeup4UDcQ2L6RDL";
+		
+		event.verifySignature();
+	}
+	
+	@Test
+	public void testSignWith()
+	{
+		LTOJsonObject data = new LTOJsonObject(true);
+		Event _event = new Event(data, "");
+	}
 }

@@ -4,6 +4,9 @@
 package LTO.core;
 
 import LTO.core.Event;
+
+import org.apache.wink.json4j.JSONException;
+
 import LTO.core.Account;
 
 import LTO.exceptions.BadMethodCallException;
@@ -61,15 +64,17 @@ public class EventChain {
      */
     protected String getNonce()
     {
-        return new String(CryptoUtil.random_bytes(8));
+    	CryptoUtil cryptoUtil = new CryptoUtil();
+        return new String(cryptoUtil.random_bytes(8));
     }
     
     /**
      * Initialize a new event chain
      * 
      * @param Account $account
+     * @throws JSONException 
      */
-    public void initFor(Account account)
+    public void initFor(Account account) throws JSONException
     {
     	if (id == null) {
     		throw new BadMethodCallException("Chain id already set");

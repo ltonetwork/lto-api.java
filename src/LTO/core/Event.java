@@ -3,15 +3,13 @@
  */
 package LTO.core;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONArray;
 import java.util.Date;
 
 import LTO.exceptions.BadMethodCallException;
 
 import LTO.core.Account;
 import LTO.core.EventChain;
-
+import Util.core.LTOJsonObject;
 import Util.utils.*;
 
 /**
@@ -68,29 +66,22 @@ public class Event {
      * @param object|array $body
      * @param string       $previous
      */
-    public Event(JSONObject body, String previous)
+    public Event(LTOJsonObject body, String previous)
     {
     	if (body != null) {
-    		this.body = StringUtil.encodeBase58(JsonUtil.jsonEncode(body));
+    		this.body = StringUtil.encodeBase58(body.toString());
     		this.timestamp = new Date();
     	}
     	
     	this.previous = previous;
     }
-    
-    public Event(JSONArray body, String previous)
+    public Event(LTOJsonObject body)
     {
-    	if (body != null) {
-    		this.body = JsonUtil.jsonEncode(body);
-    		this.timestamp = new Date();
-    	}
-    	
-    	this.previous = previous;
+    	this(body, null);
     }
     
     public Event() {
-    	this.body = null;
-    	this.previous = null;
+    	this(null, null);
     }
     
     public String getMessage()
@@ -103,7 +94,7 @@ public class Event {
     		throw new BadMethodCallException("First set signkey before creating message");
     	}
     	
-    	String message = String.join("\n", new String[] {body, Integer.toString((int) timestamp.getTime() / 1000), previous, signkey});
+    	String message = String.join("\n", new String[] {body, Integer.toString((int) timestamp.getTime()), previous, signkey});
     	
     	return message;
     }
@@ -115,7 +106,7 @@ public class Event {
      */
     public String getHash()
     {
-    	String hash = StringUtil.SHA256(this.getMessage());
+    	byte[] hash = StringUtil.SHA256(this.getMessage().getBytes());
     	
     	return StringUtil.encodeBase58(hash);
     }
@@ -133,7 +124,6 @@ public class Event {
     	
     	String _signature = StringUtil.decodeBase58(signature);
     	String _signkey = StringUtil.decodeBase58(signkey);
-    	
     	return	_signature.length() == CryptoUtil.crypto_sign_bytes() &&
     			_signkey.length() == CryptoUtil.crypto_sign_publickeybytes() && 
     			CryptoUtil.crypto_sign_verify_detached(_signature, getMessage(),_signkey);
@@ -144,6 +134,7 @@ public class Event {
      * 
      * @param Account $account
      * @return $this
+     * @throws JSONException 
      */
     public Event signWith(Account account)
     {

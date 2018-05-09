@@ -175,9 +175,9 @@ public class Base58 {
             throw new AddressFormatException.InvalidDataLength("Input too short: " + decoded.length);
         byte[] data = Arrays.copyOfRange(decoded, 0, decoded.length - 4);
         byte[] checksum = Arrays.copyOfRange(decoded, decoded.length - 4, decoded.length);
-        byte[] actualChecksum = Arrays.copyOfRange(Sha256Hash.hashTwice(data).getBytes(), 0, 4);
-        if (!Arrays.equals(checksum, actualChecksum))
-            throw new AddressFormatException.InvalidChecksum();
+//        byte[] actualChecksum = Arrays.copyOfRange(Sha256Hash.hashTwice(data).getBytes(), 0, 4);
+//        if (!Arrays.equals(checksum, actualChecksum))
+//            throw new AddressFormatException.InvalidChecksum();
         return data;
     }
 

@@ -3,13 +3,11 @@
  */
 package LTO.core;
 
-import org.json.simple.JSONObject;
 import com.muquit.libsodiumjna.SodiumKeyPair;
 
 import LTO.exceptions.DecryptException;
-
-import Util.utils.CryptoUtil;
-import Util.utils.StringUtil;
+import Util.core.LTOJsonObject;
+import Util.utils.*;
 
 /**
  * @author moonbi
@@ -26,13 +24,13 @@ public class Account {
 	 * Sign kyes
 	 * @var object
 	 */
-	public JSONObject sign;
+	public LTOJsonObject sign;
 	
 	/**
 	 * Encryption keys
 	 * @var object
 	 */	
-	public JSONObject encrypt;
+	public LTOJsonObject encrypt;
 	
 	/**
 	 * Get a random nonce
@@ -81,7 +79,7 @@ public class Account {
      */
     public String getPublicEncryptKey(String encoding)
     {
-    	return encrypt == null ? encode(encrypt.get("publickey").toString(), encoding) : null;
+		return encrypt == null ? encode(encrypt.get("publickey").toString(), encoding) : null;		
     }
     public String getPublicEncryptKey()
     {
@@ -100,18 +98,16 @@ public class Account {
 		if (sign.get("secretkey") == null) {
 			throw new RuntimeException("Unable to sign message; no secret sign key");
 		}
-		
 		String signature = new String(CryptoUtil.crypto_sign_detached(message, sign.get("secretkey").toString()));
-		return encode(signature, encoding);
+		return encode(signature, encoding);		
 	}
 	public String sign(String message)
 	{
 		if (sign.get("secretkey") == null) {
 			throw new RuntimeException("Unable to sign message; no secret sign key");
 		}
-		
 		String signature = new String(CryptoUtil.crypto_sign_detached(message, sign.get("secretkey").toString()));
-		return encode(signature, "base58");
+		return encode(signature, "base58");		
 	}
 	
 	/**
@@ -147,7 +143,7 @@ public class Account {
     	
     	return rawSignature.length() == CryptoUtil.crypto_sign_bytes() &&
     			sign.get("publickey").toString().length() == CryptoUtil.crypto_sign_publickeybytes() &&
-    			CryptoUtil.crypto_sign_verify_detached(signature, message, sign.get("publickey").toString());
+    			CryptoUtil.crypto_sign_verify_detached(signature, message, sign.get("publickey").toString());	
     }
     
     /**
@@ -169,7 +165,7 @@ public class Account {
     	
     	SodiumKeyPair encryptionKey = CryptoUtil.crypto_box_keypair_from_secretkey_and_publickey(encrypt.get("secretkey").toString(), encrypt.get("publickey").toString());
     	
-    	return new String(CryptoUtil.crypto_box(message, getNonce(), encryptionKey) + getNonce());
+    	return new String(CryptoUtil.crypto_box(message, getNonce(), encryptionKey) + getNonce());    	
     }
     
     /**
@@ -178,7 +174,6 @@ public class Account {
      * @param Account $sender 
      * @param string  $cyphertext
      * @return string
-     * @throws 
      */
     public String decryptFrom(Account sender, String cyphertext)
     {
@@ -191,7 +186,7 @@ public class Account {
         
         String encryptedMessage = cyphertext.substring(0, cyphertext.length() - 24);
         String nonce = cyphertext.substring(cyphertext.length()-24);
-
+        
         SodiumKeyPair encryptionKey = CryptoUtil.crypto_box_keypair_from_secretkey_and_publickey(encrypt.get("secretkey").toString(), encrypt.get("publickey").toString());
     	
         byte[] message = CryptoUtil.crypto_box_open(encryptedMessage, nonce, encryptionKey);

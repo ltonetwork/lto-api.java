@@ -3,6 +3,7 @@
  */
 package Util.utils;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 import Util.core.Base58;
@@ -28,10 +29,28 @@ public class StringUtil {
 		}
 	}
 	
+	public static byte[] SHA256(byte[] input) {
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] hash = digest.digest(input);
+			return hash;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public static String encodeBase58(String input) {
 		try {
-			return Base58.encode(input.getBytes("UTF-8"));
+			return Base58.encode(input.getBytes(StandardCharsets.UTF_8));
 		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static String encodeBase58(byte[] input) {
+		try {
+			return Base58.encode(input);
+		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
