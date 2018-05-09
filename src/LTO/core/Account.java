@@ -6,7 +6,7 @@ package LTO.core;
 import com.muquit.libsodiumjna.SodiumKeyPair;
 
 import LTO.exceptions.DecryptException;
-import Util.core.LTOJsonObject;
+import Util.core.JsonObject;
 import Util.utils.*;
 
 /**
@@ -24,13 +24,13 @@ public class Account {
 	 * Sign kyes
 	 * @var object
 	 */
-	public LTOJsonObject sign;
+	public JsonObject sign;
 	
 	/**
 	 * Encryption keys
 	 * @var object
 	 */	
-	public LTOJsonObject encrypt;
+	public JsonObject encrypt;
 	
 	/**
 	 * Get a random nonce
@@ -197,6 +197,19 @@ public class Account {
         
         return new String(message);
     }
+    
+    /**
+     * Create a new event chain for this account
+     * 
+     * @return EventChain
+     * @throws \BadMethodCallException
+     */
+    public EventChain createEventChain()
+    {
+    	EventChain chain = new EventChain();
+    	chain.initFor(this);
+    	return chain;
+    }
 	
 	protected static String encode(String string, String encoding ) {
 		if (encoding == "base58") {
@@ -204,12 +217,11 @@ public class Account {
 		}
 		
 		if (encoding == "base64" ) {
-			string = string;
+			string = StringUtil.encodeBase64(string);
 		}
 		
 		return string;
 	}
-	
 	protected static String encode(String string) {
 		return encode(string, "base58");
 	}
@@ -228,12 +240,11 @@ public class Account {
     	}
     	
     	if (encoding == "base64" ) {
-    		string = string;
+    		string = StringUtil.decodeBase64(string);
     	}
     	
     	return string;
     }
-    
     protected static String decode(String string) {
     	return decode(string, "base58");
     }

@@ -11,7 +11,8 @@ import org.junit.rules.ExpectedException;
 
 import LTO.core.Event;
 import LTO.exceptions.BadMethodCallException;
-import Util.core.LTOJsonObject;
+import Util.core.JsonObject;
+
 import static org.easymock.EasyMock.*;
 
 public class EventTest {
@@ -22,7 +23,7 @@ public class EventTest {
 
 	@Before
 	public void setUp() {
-		LTOJsonObject data = new LTOJsonObject();
+		JsonObject data = new JsonObject();
 		data.put("foo", "bar");
 		data.put("color", "red");
 		
@@ -64,7 +65,7 @@ public class EventTest {
 		thrown.expect(BadMethodCallException.class);
         thrown.expectMessage("First set signkey before creating message");
         
-		LTOJsonObject data = new LTOJsonObject();
+		JsonObject data = new JsonObject();
 		data.put("foo", "bar");
 		data.put("color", "red");
 		
@@ -114,7 +115,7 @@ public class EventTest {
 	@Test
 	public void testSignWith()
 	{
-		LTOJsonObject data = new LTOJsonObject(true);
+		JsonObject data = new JsonObject(true);
 		Event _event = new Event(data, "");
 	}
 }

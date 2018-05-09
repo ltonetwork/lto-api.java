@@ -9,7 +9,7 @@ import LTO.exceptions.BadMethodCallException;
 
 import LTO.core.Account;
 import LTO.core.EventChain;
-import Util.core.LTOJsonObject;
+import Util.core.JsonObject;
 import Util.utils.*;
 
 /**
@@ -66,7 +66,7 @@ public class Event {
      * @param object|array $body
      * @param string       $previous
      */
-    public Event(LTOJsonObject body, String previous)
+    public Event(JsonObject body, String previous)
     {
     	if (body != null) {
     		this.body = StringUtil.encodeBase58(body.toString());
@@ -75,7 +75,7 @@ public class Event {
     	
     	this.previous = previous;
     }
-    public Event(LTOJsonObject body)
+    public Event(JsonObject body)
     {
     	this(body, null);
     }

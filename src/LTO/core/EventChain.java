@@ -64,8 +64,7 @@ public class EventChain {
      */
     protected String getNonce()
     {
-    	CryptoUtil cryptoUtil = new CryptoUtil();
-        return new String(cryptoUtil.random_bytes(8));
+        return new String(CryptoUtil.random_bytes(8));
     }
     
     /**
@@ -74,7 +73,7 @@ public class EventChain {
      * @param Account $account
      * @throws JSONException 
      */
-    public void initFor(Account account) throws JSONException
+    public void initFor(Account account)
     {
     	if (id == null) {
     		throw new BadMethodCallException("Chain id already set");

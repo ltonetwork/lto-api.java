@@ -4,7 +4,7 @@ import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.OrderedJSONObject;
 import org.apache.wink.json4j.JSONArray;
 
-public class LTOJsonObject {
+public class JsonObject {
 	private static final int OBJECT = 1;
 	private static final int ARRAY = 2;
 	
@@ -13,7 +13,7 @@ public class LTOJsonObject {
 	private OrderedJSONObject object;
 	private JSONArray array;
 
-	public LTOJsonObject(boolean isArray) {
+	public JsonObject(boolean isArray) {
 		if (isArray) {
 			this.type = ARRAY;
 		} else {
@@ -22,7 +22,7 @@ public class LTOJsonObject {
 		
 		init();
 	}
-	public LTOJsonObject() {
+	public JsonObject() {
 		this(false);
 	}
 	
