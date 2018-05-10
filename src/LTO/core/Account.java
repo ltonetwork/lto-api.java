@@ -145,6 +145,10 @@ public class Account {
     			sign.get("publickey").toString().length() == CryptoUtil.crypto_sign_publickeybytes() &&
     			CryptoUtil.crypto_sign_verify_detached(signature, message, sign.get("publickey").toString());	
     }
+    public boolean verify(String signature, String message)
+    {
+    	return verify(signature, message, "base58");
+    }
     
     /**
      * Encrypt a message for another account.

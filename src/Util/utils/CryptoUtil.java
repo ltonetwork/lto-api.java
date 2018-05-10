@@ -120,4 +120,17 @@ public class CryptoUtil {
 		}
 		return null;
 	}
+	
+	public static byte[] crypto_generichash(String input, int length) {
+		try {
+			return SodiumLibrary.cryptoGenerichash(input.getBytes("UTF-8"), length);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SodiumLibraryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

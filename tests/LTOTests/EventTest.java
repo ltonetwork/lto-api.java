@@ -8,12 +8,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.powermock.api.easymock.PowerMock;
 
+import LTO.core.Account;
 import LTO.core.Event;
 import LTO.exceptions.BadMethodCallException;
 import Util.core.JsonObject;
 
-import static org.easymock.EasyMock.*;
 
 public class EventTest {
 	private Event event;
@@ -113,9 +114,14 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testSignWith()
+	public void testSignWith() throws Exception
 	{
 		JsonObject data = new JsonObject(true);
 		Event _event = new Event(data, "");
+		
+		Account account = PowerMock.createMock(Account.class);
+		PowerMock.expectPrivate(account, "add", event).andReturn(event);
 	}
+	
+	
 }

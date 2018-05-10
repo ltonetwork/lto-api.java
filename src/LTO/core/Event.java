@@ -106,7 +106,7 @@ public class Event {
      */
     public String getHash()
     {
-    	byte[] hash = StringUtil.SHA256(this.getMessage().getBytes());
+    	byte[] hash = HashUtil.SHA256(this.getMessage().getBytes());
     	
     	return StringUtil.encodeBase58(hash);
     }
