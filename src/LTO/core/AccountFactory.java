@@ -84,13 +84,13 @@ public class AccountFactory {
      * @param string $seed
      * @return object
      */
-    protected SodiumKeyPair createSignKeys($seed)
-    {
-    	
-        $keypair = \sodium\crypto_sign_seed_keypair($seed);
-        $publickey = \sodium\crypto_sign_publickey($keypair);
-        $secretkey = \sodium\crypto_sign_secretkey($keypair);
-
-        return kp;
-    }
+//    protected SodiumKeyPair createSignKeys($seed)
+//    {
+//    	
+//        $keypair = \sodium\crypto_sign_seed_keypair($seed);
+//        $publickey = \sodium\crypto_sign_publickey($keypair);
+//        $secretkey = \sodium\crypto_sign_secretkey($keypair);
+//
+//        return kp;
+//    }
 }
