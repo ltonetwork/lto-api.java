@@ -133,4 +133,8 @@ public class CryptoUtil {
 		}
 		return null;
 	}
+	
+//	public static SodiumKeyPair crypto_sign_seed_keypair(String seed) {
+//		return SodiumLibrary.sodium().crypto_sign_seed_keypair(seed.getBytes());
+//	}
 }

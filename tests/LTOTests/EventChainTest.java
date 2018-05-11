@@ -91,10 +91,10 @@ public class EventChainTest {
     {
     	thrown.expect(InvalidArgumentException.class);
     	
-        Account account = PowerMock.createMock(Account.class);
-        
-        EventChain chain = PowerMock.createPartialMock(EventChain.class, "getNonce");
-        
-        chain.initFor(account);
+    	Account account = PowerMock.createMock(Account.class);
+    	
+    	EventChain chain = PowerMock.createPartialMock(EventChain.class, "getNonce");
+    	
+    	chain.initFor(account);
     }
 }
