@@ -1,8 +1,8 @@
 package legalthings.lto_api.utils.core;
 
 import java.math.BigInteger;
-import legalthings.lto_api.utils.core.Parameters;
 import legalthings.lto_api.utils.main.HexUtil;
+import legalthings.lto_api.utils.core.Parameters;
 
 public class Keccak {	
     public static final int DEFAULT_PERMUTATION_WIDTH = 1600;
