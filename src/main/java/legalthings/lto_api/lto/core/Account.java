@@ -1,6 +1,5 @@
 package legalthings.lto_api.lto.core;
 
-import legalthings.lto_api.lto.exceptions.DecryptException;
 import legalthings.lto_api.utils.core.JsonObject;
 import legalthings.lto_api.utils.main.CryptoUtil;
 import legalthings.lto_api.utils.main.StringUtil;
@@ -10,7 +9,7 @@ public class Account {
 	 * Account public address
 	 * @var string
 	 */
-	public String address;
+	public byte[] address;
 	
 	/**
 	 * Sign kyes
@@ -30,9 +29,9 @@ public class Account {
 	 * 
 	 * @return string
 	 */
-	protected String getNonce()
+	protected byte[] getNonce()
 	{
-		return new String(CryptoUtil.random_bytes(CryptoUtil.crypto_box_noncebytes()));
+		return CryptoUtil.random_bytes(CryptoUtil.crypto_box_noncebytes());
 	}
 	
 	/**
@@ -56,7 +55,7 @@ public class Account {
      */
 	public String getPublicSignKey(String encoding)
 	{
-		return sign != null ? encode(sign.get("publickey").toString(), encoding) : null;
+		return sign != null ? encode(sign.getByte("publickey"), encoding) : null;
 	}
 	public String getPublicSignKey()
 	{
@@ -71,7 +70,7 @@ public class Account {
      */
     public String getPublicEncryptKey(String encoding)
     {
-		return encrypt == null ? encode(encrypt.get("publickey").toString(), encoding) : null;		
+		return encrypt != null ? encode(encrypt.getByte("publickey"), encoding) : null;		
     }
     public String getPublicEncryptKey()
     {
@@ -87,19 +86,19 @@ public class Account {
      */
 	public String sign(String message, String encoding)
 	{
-		if (sign.get("secretkey") == null) {
+		if (sign == null || sign.getByte("secretkey") == null) {
 			throw new RuntimeException("Unable to sign message; no secret sign key");
 		}
-		String signature = new String(CryptoUtil.crypto_sign_detached(message, sign.get("secretkey").toString()));
-		return encode(signature, encoding);		
+		byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getByte("secretkey"));
+		return encode(signature, encoding);
 	}
 	public String sign(String message)
 	{
-		if (sign.get("secretkey") == null) {
+		if (sign == null || sign.getByte("secretkey") == null) {
 			throw new RuntimeException("Unable to sign message; no secret sign key");
 		}
-		String signature = new String(CryptoUtil.crypto_sign_detached(message, sign.get("secretkey").toString()));
-		return encode(signature, "base58");		
+		byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getByte("secretkey"));
+		return encode(signature, "base58");
 	}
 	
 	/**
@@ -127,16 +126,15 @@ public class Account {
      */
     public boolean verify(String signature, String message, String encoding)
     {
-    	if (this.sign.get("publickey") == null) {
+    	if (sign == null || sign.getByte("publickey") == null) {
     		throw new RuntimeException("Unable to verify message; no public sign key");
     	}
         
-    	String rawSignature = decode(signature, encoding);
+    	byte[] rawSignature = decode(signature, encoding);
     	
-    	return true;
-//    	return rawSignature.length() == CryptoUtil.crypto_sign_bytes() &&
-//    			sign.get("publickey").toString().length() == CryptoUtil.crypto_sign_publickeybytes() &&
-//    			CryptoUtil.crypto_sign_verify_detached(signature, message, sign.get("publickey").toString());	
+    	return rawSignature.length == CryptoUtil.crypto_sign_bytes() &&
+    			sign.getByte("publickey").length == CryptoUtil.crypto_sign_publickeybytes() &&
+    			CryptoUtil.crypto_sign_verify_detached(rawSignature, message.getBytes(), sign.getByte("publickey"));	
     }
     public boolean verify(String signature, String message)
     {
@@ -151,20 +149,24 @@ public class Account {
      * @param string  $message
      * @return string
      */
-    public String encryptFor(Account recipient, String message)
+    public byte[] encryptFor(Account recipient, String message)
     {
-    	if (encrypt.get("secretkey") == null) {
+    	if (encrypt == null || encrypt.getByte("secretkey") == null) {
     		throw new RuntimeException("Unable to encrypt message; no secret encryption key");
     	}
-    	if (encrypt.get("publickey") == null) {
+    	if (recipient.encrypt == null || recipient.encrypt.getByte("publickey") == null) {
     		throw new RuntimeException("Unable to encrypt message; no public encryption key for recipient");
     	}
     	
-//    	JsonObject encryptionKey = CryptoUtil.crypto_box_keypair_from_secretkey_and_publickey(encrypt.get("secretkey").toString(), encrypt.get("publickey").toString());
-    	JsonObject encryptionKey = new JsonObject();
+    	byte[] nonce = getNonce();
     	
-    	return "";
-//    	return new String(CryptoUtil.crypto_box(message, getNonce(), encryptionKey) + getNonce());    	
+    	byte[] retEncrypt = CryptoUtil.crypto_box(nonce, message.getBytes(), recipient.encrypt.getByte("publickey"), encrypt.getByte("secretkey"));
+    	
+    	byte[] ret = new byte[retEncrypt.length + nonce.length];
+    	System.arraycopy(retEncrypt, 0, ret, 0, retEncrypt.length);
+    	System.arraycopy(nonce, 0, ret, retEncrypt.length, nonce.length);
+    	
+    	return ret;
     }
     
     /**
@@ -174,30 +176,22 @@ public class Account {
      * @param string  $cyphertext
      * @return string
      */
-    public String decryptFrom(Account sender, String cyphertext)
+    public byte[] decryptFrom(Account sender, byte[] ciphertext)
     {
-    	if (encrypt.get("secretkey") == null) {
+    	if (encrypt == null || encrypt.getByte("secretkey") == null) {
     		throw new RuntimeException("Unable to decrypt message; no secret encryption key");
     	}
-    	if (encrypt.get("publickey") == null) {
+    	if (sender.encrypt == null || sender.encrypt.getByte("publickey") == null) {
     		throw new RuntimeException("Unable to decrypt message; no public encryption key for recipient");
     	}
         
-        String encryptedMessage = cyphertext.substring(0, cyphertext.length() - 24);
-        String nonce = cyphertext.substring(cyphertext.length()-24);
+        byte[] encryptedMessage = new byte[ciphertext.length - 24];
+        System.arraycopy(ciphertext, 0, encryptedMessage, 0, ciphertext.length - 24);
         
-        JsonObject encryptionKey = new JsonObject();
-//        JsonObject encryptionKey = CryptoUtil.crypto_box_keypair_from_secretkey_and_publickey(encrypt.get("secretkey").toString(), encrypt.get("publickey").toString());
-    	
-//        byte[] message = CryptoUtil.crypto_box_open(encryptedMessage, nonce, encryptionKey);
+        byte[] nonce = new byte[24];
+        System.arraycopy(ciphertext, ciphertext.length - 24, nonce, 0, 24);
         
-        String message = "";
-        
-        if (message == null) {
-            throw new DecryptException("Failed to decrypt message from " + sender.getAddress());
-        }
-        
-        return new String(message);
+        return CryptoUtil.crypto_box_open(nonce, encryptedMessage, encrypt.getByte("publickey"), sender.encrypt.getByte("secretkey"));
     }
     
     /**
@@ -224,7 +218,20 @@ public class Account {
 		
 		return string;
 	}
+	protected static String encode(byte[] string, String encoding ) {
+		if (encoding == "base58") {
+			return StringUtil.base58Encode(string);
+		}
+		
+		if (encoding == "base64" ) {
+			return StringUtil.base64Encode(string);
+		}
+		return null;
+	}
 	protected static String encode(String string) {
+		return encode(string, "base58");
+	}
+	protected static String encode(byte[] string) {
 		return encode(string, "base58");
 	}
 	
@@ -235,19 +242,19 @@ public class Account {
      * @param string $encoding  'raw', 'base58' or 'base64'
      * @return string
      */
-    protected static String decode(String string, String encoding)
+    protected static byte[] decode(String string, String encoding)
     {
     	if (encoding == "base58" ) {
-    		string = StringUtil.base58Decode(string, "UTF-8");
+    		return StringUtil.base58Decode(string);
     	}
     	
     	if (encoding == "base64" ) {
-    		string = StringUtil.base64Decode(string);
+    		return StringUtil.base64Decode(string);
     	}
     	
-    	return string;
+    	return null;
     }
-    protected static String decode(String string) {
+    protected static byte[] decode(String string) {
     	return decode(string, "base58");
     }
 }

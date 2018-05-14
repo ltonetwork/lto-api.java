@@ -6,10 +6,11 @@ import legalthings.lto_api.lto.exceptions.BadMethodCallException;
 import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
 import legalthings.lto_api.utils.main.CryptoUtil;
 import legalthings.lto_api.utils.main.HashUtil;
+import legalthings.lto_api.utils.main.PackUtil;
 import legalthings.lto_api.utils.main.StringUtil;
 
 public class EventChain {
-	public static final short ADDRESS_VERSION = 0x40;
+	public static final char ADDRESS_VERSION = 0x40;
 	
 	/**
      * Unique identifier
@@ -55,9 +56,9 @@ public class EventChain {
      * 
      * @return string
      */
-    protected String getNonce()
+    protected byte[] getNonce()
     {
-        return new String(CryptoUtil.random_bytes(8));
+        return CryptoUtil.random_bytes(8);
     }
     
     /**
@@ -71,24 +72,21 @@ public class EventChain {
     	if (id == null) {
     		throw new BadMethodCallException("Chain id already set");
     	}
-    	if (account.sign.get("publickey") == null) {
+    	if (account.sign == null || account.sign.getByte("publickey") == null) {
     		throw new InvalidArgumentException("Unable to create new event chain; public sign key unknown");
     	}
     	
-    	String signkey = account.sign.get("publickey").toString();
-//    	String signkeyHashed = HashUtil.Keccak256(CryptoUtil.crypto_generichash(signkey, 32)).substring(0, 40);
+    	byte[] signkey = account.sign.getByte("publickey");
+    	String signkeyHashed = HashUtil.Keccak256(CryptoUtil.crypto_generichash(signkey)).substring(0, 40);
     	
-    	String nonce = getNonce();
+    	byte[] nonce = getNonce();
     	
-//    	$packed = pack('Ca8H40', self::ADDRESS_VERSION, $nonce, $signkeyHashed);
-//        $chksum = substr(Keccak::hash(\sodium\crypto_generichash($packed), 256), 0, 8);
-//        
-//        $idBinary = pack('Ca8H40H8', self::ADDRESS_VERSION, $nonce, $signkeyHashed, $chksum);
-//        
-//        $base58 = new \StephenHill\Base58();
-//        
-//        $this->id = $base58->encode($idBinary);
-//        $this->latestHash = $this->getInitialHash();
+    	byte[] packed = PackUtil.packCa8H40(ADDRESS_VERSION, nonce, signkeyHashed);
+    	String chksum = HashUtil.Keccak256(CryptoUtil.crypto_generichash(packed)).substring(0, 8);
+    	
+    	byte[] idBinary = PackUtil.packCa8H40H8(ADDRESS_VERSION, nonce, signkeyHashed, chksum);
+    	id = StringUtil.base58Encode(idBinary);
+    	latestHash = getInitialHash();
     }
     
     /**

@@ -106,9 +106,9 @@ public class EventTest {
 	{
 		thrown.expect(BadMethodCallException.class);
 		Event _event = new Event();
-		event.signkey = "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y";
+		_event.signkey = "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y";
 		
-		event.verifySignature();
+		_event.verifySignature();
 	}
 	
 	@Test
@@ -116,9 +116,9 @@ public class EventTest {
 	{
 		thrown.expect(BadMethodCallException.class);
 		Event _event = new Event();
-		event.signature = "258KnaZxcx4cA9DUWSPw8QwBokRGzFDQmB4BH9MRJhoPJghsXoAZ7KnQ2DWR7ihtjXzUjbsXtSeup4UDcQ2L6RDL";
+		_event.signature = "258KnaZxcx4cA9DUWSPw8QwBokRGzFDQmB4BH9MRJhoPJghsXoAZ7KnQ2DWR7ihtjXzUjbsXtSeup4UDcQ2L6RDL";
 		
-		event.verifySignature();
+		_event.verifySignature();
 	}
 	
 	@Test

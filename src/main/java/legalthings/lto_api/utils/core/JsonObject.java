@@ -4,6 +4,8 @@ import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.OrderedJSONObject;
 
+import legalthings.lto_api.utils.main.StringUtil;
+
 public class JsonObject {
 	private static final int OBJECT = 1;
 	private static final int ARRAY = 2;
@@ -102,6 +104,24 @@ public class JsonObject {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void putByte(String key, byte[] value) {
+		try {
+			if (type == OBJECT) {
+				object.put(key, StringUtil.base58Encode(value));
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public byte[] getByte(String key) {
+		if (type == OBJECT) {
+			return StringUtil.base58Decode(get(key));
+		}
+		return null;
 	}
 	
 	public void put(int index, String value) {

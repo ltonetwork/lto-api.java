@@ -1,6 +1,8 @@
 package legalthings.lto_api.utils.main;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Base64;
 
 import legalthings.lto_api.utils.core.Base58;
@@ -47,21 +49,51 @@ public class StringUtil {
 	
 	public static String base64Encode(String input) {
 		try {
-			return Base64.getEncoder().encodeToString(input.getBytes("UTF-8"));
+			return new String(Base64.getEncoder().encode(input.getBytes()));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	public static String base64Decode(String input) {
+	public static String base64Encode(byte[] input) {
 		try {
-			return new String(Base64.getDecoder().decode(input), "UTF-8");
+			return new String(Base64.getEncoder().encode(input));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static byte[] base64Decode(String input) {
+		return Base64.getDecoder().decode(input);
+	}
+	
+	public static byte[] base64Decode(byte[] input) {
+		return Base64.getDecoder().decode(input);
 	}
 	
 	public static String repeat(String string, int times) {
 		return new String(new char[times]).replace("\0", string);
+	}
+	
+	static byte[] packN(int value) {
+		byte[] bytes = ByteBuffer.allocate(4).putInt(value).array();
+		bytes = toPositiveByteArray(bytes);
+		return bytes;
+	}
+	 
+	static int unpackN(byte[] value) {
+		ByteBuffer buf = ByteBuffer.allocate(4);
+		buf.order(ByteOrder.BIG_ENDIAN);
+		buf.put(value);
+		buf.flip();
+		return buf.getInt();
+	}
+	
+	// converts a byte[] like [0,0,19,-2] to [0,0,19,254]
+	protected static byte[] toPositiveByteArray(byte[] bytes) {
+		for (int i = 0; i< bytes.length; i++) {
+			bytes[i] = (byte) (bytes[i] < 0 ? bytes[i] + 256 : bytes[i]);
+		}
+		return bytes;
 	}
 }

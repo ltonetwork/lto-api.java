@@ -3,6 +3,8 @@ package legalthings.lto_api.utils.main;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import legalthings.lto_api.utils.core.BinHex;
 import legalthings.lto_api.utils.main.StringUtil;
 
 public class StringUtilTest {
@@ -18,8 +20,6 @@ public class StringUtilTest {
 		assertEquals("Hello", retCase2);
 		
 		String case3 = "3PLSsSDUn3kZdGe8qWEDak9y8oAjLVecXV1";
-		String encodedCase3 = new String(StringUtil.base58Decode(case3));
-		String decodedCase3 = StringUtil.base58Encode(encodedCase3);
 		assertEquals(case3, StringUtil.base58Encode(StringUtil.base58Decode(case3)));
 	}
 
@@ -27,15 +27,15 @@ public class StringUtilTest {
 	public void testBase64()
 	{
 		String case1 = "Hello";
-		String retCase1 = StringUtil.base64Encode(case1);
+		String retCase1 = new String(StringUtil.base64Encode(case1));
 		assertEquals("SGVsbG8=", retCase1);
 		
-		String retCase2 = StringUtil.base64Decode(retCase1); 
+		String retCase2 = new String(StringUtil.base64Decode(retCase1)); 
 		assertEquals("Hello", retCase2);
 		
 		String case3 = "3PLSsSDUn3kZdGe8qWEDak9y8oAjLVecXV1";
-		String encodedCase3 = StringUtil.base64Encode(case3);
-		String decodedCase3 = StringUtil.base64Decode(encodedCase3);
+		String encodedCase3 = new String(StringUtil.base64Encode(case3));
+		String decodedCase3 = new String(StringUtil.base64Decode(encodedCase3));
 		assertEquals(case3, decodedCase3);
 	}
 	

@@ -1,9 +1,5 @@
 package legalthings.lto_api.utils.main;
 
-import org.abstractj.kalium.crypto.Hash;
-import static org.abstractj.kalium.encoders.Encoder.HEX;
-
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 
 import legalthings.lto_api.utils.core.Keccak;
@@ -46,5 +42,11 @@ public class HashUtil {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static String Keccak256(byte[] input) {
+		String s = HexUtil.getHex(input);
+		Keccak keccak = new Keccak();
+		return keccak.getHash(s, KECCAK_256);
 	}
 }
