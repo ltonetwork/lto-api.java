@@ -40,9 +40,9 @@ public class StringUtil {
 		}
 		return null;
 	}
-	public static String base58Decode(String string)
+	public static byte[] base58Decode(String string)
 	{
-		return base58Decode(string, "UTF-8");
+		return Base58.decode(string);
 	}
 	
 	public static String base64Encode(String input) {

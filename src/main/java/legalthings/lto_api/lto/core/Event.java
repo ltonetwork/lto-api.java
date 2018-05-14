@@ -114,11 +114,12 @@ public class Event {
     		throw new BadMethodCallException("Signature and/or signkey not set");
     	}
     	
-    	String _signature = StringUtil.base58Decode(signature);
-    	String _signkey = StringUtil.base58Decode(signkey);
-    	return	_signature.length() == CryptoUtil.crypto_sign_bytes() &&
-    			_signkey.length() == CryptoUtil.crypto_sign_publickeybytes() && 
-    			CryptoUtil.crypto_sign_verify_detached(_signature, getMessage(),_signkey);
+    	byte[] _signature = StringUtil.base58Decode(signature);
+    	byte[] _signkey = StringUtil.base58Decode(signkey);
+    	
+    	return	_signature.length == CryptoUtil.crypto_sign_bytes() &&
+    			_signkey.length == CryptoUtil.crypto_sign_publickeybytes() && 
+    			CryptoUtil.crypto_sign_verify_detached(_signature, getMessage().getBytes(),_signkey);
     }
     
     /**

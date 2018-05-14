@@ -96,7 +96,7 @@ public class EventChain {
      */
     public String getInitialHash()
     {
-        String rawId = StringUtil.base58Decode(id);
+        byte[] rawId = StringUtil.base58Decode(id);
         
         return StringUtil.base58Encode(HashUtil.SHA256(rawId));
     }

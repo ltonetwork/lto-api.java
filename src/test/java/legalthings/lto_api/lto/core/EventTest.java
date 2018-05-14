@@ -82,11 +82,21 @@ public class EventTest {
     }
 	
 	@Test
-	public void testVerifySignatureFail()
+	public void testVerifySignature()
 	{
 		event.timestamp = new Date(1519862400);
         event.signkey = "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y";
-        event.timestamp = new Date(1519084800);
+        
+        event.signature = "258KnaZxcx4cA9DUWSPw8QwBokRGzFDQmB4BH9MRJhoPJghsXoAZ7KnQ2DWR7ihtjXzUjbsXtSeup4UDcQ2L6RDL";
+        assertTrue(event.verifySignature());
+	}
+	
+	@Test
+	public void testVerifySignatureFail()
+	{
+		event.timestamp = new Date(1519084800);
+        event.signkey = "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y";
+        
         event.signature = "258KnaZxcx4cA9DUWSPw8QwBokRGzFDQmB4BH9MRJhoPJghsXoAZ7KnQ2DWR7ihtjXzUjbsXtSeup4UDcQ2L6RDL";
         assertFalse(event.verifySignature());
 	}

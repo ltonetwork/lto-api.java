@@ -14,13 +14,13 @@ public class StringUtilTest {
 		String retCase1 = StringUtil.base58Encode(case1);
 		assertEquals("9Ajdvzr", retCase1);
 		
-		String retCase2 = StringUtil.base58Decode(retCase1); 
+		String retCase2 = new String(StringUtil.base58Decode(retCase1)); 
 		assertEquals("Hello", retCase2);
 		
 		String case3 = "3PLSsSDUn3kZdGe8qWEDak9y8oAjLVecXV1";
-		String encodedCase3 = StringUtil.base58Encode(case3);
-		String decodedCase3 = StringUtil.base58Decode(encodedCase3);
-		assertEquals(case3, decodedCase3);
+		String encodedCase3 = new String(StringUtil.base58Decode(case3));
+		String decodedCase3 = StringUtil.base58Encode(encodedCase3);
+		assertEquals(case3, StringUtil.base58Encode(StringUtil.base58Decode(case3)));
 	}
 
 	@Test
