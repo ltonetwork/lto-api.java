@@ -24,6 +24,23 @@
 	    <groupId>org.apache.wink</groupId>
 	    <artifactId>wink-json4j</artifactId>
 	    <version>1.4</version>
-	</dependency>			
+	</dependency>
+	<dependency>
+	    <groupId>org.abstractj.kalium</groupId>
+	    <artifactId>kalium</artifactId>
+	    <version>0.7.0</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.powermock</groupId>
+	    <artifactId>powermock-api-easymock</artifactId>
+	    <version>1.7.4</version>
+	    <scope>test</scope>
+	</dependency>
+	<dependency>
+	    <groupId>org.easymock</groupId>
+	    <artifactId>easymock</artifactId>
+	    <version>3.4</version>
+	    <scope>test</scope>
+	</dependency>
   </dependencies>
 </project>
