@@ -1,5 +1,7 @@
 package legalthings.lto_api.utils.main;
 
+import java.util.Formatter;
+
 public class HexUtil {
 	private static final char[] DIGITS =
         {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -33,5 +35,18 @@ public class HexUtil {
         }
 
         return data;
+    }
+    
+    public static String getHexStringByByteArray(byte[] array) {
+        if (array == null)
+            return null;
+
+        StringBuilder stringBuilder = new StringBuilder(array.length * 2);
+        @SuppressWarnings("resource")
+        Formatter formatter = new Formatter(stringBuilder);
+        for (byte tempByte : array)
+            formatter.format("%02x", tempByte);
+
+        return stringBuilder.toString();
     }
 }

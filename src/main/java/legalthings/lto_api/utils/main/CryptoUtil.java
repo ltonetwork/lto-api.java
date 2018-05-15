@@ -1,6 +1,7 @@
 package legalthings.lto_api.utils.main;
 
 import org.abstractj.kalium.crypto.Box;
+import org.abstractj.kalium.crypto.Hash;
 import org.abstractj.kalium.crypto.Random;
 import org.abstractj.kalium.crypto.Util;
 
@@ -8,13 +9,15 @@ import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_SIGN_ED25519_BYTES;
 import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_BOX_CURVE25519XSALSA20POLY1305_NONCEBYTES;
 import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_AUTH_HMACSHA512256_KEYBYTES;
 import org.abstractj.kalium.keys.VerifyKey;
+
 import static org.abstractj.kalium.NaCl.*;
 import static org.abstractj.kalium.crypto.Util.slice;
+
 import jnr.ffi.byref.LongLongByReference;
-import org.abstractj.kalium.crypto.Hash;
+//import org.abstractj.kalium.crypto.Hash;
 
 
-public class CryptoUtil {
+public class CryptoUtil {	
 	public static byte[] random_bytes(int size) {
 		return new Random().randomBytes(size);
 	}
@@ -60,8 +63,18 @@ public class CryptoUtil {
 		return box.decrypt(nonce, ciphertext);
 	}
 	
-	public static byte[] crypto_generichash(byte[] message) {
+	public static byte[] crypto_generichash(byte[] message, int length) {
 		Hash hash = new Hash();
 		return hash.blake2(message);
 	}
+	
+//	public static byte[] crypto_generichash(byte[] message, int length) {
+//		try {
+//			return SodiumLibrary.cryptoGenerichash(message, length);
+//		} catch (SodiumLibraryException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
 }

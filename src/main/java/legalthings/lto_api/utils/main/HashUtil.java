@@ -34,7 +34,7 @@ public class HashUtil {
 	
 	public static String Keccak256(String input) {
 		try {
-			String s = HexUtil.getHex(input.getBytes("UTF-8"));
+			String s = HexUtil.getHex(input.getBytes());
 			
 			Keccak keccak = new Keccak();
 			

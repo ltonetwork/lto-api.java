@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import legalthings.lto_api.utils.core.BinHex;
 import legalthings.lto_api.utils.main.StringUtil;
 
 public class StringUtilTest {

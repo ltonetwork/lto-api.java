@@ -1,5 +1,6 @@
 package legalthings.lto_api.lto.core;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;
@@ -38,8 +39,9 @@ public class EventChain {
      */
     public EventChain(String id, String latestHash)
     {
+    	this.events = new ArrayList<Event>();
     	this.id = id;
-    	this.latestHash = latestHash;
+    	this.latestHash = latestHash != null ? latestHash : ( this.id != null ? getInitialHash() : null );
     }
     public EventChain(String id)
     {
@@ -69,7 +71,7 @@ public class EventChain {
      */
     public void initFor(Account account)
     {
-    	if (id == null) {
+    	if (id != null) {
     		throw new BadMethodCallException("Chain id already set");
     	}
     	if (account.sign == null || account.sign.getByte("publickey") == null) {
@@ -77,12 +79,18 @@ public class EventChain {
     	}
     	
     	byte[] signkey = account.sign.getByte("publickey");
-    	String signkeyHashed = HashUtil.Keccak256(CryptoUtil.crypto_generichash(signkey)).substring(0, 40);
+    	System.out.println(signkey.length);
+    	
+    	System.out.println(StringUtil.base58Encode(signkey));
+    	
+    	String signkeyHashed = HashUtil.Keccak256(CryptoUtil.crypto_generichash(signkey, 32)).substring(0, 40);
+    	
+    	System.out.println(HashUtil.Keccak256(CryptoUtil.crypto_generichash(signkey, 32)));
     	
     	byte[] nonce = getNonce();
     	
     	byte[] packed = PackUtil.packCa8H40(ADDRESS_VERSION, nonce, signkeyHashed);
-    	String chksum = HashUtil.Keccak256(CryptoUtil.crypto_generichash(packed)).substring(0, 8);
+    	String chksum = HashUtil.Keccak256(CryptoUtil.crypto_generichash(packed, 32)).substring(0, 8);
     	
     	byte[] idBinary = PackUtil.packCa8H40H8(ADDRESS_VERSION, nonce, signkeyHashed, chksum);
     	id = StringUtil.base58Encode(idBinary);

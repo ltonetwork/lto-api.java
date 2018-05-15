@@ -3,7 +3,6 @@ package legalthings.lto_api.utils.main;
 import java.io.IOException;
 import java.io.InputStream;
 
-import jnr.ffi.Struct.Unsigned16;
 import legalthings.lto_api.utils.core.BinHex;
  
 public class PackUtil{
