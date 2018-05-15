@@ -67,14 +67,4 @@ public class CryptoUtil {
 		Hash hash = new Hash();
 		return hash.blake2(message);
 	}
-	
-//	public static byte[] crypto_generichash(byte[] message, int length) {
-//		try {
-//			return SodiumLibrary.cryptoGenerichash(message, length);
-//		} catch (SodiumLibraryException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
 }
