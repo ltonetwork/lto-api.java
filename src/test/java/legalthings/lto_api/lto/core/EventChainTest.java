@@ -70,8 +70,8 @@ public class EventChainTest {
 		
 		chain.initFor(account);
 		
-//		assertEquals("L1hGimV7Pp2CFNUnTCitqWDbk9Zng3r3uc66dAG6hLwEx", chain.id);
-//		assertEquals("9HM1ykH7AxLgdCqBBeUhvoTH4jkq3zsZe4JGTrjXVENg", chain.getLatestHash());
+		assertEquals("L1hGimV7Pp2CFNUnTCitqWDbk9Zng3r3uc66dAG6hLwEx", chain.id);
+		assertEquals("9HM1ykH7AxLgdCqBBeUhvoTH4jkq3zsZe4JGTrjXVENg", chain.getLatestHash());
 	}
 	
 	@Test
