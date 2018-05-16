@@ -39,7 +39,10 @@ public class EventChain {
      */
     public EventChain(String id, String latestHash)
     {
-    	this.events = new ArrayList<Event>();
+    	if (events == null) {
+    		events = new ArrayList<Event>();
+    	}
+    	
     	this.id = id;
     	this.latestHash = latestHash != null ? latestHash : ( this.id != null ? getInitialHash() : null );
     }
@@ -79,14 +82,10 @@ public class EventChain {
     	}
     	
     	byte[] signkey = account.sign.getByte("publickey");
-    	System.out.println(signkey.length);
+    	byte[] generichash = CryptoUtil.crypto_generichash(signkey, 32);
     	
-    	System.out.println(StringUtil.base58Encode(signkey));
-    	
-    	String signkeyHashed = HashUtil.Keccak256(CryptoUtil.crypto_generichash(signkey, 32)).substring(0, 40);
-    	
-    	System.out.println(HashUtil.Keccak256(CryptoUtil.crypto_generichash(signkey, 32)));
-    	
+    	String signkeyHashed = HashUtil.Keccak256(generichash).substring(0, 40);
+
     	byte[] nonce = getNonce();
     	
     	byte[] packed = PackUtil.packCa8H40(ADDRESS_VERSION, nonce, signkeyHashed);
@@ -115,6 +114,10 @@ public class EventChain {
      */
     public String getLatestHash()
     {
+    	if (events == null) {
+    		events = new ArrayList<Event>();
+    	}
+
         if (events.size() == 0) {
             return latestHash;
         }
@@ -131,6 +134,10 @@ public class EventChain {
      */
     public Event add(Event event)
     {
+    	if (events == null) {
+    		events = new ArrayList<Event>();
+    	}
+    	
         event.previous = getLatestHash();
         
         events.add(event);

@@ -3,14 +3,20 @@ package legalthings.lto_api.lto.core;
 import static org.junit.Assert.*;
 
 import org.easymock.EasyMock;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.powermock.api.easymock.PowerMock;
 
+import legalthings.lto_api.lto.exceptions.BadMethodCallException;
+import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
 import legalthings.lto_api.utils.core.JsonObject;
 import legalthings.lto_api.utils.main.StringUtil;
 
 public class EventChainTest {
-
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
 	@Test
 	public void testConstruct() 
 	{
@@ -66,5 +72,30 @@ public class EventChainTest {
 		
 //		assertEquals("L1hGimV7Pp2CFNUnTCitqWDbk9Zng3r3uc66dAG6hLwEx", chain.id);
 //		assertEquals("9HM1ykH7AxLgdCqBBeUhvoTH4jkq3zsZe4JGTrjXVENg", chain.getLatestHash());
+	}
+	
+	@Test
+	public void testInitForExisting()
+	{
+		thrown.expect(BadMethodCallException.class);
+		
+		Account account = PowerMock.createMock(Account.class);
+		
+		EventChain chain = PowerMock.createPartialMock(EventChain.class, "getNonce");
+		chain.id = "123";
+		
+		chain.initFor(account);
+	}
+	
+	@Test
+	public void testInitForInvalidAccount()
+	{
+		thrown.expect(InvalidArgumentException.class);
+		
+		Account account = PowerMock.createMock(Account.class);
+		
+		EventChain chain = PowerMock.createPartialMock(EventChain.class, "getNonce");
+		
+		chain.initFor(account);
 	}
 }

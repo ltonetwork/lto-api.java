@@ -40,6 +40,11 @@ public class JsonObject {
 		this(string, false);
 	}
 	
+	
+	public boolean isArray() {
+		return type == ARRAY;
+	}
+	
 	private void init() {
 		if (type == OBJECT) {
 			object = new OrderedJSONObject();

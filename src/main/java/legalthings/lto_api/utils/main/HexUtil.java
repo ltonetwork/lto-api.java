@@ -16,6 +16,17 @@ public class HexUtil {
 
         return new String(outData);
     }
+    
+    public static String getHex(char[] data) {
+        final int l = data.length;
+        final char[] outData = new char[l << 1];
+        for (int i = 0, j = 0; i < l; i++) {
+            outData[j++] = DIGITS[(0xF0 & (int) data[i]) >>> 4];
+            outData[j++] = DIGITS[0x0F & (int) data[i]];
+        }
+        
+        return new String(outData);
+    }
 
     public static String getReverseHex(byte[] data) {
         return getHex(reverse(data));

@@ -9,7 +9,14 @@
 
   <name>lto-api</name>
   <url>http://maven.apache.org</url>
-
+  
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+	
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>	
@@ -41,6 +48,12 @@
 	    <artifactId>easymock</artifactId>
 	    <version>3.4</version>
 	    <scope>test</scope>
+	</dependency>
+	<dependency>
+	    <groupId>com.github.joshjdevl.libsodiumjni</groupId>
+	    <artifactId>libsodium-jni</artifactId>
+	    <version>1.0.8</version>
+	    <type>jar</type>
 	</dependency>
   </dependencies>
 </project>

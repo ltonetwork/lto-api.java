@@ -2,6 +2,7 @@ package legalthings.lto_api.utils.main;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 import legalthings.lto_api.utils.core.BinHex;
  
@@ -85,6 +86,25 @@ public class PackUtil{
     	return packed;
     }
     
+    public static byte[] packCaH40(char version, String network, String hash)
+    {
+    	byte[] packed = new byte[1 + 1 + 20];
+    	packed[0] = (byte) version;
+    	System.arraycopy(network.getBytes(), 0, packed, 1, 1);
+    	System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 1, 20);
+    	return packed;
+    }
+    
+    public static byte[] packCaH40H8(char version, String network, String hash, String chksum)
+    {
+    	byte[] packed = new byte[1 + 1 + 20 + 4];
+    	packed[0] = (byte) version;
+    	System.arraycopy(network.getBytes(), 0, packed, 1, 1);
+    	System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 1, 20);
+    	System.arraycopy(BinHex.hex2bin(chksum), 0, packed, 1 + 1 + 20, 4);
+    	return packed;
+    }
+    
     public static byte[] packCa8H40H8(char version, byte[] nonce, String hash, String chksum)
     {
     	byte[] packed = new byte[1 + 8 + 20 + 4];
@@ -92,6 +112,18 @@ public class PackUtil{
     	System.arraycopy(nonce, 0, packed, 1, 8);
     	System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 8, 20);
     	System.arraycopy(BinHex.hex2bin(chksum), 0, packed, 1 + 8 + 20, 4);
+    	return packed;
+    }
+    
+    public static byte[] packLaStar(int nonce, String seedText)
+    {
+    	byte[] packed = new byte[4 + seedText.getBytes().length];
+    	
+    	ByteBuffer b = ByteBuffer.allocate(4);
+    	b.putInt(nonce);
+    	System.arraycopy(b.array(), 0, packed, 0, 4);
+    	System.arraycopy(seedText.getBytes(), 0, packed, 4, seedText.getBytes().length);
+    	
     	return packed;
     }
   }

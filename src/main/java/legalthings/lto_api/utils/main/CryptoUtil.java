@@ -7,15 +7,22 @@ import org.abstractj.kalium.crypto.Util;
 
 import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_SIGN_ED25519_BYTES;
 import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_BOX_CURVE25519XSALSA20POLY1305_NONCEBYTES;
+import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_BOX_CURVE25519XSALSA20POLY1305_SECRETKEYBYTES;
+import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_BOX_CURVE25519XSALSA20POLY1305_PUBLICKEYBYTES;
 import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_AUTH_HMACSHA512256_KEYBYTES;
+
 import org.abstractj.kalium.keys.VerifyKey;
 
 import static org.abstractj.kalium.NaCl.*;
 import static org.abstractj.kalium.crypto.Util.slice;
+import static org.abstractj.kalium.crypto.Util.zeros;
 
 import jnr.ffi.byref.LongLongByReference;
+import legalthings.lto_api.utils.core.JsonObject;
 //import org.abstractj.kalium.crypto.Hash;
 
+import org.libsodium.jni.Sodium;
+import org.libsodium.jni.NaCl;
 
 public class CryptoUtil {	
 	public static byte[] random_bytes(int size) {
@@ -23,7 +30,8 @@ public class CryptoUtil {
 	}
 	
 	public static int crypto_sign_bytes() {
-		return CRYPTO_SIGN_ED25519_BYTES;
+		NaCl.sodium();
+		return Sodium.crypto_sign_bytes();
 	}
 	
 	public static int crypto_sign_publickeybytes() {
@@ -66,5 +74,59 @@ public class CryptoUtil {
 	public static byte[] crypto_generichash(byte[] message, int length) {
 		Hash hash = new Hash();
 		return hash.blake2(message);
+	}
+	
+	public static JsonObject crypto_sign_seed_keypair(byte[] seed) {
+		byte[] secretkey = zeros(CRYPTO_BOX_CURVE25519XSALSA20POLY1305_SECRETKEYBYTES * 2);
+		byte[] publickey = zeros(CRYPTO_BOX_CURVE25519XSALSA20POLY1305_PUBLICKEYBYTES);
+		
+		sodium().crypto_sign_ed25519_seed_keypair(publickey, secretkey, seed);
+		
+		JsonObject keypair = new JsonObject();
+		keypair.putByte("publickey", publickey);
+		keypair.putByte("secretkey", secretkey);
+		
+		return keypair;
+	}
+	
+	public static JsonObject crypto_box_seed_keypair(byte[] seed) {
+		byte[] secretkey = zeros(CRYPTO_BOX_CURVE25519XSALSA20POLY1305_SECRETKEYBYTES);
+		byte[] publickey = zeros(CRYPTO_BOX_CURVE25519XSALSA20POLY1305_PUBLICKEYBYTES);
+		
+		NaCl.sodium();
+		Sodium.crypto_box_seed_keypair(publickey, secretkey, seed);
+		
+		JsonObject keypair = new JsonObject();
+		keypair.putByte("publickey", publickey);
+		keypair.putByte("secretkey", secretkey);
+		
+		return keypair;
+	}
+	
+	public static byte[] crypto_sign_ed25519_pk_to_curve25519(byte[] publickey) {
+		byte[] key = new byte[publickey.length];
+		
+		NaCl.sodium();
+		Sodium.crypto_sign_ed25519_pk_to_curve25519(key, publickey);
+		return key;
+	}
+	
+	public static byte[] crypto_sign_ed25519_sk_to_curve25519(byte[] publickey) {
+		byte[] key = new byte[publickey.length];
+		
+		NaCl.sodium();
+		Sodium.crypto_sign_ed25519_sk_to_curve25519(key, publickey);
+		return key;
+	}
+	
+	public static byte[] crypto_sign_publickey_from_secretkey(byte[] secretkey) {
+		NaCl.sodium();
+		return secretkey;
+//		Sodium.public
+	}
+	
+	public static byte[] crypto_box_publickey_from_secretkey(byte[] secretkey) {
+		NaCl.sodium();
+		return secretkey;
 	}
 }

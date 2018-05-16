@@ -90,10 +90,19 @@ public class StringUtil {
 	}
 	
 	// converts a byte[] like [0,0,19,-2] to [0,0,19,254]
-	protected static byte[] toPositiveByteArray(byte[] bytes) {
+	public static byte[] toPositiveByteArray(byte[] bytes) {
 		for (int i = 0; i< bytes.length; i++) {
 			bytes[i] = (byte) (bytes[i] < 0 ? bytes[i] + 256 : bytes[i]);
 		}
 		return bytes;
 	}
+	
+//	public static char[] toPositiveByteArray(byte[] bytes) {
+//		char[] ret = new char[bytes.length];
+//		
+//		for (int i = 0; i< bytes.length; i++) {
+//			ret[i] = (char) (bytes[i] < 0 ? bytes[i] + 256 : bytes[i]);
+//		}
+//		return ret;
+//	}
 }
