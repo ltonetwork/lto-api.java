@@ -1,8 +1,6 @@
 package legalthings.lto_api.utils.core;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.util.Arrays;
 
 public class Base58 {
     public static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
@@ -104,31 +102,6 @@ public class Base58 {
         }
 
         return copyOfRange(temp, j - zeroCount, temp.length);
-    }
-
-    public static BigInteger decodeToBigInteger(String input) throws RuntimeException {
-        return new BigInteger(1, decode(input));
-    }
-
-    /**
-     * Uses the checksum in the last 4 bytes of the decoded data to verify the rest are correct. The checksum is
-     * removed from the returned data.
-     *
-     * @throws AddressFormatException if the input is not base 58 or the checksum does not validate.
-     */
-    public static byte[] decodeChecked(String input) throws RuntimeException {
-        byte tmp[] = decode(input);
-        if (tmp.length < 4)
-            throw new RuntimeException("Input too short");
-        byte[] bytes = copyOfRange(tmp, 0, tmp.length - 4);
-        byte[] checksum = copyOfRange(tmp, tmp.length - 4, tmp.length);
-
-        tmp = DoubleDigest.doubleDigest(bytes);
-        byte[] hash = copyOfRange(tmp, 0, 4);
-        if (!Arrays.equals(checksum, hash))
-            throw new RuntimeException("Checksum does not validate");
-
-        return bytes;
     }
 
     //
