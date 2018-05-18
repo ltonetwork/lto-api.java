@@ -1,12 +1,9 @@
 package legalthings.lto_api.utils.main;
 
 import java.security.MessageDigest;
-import java.util.Formatter;
 
-import legalthings.lto_api.utils.core.Keccak;
-import legalthings.lto_api.utils.core.Keccak1;
-
-import static legalthings.lto_api.utils.core.Parameters.KECCAK_256;
+import legalthings.lto_api.utils.core.BinHex;
+import org.ethereum.crypto.cryptohash.Keccak256;
 
 public class HashUtil {	
 	public static byte[] SHA256(byte[] input) {
@@ -37,42 +34,17 @@ public class HashUtil {
 	
 	public static String Keccak256(String input) {
 		try {
-			String s = HexUtil.getHex(input.getBytes());
-			
-			Keccak keccak = new Keccak();
-			
-			return keccak.getHash(s, KECCAK_256);
+			Keccak256 digest =  new Keccak256();
+		    digest.update(input.getBytes("UTF-8"));
+		    return BinHex.bin2hex(digest.digest());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
 	public static String Keccak256(byte[] input) {
-        String s = getHexStringByByteArray(input);
-        Keccak1 keccak1 = new Keccak1(1600);
-        return keccak1.getHash(s, 1088, 32);
+		Keccak256 digest =  new Keccak256();
+	    digest.update(input);
+	    return BinHex.bin2hex(digest.digest());
 	}
-	
-	public static String Keccak256(char[] input) {		
-		String s = HexUtil.getHex(input);
-		Keccak keccak = new Keccak();
-		return keccak.getHash(s, KECCAK_256);
-	}
-	
-	public static byte[] getByteArray(String s) {
-        return (s != null) ? s.getBytes(): null;
-    }
-	
-	public static String getHexStringByByteArray(byte[] array) {
-        if (array == null)
-            return null;
-
-        StringBuilder stringBuilder = new StringBuilder(array.length * 2);
-        @SuppressWarnings("resource")
-        Formatter formatter = new Formatter(stringBuilder);
-        for (byte tempByte : array)
-            formatter.format("%02x", tempByte);
-
-        return stringBuilder.toString();
-    }
 }

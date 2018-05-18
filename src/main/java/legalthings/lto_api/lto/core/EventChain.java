@@ -1,6 +1,5 @@
 package legalthings.lto_api.lto.core;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;

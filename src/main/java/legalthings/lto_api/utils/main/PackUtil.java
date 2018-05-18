@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import legalthings.lto_api.utils.core.BinHex;
+import legalthings.lto_api.utils.core.JsonObject;
  
 public class PackUtil{
  
@@ -113,6 +114,26 @@ public class PackUtil{
     	System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 8, 20);
     	System.arraycopy(BinHex.hex2bin(chksum), 0, packed, 1 + 8 + 20, 4);
     	return packed;
+    }
+    
+    public static JsonObject unpackCa8H40H8(byte[] packed)
+    {
+    	JsonObject unpacked = new JsonObject();
+    	
+    	byte[] version = new byte[1]; version[0] = packed[0];
+    	unpacked.putByte("version", version);
+    	
+    	byte[] nonce = new byte[8]; System.arraycopy(packed, 1, nonce, 0, 8);
+    	unpacked.putByte("nonce", nonce);
+    	
+    	byte[] hash = new byte[20]; System.arraycopy(packed, 1 + 8, hash, 0, 20);
+    	unpacked.put("keyhash", BinHex.bin2hex(hash));
+    	
+    	byte[] chksum = new byte[4]; System.arraycopy(packed, 1 + 8 + 20, chksum, 0, 4);
+    	unpacked.put("checksum", BinHex.bin2hex(chksum));
+    	
+    	return unpacked;
+    	
     }
     
     public static byte[] packLaStar(int nonce, String seedText)

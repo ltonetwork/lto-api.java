@@ -30,6 +30,8 @@ public class CryptoUtil {
 	}
 	
 	public static int crypto_sign_bytes() {
+//		NaCl.sodium();
+//		return Sodium.crypto_sign_bytes();
 		return CRYPTO_SIGN_ED25519_BYTES;
 	}
 	

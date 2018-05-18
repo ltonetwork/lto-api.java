@@ -11,7 +11,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.powermock.api.easymock.PowerMock;
 
+import legalthings.lto_api.utils.core.BinHex;
 import legalthings.lto_api.utils.core.JsonObject;
+import legalthings.lto_api.utils.main.CryptoUtil;
+import legalthings.lto_api.utils.main.HashUtil;
+import legalthings.lto_api.utils.main.PackUtil;
 import legalthings.lto_api.utils.main.StringUtil;
 
 public class AccountTest {
@@ -179,26 +183,26 @@ private Account account;
         account.decryptFrom(account, ciphertext);
     }
 	
-//    protected void assertValidId(byte[] signkey, EventChain chain)
-//    {
-//        String signkeyHashed = HashUtil.Keccak256(CryptoUtil.crypto_generichash(signkey, 32)).substring(0, 40);
+    protected void assertValidId(byte[] signkey, EventChain chain)
+    {
+        String signkeyHashed = HashUtil.Keccak256(CryptoUtil.crypto_generichash(signkey, 32)).substring(0, 40);
         
-//        String decodedId = StringUtil.decodeBase58(chain.id);
+        byte[] decodedId = StringUtil.base58Decode(chain.id);
         
-//        $vars = (object)unpack('Cversion/H16random/H40keyhash/H8checksum', $decodedId);
+        JsonObject vars = PackUtil.unpackCa8H40H8(decodedId);
         
-//        assertEquals(EventChain.ADDRESS_VERSION, vars.version);
-//        assertEquals(signkeyHashed.substring(0,  40), vars.keyhash);
-//        assertEquals(BinHex.bin2hex(decodedId.getBytes()).substring(BinHex.bin2hex(decodedId.getBytes()).length() - 8), vars.checksum);
-//    }
-//    
-//    @Test
-//    public void testCreateEventChain()
-//    {
-//        EventChain chain = account.createEventChain();
-//        
-//        assertThat(chain, instanceOf(EventChain.class));
-//        assertValidId(account.sign.get("publickey"), chain);
-//    }
+        assertEquals(EventChain.ADDRESS_VERSION, vars.getByte("version")[0]);
+        assertEquals(signkeyHashed.substring(0,  40), vars.get("keyhash"));
+        assertEquals(BinHex.bin2hex(decodedId).substring(BinHex.bin2hex(decodedId).length() - 8), vars.get("checksum"));
+    }
+    
+    @Test
+    public void testCreateEventChain()
+    {
+        EventChain chain = account.createEventChain();
+        
+        assertTrue(chain instanceof EventChain);
+        assertValidId(account.sign.getByte("publickey"), chain);
+    }
 
 }
