@@ -5,61 +5,70 @@ import org.abstractj.kalium.crypto.Hash;
 import org.abstractj.kalium.crypto.Random;
 import org.abstractj.kalium.crypto.Util;
 
-import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_SIGN_ED25519_BYTES;
-import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_BOX_CURVE25519XSALSA20POLY1305_NONCEBYTES;
-import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_BOX_CURVE25519XSALSA20POLY1305_SECRETKEYBYTES;
-import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_BOX_CURVE25519XSALSA20POLY1305_PUBLICKEYBYTES;
-import static org.abstractj.kalium.NaCl.Sodium.CRYPTO_AUTH_HMACSHA512256_KEYBYTES;
 
 import org.abstractj.kalium.keys.VerifyKey;
 
 import static org.abstractj.kalium.NaCl.*;
-import static org.abstractj.kalium.crypto.Util.slice;
 import static org.abstractj.kalium.crypto.Util.zeros;
 
-import jnr.ffi.byref.LongLongByReference;
 import legalthings.lto_api.utils.core.JsonObject;
 //import org.abstractj.kalium.crypto.Hash;
 
 import org.libsodium.jni.Sodium;
 import org.libsodium.jni.NaCl;
 
-public class CryptoUtil {	
+import jnr.ffi.LibraryLoader;
+
+public class CryptoUtil {
+	public static interface Sodium {
+		int crypto_sign_bytes();
+		int crypto_sign_publickeybytes();
+		int crypto_sign_secretkeybytes();
+		int crypto_box_publickeybytes();
+		int crypto_box_secretkeybytes();
+		int crypto_box_noncebytes();
+		int crypto_generichash_bytes();
+		int crypto_scalarmult_curve25519_bytes();
+		
+		int crypto_sign_detached(byte[] sig, long siglen[], byte[] m, long mlen, byte[] sk);
+		int crypto_sign_verify_detached(byte[] sig, byte[] m, long mlen, byte[] pk);
+		int crypto_generichash(byte[] out, int outlen, byte[] in, int inlen, byte[] key, int keylen);
+		int crypto_sign_ed25519_pk_to_curve25519(byte[] curve25519_pk, byte[] ed25519_pk);
+		int crypto_sign_ed25519_sk_to_curve25519(byte[] curve25519_pk, byte[] ed25519_pk);
+		int crypto_sign_seed_keypair(byte[] pk, byte[] sk, byte[] seed);
+		int crypto_box_seed_keypair(byte[] pk, byte[] sk, byte[] seed);
+    }
+	
+	private static Sodium sodium = null;
+	
+	static {
+		sodium = LibraryLoader.create(Sodium.class).load("/usr/local/lib/libsodium.so");
+	}
+	
 	public static byte[] random_bytes(int size) {
 		return new Random().randomBytes(size);
 	}
 	
 	public static int crypto_sign_bytes() {
-//		NaCl.sodium();
-//		return Sodium.crypto_sign_bytes();
-		return CRYPTO_SIGN_ED25519_BYTES;
+		return sodium.crypto_sign_bytes();
 	}
 	
 	public static int crypto_sign_publickeybytes() {
-		return CRYPTO_AUTH_HMACSHA512256_KEYBYTES;
+		return sodium.crypto_sign_publickeybytes();
 	}
 	
 	public static int crypto_box_noncebytes() {
-		return CRYPTO_BOX_CURVE25519XSALSA20POLY1305_NONCEBYTES;
+		return sodium.crypto_box_noncebytes();
 	}
 	
 	public static byte[] crypto_sign_detached(byte[] message, byte[] secretkey) {
-		byte[] signature = Util.prependZeros(CRYPTO_SIGN_ED25519_BYTES, message);
-		LongLongByReference bufferLen = new LongLongByReference(0);
-		sodium().crypto_sign_ed25519(signature, bufferLen, message, message.length, secretkey);
-		signature = slice(signature, 0, CRYPTO_SIGN_ED25519_BYTES);
-        return signature;
+		byte[] signature = new byte[crypto_sign_bytes()];
+		sodium.crypto_sign_detached(signature, null, message, message.length, secretkey);
+		return signature;
 	}
 	
 	public static boolean crypto_sign_verify_detached(byte[] signature, byte[] message, byte[] signkey) {
-		boolean ret;
-		try {
-			VerifyKey key = new VerifyKey(signkey);
-			ret = key.verify(message, signature);
-		} catch (RuntimeException e) {
-			ret = false;
-		}
-		return ret;
+		return sodium.crypto_sign_verify_detached(signature, message, message.length, signkey) == 0;
 	}
 	
 	public static byte[] crypto_box(byte[] nonce, byte[] message, byte[] publickey, byte[] privatekey) {
@@ -73,15 +82,16 @@ public class CryptoUtil {
 	}
 	
 	public static byte[] crypto_generichash(byte[] message, int length) {
-		Hash hash = new Hash();
-		return hash.blake2(message);
+		byte[] hash = zeros(sodium.crypto_generichash_bytes());
+		sodium.crypto_generichash(hash, sodium.crypto_generichash_bytes(), message, message.length, null, 0);
+		return hash;
 	}
 	
 	public static JsonObject crypto_sign_seed_keypair(byte[] seed) {
-		byte[] secretkey = zeros(CRYPTO_BOX_CURVE25519XSALSA20POLY1305_SECRETKEYBYTES * 2);
-		byte[] publickey = zeros(CRYPTO_BOX_CURVE25519XSALSA20POLY1305_PUBLICKEYBYTES);
+		byte[] secretkey = zeros(sodium.crypto_sign_secretkeybytes());
+		byte[] publickey = zeros(sodium.crypto_sign_publickeybytes());
 		
-		sodium().crypto_sign_ed25519_seed_keypair(publickey, secretkey, seed);
+		sodium.crypto_sign_seed_keypair(publickey, secretkey, seed);
 		
 		JsonObject keypair = new JsonObject();
 		keypair.putByte("publickey", publickey);
@@ -91,11 +101,10 @@ public class CryptoUtil {
 	}
 	
 	public static JsonObject crypto_box_seed_keypair(byte[] seed) {
-		byte[] secretkey = zeros(CRYPTO_BOX_CURVE25519XSALSA20POLY1305_SECRETKEYBYTES);
-		byte[] publickey = zeros(CRYPTO_BOX_CURVE25519XSALSA20POLY1305_PUBLICKEYBYTES);
+		byte[] secretkey = zeros(sodium.crypto_box_secretkeybytes());
+		byte[] publickey = zeros(sodium.crypto_box_publickeybytes());
 		
-		NaCl.sodium();
-		Sodium.crypto_box_seed_keypair(publickey, secretkey, seed);
+		sodium.crypto_box_seed_keypair(publickey, secretkey, seed);
 		
 		JsonObject keypair = new JsonObject();
 		keypair.putByte("publickey", publickey);
@@ -105,18 +114,14 @@ public class CryptoUtil {
 	}
 	
 	public static byte[] crypto_sign_ed25519_pk_to_curve25519(byte[] publickey) {
-		byte[] key = new byte[publickey.length];
-		
-		NaCl.sodium();
-		Sodium.crypto_sign_ed25519_pk_to_curve25519(key, publickey);
+		byte[] key = zeros(sodium.crypto_scalarmult_curve25519_bytes());
+		sodium.crypto_sign_ed25519_pk_to_curve25519(key, publickey);
 		return key;
 	}
 	
-	public static byte[] crypto_sign_ed25519_sk_to_curve25519(byte[] publickey) {
-		byte[] key = new byte[publickey.length];
-		
-		NaCl.sodium();
-		Sodium.crypto_sign_ed25519_sk_to_curve25519(key, publickey);
+	public static byte[] crypto_sign_ed25519_sk_to_curve25519(byte[] secretkey) {
+		byte[] key = zeros(sodium.crypto_scalarmult_curve25519_bytes());
+		sodium.crypto_sign_ed25519_sk_to_curve25519(key, secretkey);
 		return key;
 	}
 	

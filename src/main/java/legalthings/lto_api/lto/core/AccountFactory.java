@@ -1,7 +1,11 @@
 package legalthings.lto_api.lto.core;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Random;
+
+import org.apache.wink.json4j.JSONException;
+import org.apache.wink.json4j.OrderedJSONObject;
 
 import legalthings.lto_api.lto.exceptions.InvalidAccountException;
 import legalthings.lto_api.utils.core.BinHex;
@@ -50,6 +54,20 @@ public class AccountFactory {
     {
     	this(network, new Random().nextInt(0xFFFF + 1));
     }
+    public AccountFactory(Object network)
+    {
+    	this(network, new Random().nextInt(0xFFFF + 1));
+    }
+    public AccountFactory(Object network, int nonce)
+    {
+    	if (network instanceof String) {
+    		this.network = network.toString().substring(0, 1);
+    	}
+    	if (network instanceof Number) {
+    		this.network = Character.toString((char) ((Number) network).intValue());
+    	}
+    	this.nonce = nonce;
+    }
     
     /**
      * Get the new nonce.
@@ -71,10 +89,11 @@ public class AccountFactory {
     {
     	byte[] seedBase = PackUtil.packLaStar(nonce, seedText);
     	
-    	byte[] secureSeed = BinHex.hex2bin(HashUtil.Keccak256(CryptoUtil.crypto_generichash(seedBase, 32))); //raw output
+    	byte[] secureSeed = BinHex.hex2bin(HashUtil.Keccak256(CryptoUtil.crypto_generichash(seedBase, 32)));
+//    	byte[] seed = BinHex.hex2bin(new String(HashUtil.SHA256(secureSeed)));
     	byte[] seed = HashUtil.SHA256(secureSeed);
     	
-    	return seed;    	
+    	return seed;
     }
     
     /**
@@ -156,15 +175,12 @@ public class AccountFactory {
     	JsonObject encrypt = new JsonObject();
     	
     	if (sign != null && sign.getByte("secretkey") != null) {
-    		byte[] secretkey = CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(sign.getByte("publickey"));
+    		byte[] secretkey = CryptoUtil.crypto_sign_ed25519_sk_to_curve25519(sign.getByte("secretkey"));
     		
-    		// Swap bits, on uneven???
-    		byte[] bytes = StringUtil.toPositiveByteArray(secretkey);
-//    		int i = bytes.length;
-//    		$bytes[$i] = $bytes[$i] % 2 ? ($bytes[$i] | 0x80) & ~0x40 : $bytes[$i];
+    		int last = secretkey.length - 1;
+    		secretkey[last] = secretkey[last] % 2 == 1 ? ((byte) ((secretkey[last] | 0x80) & ~0x40)) : secretkey[last];
     		
-//    		$encrypt->secretkey = pack('C*', ...$bytes);
-    		encrypt.putByte("secretkey", bytes);
+    		encrypt.putByte("secretkey", secretkey);
     	}
     	
     	if (sign != null && sign.getByte("publickey") != null) {
@@ -249,6 +265,23 @@ public class AccountFactory {
     	
     	return account;
     }
+    public Account create(Object data, String encoding)
+    {
+    	JsonObject _data = (JsonObject) data;
+    	_data.setObject((OrderedJSONObject) decode(_data.getObject(), encoding));
+    	
+    	System.out.println(data);
+    	
+    	Account account = new Account();
+    	
+    	
+    	
+    	return account;
+    }
+    public Account create(Object data)
+    {
+    	return create(data, "base58");
+    }
     
     /**
      * Create an account from public keys.
@@ -261,5 +294,52 @@ public class AccountFactory {
     public Account createPublic(JsonObject sign, JsonObject encrypt, String encoding)
     {
         return create(sign, encrypt, null, encoding);
+    }
+    
+    /**
+     * Base58 or base64 decode, recursively
+     * 
+     * @param string|array $data
+     * @param string       $encoding  'raw', 'base58' or 'base64'
+     * @return string|array
+     */
+    protected static Object decode(Object data, String encoding)
+    {
+    	if (encoding == "raw")
+    	{
+    		return data;
+    	}
+    	
+    	if (data instanceof OrderedJSONObject)
+    	{
+    		OrderedJSONObject _data = (OrderedJSONObject) data;
+    		
+    		Iterator<?> keys = _data.keys();
+    		while (keys.hasNext()) {
+    			String key = (String) keys.next();
+    			try {
+    				Object obj = _data.get(key);
+    				if (obj instanceof String) {
+    					_data.put(key, (byte[]) decode(obj, encoding));
+    				} else {
+    					_data.put(key, decode(obj, encoding));
+    				}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		}
+    	}
+    	
+    	if (encoding == "base58")
+    	{
+    		data = StringUtil.base58Decode(data.toString());
+    	}
+    	if (encoding == "base64")
+    	{
+    		data = StringUtil.base64Decode(data.toString());
+    	}
+    	
+    	return data;
     }
 }

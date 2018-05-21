@@ -25,7 +25,7 @@ public class JsonUtilTest {
 		
 		JsonObject object = JsonUtil.jsonDecode(string);
 		
-		assertEquals("bar", object.get("foo"));
-		assertEquals("red", object.get("color"));
+		assertEquals("bar", object.getString("foo"));
+		assertEquals("red", object.getString("color"));
 	}
 }

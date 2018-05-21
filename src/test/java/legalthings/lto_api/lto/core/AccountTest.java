@@ -192,8 +192,8 @@ private Account account;
         JsonObject vars = PackUtil.unpackCa8H40H8(decodedId);
         
         assertEquals(EventChain.ADDRESS_VERSION, vars.getByte("version")[0]);
-        assertEquals(signkeyHashed.substring(0,  40), vars.get("keyhash"));
-        assertEquals(BinHex.bin2hex(decodedId).substring(BinHex.bin2hex(decodedId).length() - 8), vars.get("checksum"));
+        assertEquals(signkeyHashed.substring(0,  40), vars.getString("keyhash"));
+        assertEquals(BinHex.bin2hex(decodedId).substring(BinHex.bin2hex(decodedId).length() - 8), vars.getString("checksum"));
     }
     
     @Test

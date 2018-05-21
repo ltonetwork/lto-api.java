@@ -1,5 +1,7 @@
 package legalthings.lto_api.utils.core;
 
+import java.util.Iterator;
+
 import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.OrderedJSONObject;
@@ -41,6 +43,19 @@ public class JsonObject {
 	}
 	
 	
+	public OrderedJSONObject getObject() {
+		if (type == OBJECT) {
+			return object;
+		}
+		return null;
+	}
+	
+	public void setObject(OrderedJSONObject object) {
+		if (type == OBJECT) {
+			this.object = object;
+		}
+	}
+	
 	public boolean isArray() {
 		return type == ARRAY;
 	}
@@ -81,7 +96,19 @@ public class JsonObject {
 		return null;
 	}
 	
-	public String get(String key) {
+	public Object get(String key) {
+		try {
+			if (type == OBJECT) {
+				return object.get(key);
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public String getString(String key) {
 		try {
 			if (type == OBJECT) {
 				return object.get(key).toString();
@@ -93,11 +120,33 @@ public class JsonObject {
 		return null;
 	}
 	
+	public JsonObject getJsonObject(String key) {
+		if (type == OBJECT) {
+			JsonObject obj = new JsonObject();
+			try {
+				obj.setObject((OrderedJSONObject) object.getJSONObject(key));
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return obj;
+		}
+		
+		return null;
+	}
+	
 	public String get(int index) {
 		if (type == ARRAY) {
 			return array.get(index).toString();
 		}
 		return null;
+	}
+	
+	public boolean has(String key) {
+		if (type == OBJECT) {
+			return object.has(key);
+		}
+		return false;
 	}
 	
 	public void put(String key, String value) {
@@ -124,7 +173,7 @@ public class JsonObject {
 	
 	public byte[] getByte(String key) {
 		if (type == OBJECT) {
-			return StringUtil.base58Decode(get(key));
+			return has(key) ? StringUtil.base58Decode(getString(key)) : null;
 		}
 		return null;
 	}
@@ -138,5 +187,12 @@ public class JsonObject {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public Iterator<?> keys() {
+		if (type == OBJECT) {
+			return object.keys();
+		}
+		return null;
 	}
 }
