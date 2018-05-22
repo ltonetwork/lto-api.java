@@ -11,6 +11,7 @@ import org.abstractj.kalium.keys.VerifyKey;
 import static org.abstractj.kalium.NaCl.*;
 import static org.abstractj.kalium.crypto.Util.zeros;
 
+import legalthings.lto_api.lto.core.KeyPair;
 import legalthings.lto_api.utils.core.JsonObject;
 //import org.abstractj.kalium.crypto.Hash;
 
@@ -37,6 +38,8 @@ public class CryptoUtil {
 		int crypto_sign_ed25519_sk_to_curve25519(byte[] curve25519_pk, byte[] ed25519_pk);
 		int crypto_sign_seed_keypair(byte[] pk, byte[] sk, byte[] seed);
 		int crypto_box_seed_keypair(byte[] pk, byte[] sk, byte[] seed);
+		int crypto_sign_ed25519_sk_to_pk(byte[] pk, byte[] sk);
+		int crypto_scalarmult_curve25519_base(byte[] pk, byte[] sk);
     }
 	
 	private static Sodium sodium = null;
@@ -87,30 +90,22 @@ public class CryptoUtil {
 		return hash;
 	}
 	
-	public static JsonObject crypto_sign_seed_keypair(byte[] seed) {
+	public static KeyPair crypto_sign_seed_keypair(byte[] seed) {
 		byte[] secretkey = zeros(sodium.crypto_sign_secretkeybytes());
 		byte[] publickey = zeros(sodium.crypto_sign_publickeybytes());
 		
 		sodium.crypto_sign_seed_keypair(publickey, secretkey, seed);
 		
-		JsonObject keypair = new JsonObject();
-		keypair.putByte("publickey", publickey);
-		keypair.putByte("secretkey", secretkey);
-		
-		return keypair;
+		return new KeyPair(publickey, secretkey);
 	}
 	
-	public static JsonObject crypto_box_seed_keypair(byte[] seed) {
+	public static KeyPair crypto_box_seed_keypair(byte[] seed) {
 		byte[] secretkey = zeros(sodium.crypto_box_secretkeybytes());
 		byte[] publickey = zeros(sodium.crypto_box_publickeybytes());
 		
 		sodium.crypto_box_seed_keypair(publickey, secretkey, seed);
 		
-		JsonObject keypair = new JsonObject();
-		keypair.putByte("publickey", publickey);
-		keypair.putByte("secretkey", secretkey);
-		
-		return keypair;
+		return new KeyPair(publickey, secretkey);
 	}
 	
 	public static byte[] crypto_sign_ed25519_pk_to_curve25519(byte[] publickey) {
@@ -126,13 +121,18 @@ public class CryptoUtil {
 	}
 	
 	public static byte[] crypto_sign_publickey_from_secretkey(byte[] secretkey) {
-		NaCl.sodium();
-		return secretkey;
-//		Sodium.public
+		byte[] publickey = zeros(sodium.crypto_sign_publickeybytes());
+		
+		sodium.crypto_sign_ed25519_sk_to_pk(publickey, secretkey);
+		
+		return publickey;
 	}
 	
 	public static byte[] crypto_box_publickey_from_secretkey(byte[] secretkey) {
-		NaCl.sodium();
-		return secretkey;
+		byte[] publickey = zeros(sodium.crypto_box_publickeybytes());
+		
+		sodium.crypto_scalarmult_curve25519_base(publickey, secretkey);
+		
+		return publickey;
 	}
 }

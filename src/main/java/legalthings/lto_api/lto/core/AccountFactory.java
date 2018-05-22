@@ -90,7 +90,6 @@ public class AccountFactory {
     	byte[] seedBase = PackUtil.packLaStar(nonce, seedText);
     	
     	byte[] secureSeed = BinHex.hex2bin(HashUtil.Keccak256(CryptoUtil.crypto_generichash(seedBase, 32)));
-//    	byte[] seed = BinHex.hex2bin(new String(HashUtil.SHA256(secureSeed)));
     	byte[] seed = HashUtil.SHA256(secureSeed);
     	
     	return seed;
@@ -102,10 +101,9 @@ public class AccountFactory {
      * @param string $seed
      * @return object
      */
-    protected JsonObject createSignKeys(byte[] seed)
+    protected KeyPair createSignKeys(byte[] seed)
     {
-    	JsonObject keypair = CryptoUtil.crypto_sign_seed_keypair(seed);
-    	return keypair;
+    	return CryptoUtil.crypto_sign_seed_keypair(seed);
     }
     
     /**
@@ -114,10 +112,9 @@ public class AccountFactory {
      * @param string $seed
      * @return object
      */
-    protected JsonObject createEncryptKeys(byte[] seed)
+    protected KeyPair createEncryptKeys(byte[] seed)
     {
-    	JsonObject keypair = CryptoUtil.crypto_box_seed_keypair(seed);
-    	return keypair;
+    	return CryptoUtil.crypto_box_seed_keypair(seed);
     }
     
     /**
@@ -159,7 +156,7 @@ public class AccountFactory {
     	
     	account.sign = createSignKeys(seed);
     	account.encrypt = createEncryptKeys(seed);
-    	account.address = createAddress(account.sign.getByte("publickey"));
+    	account.address = createAddress(account.sign.getPublickey());
     	
     	return account;
     }
@@ -170,21 +167,21 @@ public class AccountFactory {
      * @param object|string $sign
      * @return object
      */
-    public JsonObject convertSignToEncrypt(JsonObject sign)
+    public KeyPair convertSignToEncrypt(KeyPair sign)
     {
-    	JsonObject encrypt = new JsonObject();
+    	KeyPair encrypt = new KeyPair();
     	
-    	if (sign != null && sign.getByte("secretkey") != null) {
-    		byte[] secretkey = CryptoUtil.crypto_sign_ed25519_sk_to_curve25519(sign.getByte("secretkey"));
+    	if (sign != null && sign.getSecretkey() != null) {
+    		byte[] secretkey = CryptoUtil.crypto_sign_ed25519_sk_to_curve25519(sign.getSecretkey());
     		
     		int last = secretkey.length - 1;
     		secretkey[last] = secretkey[last] % 2 == 1 ? ((byte) ((secretkey[last] | 0x80) & ~0x40)) : secretkey[last];
     		
-    		encrypt.putByte("secretkey", secretkey);
+    		encrypt.setSecretkey(secretkey);
     	}
     	
-    	if (sign != null && sign.getByte("publickey") != null) {
-    		encrypt.putByte("publickey", CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(sign.getByte("publickey")));
+    	if (sign != null && sign.getPublickey() != null) {
+    		encrypt.setPublickey(CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(sign.getPublickey()));
     	}
     	
     	return encrypt;
@@ -198,26 +195,21 @@ public class AccountFactory {
      * @return object
      * @throws InvalidAccountException  if keys don't match
      */
-    public JsonObject calcKeys(JsonObject keys, String type)
+    public KeyPair calcKeys(KeyPair keys, String type)
     {
-    	if (keys == null || keys.getByte("secretkey") == null) {
-    		JsonObject key = new JsonObject();
-    		key.putByte("publickey", keys.getByte("publickey"));
+    	if (keys == null || keys.getSecretkey() == null) {
+    		return new KeyPair(keys.getPublickey(), null);
     	}
     	
-    	byte[] secretkey = keys.getByte("secretkey");
+    	byte[] secretkey = keys.getSecretkey();
     	
     	byte[] publickey = type == "sign" ? CryptoUtil.crypto_sign_publickey_from_secretkey(secretkey) : CryptoUtil.crypto_box_publickey_from_secretkey(secretkey);
     	
-    	if (keys != null && !Arrays.equals(keys.getByte("publickey"),publickey)) {
+    	if (keys != null && keys.getPublickey() != null && !Arrays.equals(keys.getPublickey(), publickey)) {
     		throw new InvalidAccountException("Public " + type + " key doesn't match private " + type + " key");
     	}
     	
-    	JsonObject key = new JsonObject();
-    	key.putByte("secretkey", secretkey);
-    	key.putByte("publickey", publickey);
-    	
-    	return key;
+    	return new KeyPair(publickey, secretkey);
     }
     
     /**
@@ -229,12 +221,15 @@ public class AccountFactory {
      * @return string
      * @throws InvalidAccountException  if address doesn't match
      */
-    protected byte[] calcAddress(byte[] address, JsonObject sign, JsonObject encrypt)
-    {
-    	byte[] addrSign = (sign != null && sign.getByte("publickey") != null) ? createAddress(sign.getByte("publickey"), "sign") : null;
-    	byte[] addrEncrypt = (encrypt != null && encrypt.getByte("publickey") != null) ? createAddress(encrypt.getByte("publickey"), "encrypt") : null;
+    protected byte[] calcAddress(byte[] address, KeyPair sign, KeyPair encrypt)
+    {    	
+    	byte[] _address = null;
     	
-    	if (addrSign != null && addrEncrypt != null && addrSign != addrEncrypt) {
+//    	System.out.println(sign.getPublickey());
+    	byte[] addrSign = (sign != null && sign.getPublickey() != null) ? createAddress(sign.getPublickey(), "sign") : null;
+    	byte[] addrEncrypt = (encrypt != null && encrypt.getPublickey() != null) ? createAddress(encrypt.getPublickey(), "encrypt") : null;
+    	
+    	if (addrSign != null && addrEncrypt != null && !Arrays.equals(addrSign, addrEncrypt)) {
     		throw new InvalidAccountException("Sign key doesn't match encrypt key");
     	}
     	
@@ -242,11 +237,19 @@ public class AccountFactory {
     		if ((addrSign != null && !Arrays.equals(address, addrSign)) || (addrEncrypt != null && !Arrays.equals(address, addrEncrypt))) {
     			throw new InvalidAccountException("Address doesn't match keypair; possible network mismatch");
     		}
+    		
+    		_address = new byte[address.length];
+    		System.arraycopy(address, 0, _address, 0, address.length);
     	} else {
-    		address = addrSign != null ? addrSign : addrEncrypt;
+    		if (addrSign != null) {
+    			_address = new byte[addrSign.length];
+    			System.arraycopy(addrSign, 0, _address, 0, addrSign.length);
+    		} else if (addrEncrypt != null) {
+    			_address = new byte[addrEncrypt.length];
+    			System.arraycopy(addrEncrypt, 0, _address, 0, addrEncrypt.length);
+    		}
     	}
-    	
-    	return address;
+    	return _address;
     }
     
     /**
@@ -255,32 +258,19 @@ public class AccountFactory {
      * @param array|string $keys  All keys (array) or private sign key (string)
      * @return Account
      */
-    public Account create(JsonObject sign, JsonObject encrypt, byte[] address, String encoding)
+    public Account create(KeyPair sign, KeyPair encrypt, byte[] address, String encoding)
     {
     	Account account = new Account();
     	
     	account.sign = sign != null ? calcKeys(sign, "sign") : null;
-    	account.encrypt = encrypt != null ? calcKeys(encrypt, "encrypt") : (sign != null ? convertSignToEncrypt(sign) : null);
-    	account.address = address != null ? calcAddress(address, sign, encrypt) : null;
+    	account.encrypt = encrypt != null ? calcKeys(encrypt, "encrypt") : (sign != null ? convertSignToEncrypt(account.sign) : null);
+    	account.address = calcAddress(address, account.sign, account.encrypt);
     	
     	return account;
     }
-    public Account create(Object data, String encoding)
+    public Account create(KeyPair sign, KeyPair encrypt, byte[] address)
     {
-    	JsonObject _data = (JsonObject) data;
-    	_data.setObject((OrderedJSONObject) decode(_data.getObject(), encoding));
-    	
-    	System.out.println(data);
-    	
-    	Account account = new Account();
-    	
-    	
-    	
-    	return account;
-    }
-    public Account create(Object data)
-    {
-    	return create(data, "base58");
+    	return create(sign, encrypt, address, "base58");
     }
     
     /**
@@ -291,55 +281,22 @@ public class AccountFactory {
      * @param string $encoding  Encoding of keys 'raw', 'base58' or 'base64'
      * @return Account
      */
-    public Account createPublic(JsonObject sign, JsonObject encrypt, String encoding)
+    public Account createPublic(byte[] signkey, byte[] encryptkey, String encoding)
     {
+    	KeyPair sign = null;
+    	if (signkey != null) {
+    		sign = new KeyPair(signkey, null);
+    	}
+    	
+    	KeyPair encrypt = null;
+    	if (encryptkey != null) {
+    		encrypt = new KeyPair(encryptkey, null);
+    	}
+    	
         return create(sign, encrypt, null, encoding);
     }
-    
-    /**
-     * Base58 or base64 decode, recursively
-     * 
-     * @param string|array $data
-     * @param string       $encoding  'raw', 'base58' or 'base64'
-     * @return string|array
-     */
-    protected static Object decode(Object data, String encoding)
+    public Account createPublic(byte[] signkey, byte[] encryptkey)
     {
-    	if (encoding == "raw")
-    	{
-    		return data;
-    	}
-    	
-    	if (data instanceof OrderedJSONObject)
-    	{
-    		OrderedJSONObject _data = (OrderedJSONObject) data;
-    		
-    		Iterator<?> keys = _data.keys();
-    		while (keys.hasNext()) {
-    			String key = (String) keys.next();
-    			try {
-    				Object obj = _data.get(key);
-    				if (obj instanceof String) {
-    					_data.put(key, (byte[]) decode(obj, encoding));
-    				} else {
-    					_data.put(key, decode(obj, encoding));
-    				}
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    		}
-    	}
-    	
-    	if (encoding == "base58")
-    	{
-    		data = StringUtil.base58Decode(data.toString());
-    	}
-    	if (encoding == "base64")
-    	{
-    		data = StringUtil.base64Decode(data.toString());
-    	}
-    	
-    	return data;
+    	return createPublic(signkey, encryptkey, "base58");
     }
 }

@@ -22,11 +22,7 @@ public class EventTest {
 	
 	@Before
 	public void setUp() {
-		JsonObject data = new JsonObject();
-		data.put("foo", "bar");
-		data.put("color", "red");
-		
-		event = new Event(data, "72gRWx4C1Egqz9xvUBCYVdgh7uLc5kmGbjXFhiknNCTW");
+		event = new Event("{\"foo\":\"bar\",\"color\":\"red\"}", "72gRWx4C1Egqz9xvUBCYVdgh7uLc5kmGbjXFhiknNCTW");
 		
 		assertEquals("HeFMDcuveZQYtBePVUugLyWtsiwsW4xp7xKdv", event.body);
 		assertTrue(event.timestamp instanceof Date);
@@ -64,11 +60,7 @@ public class EventTest {
 		thrown.expect(BadMethodCallException.class);
         thrown.expectMessage("First set signkey before creating message");
         
-		JsonObject data = new JsonObject();
-		data.put("foo", "bar");
-		data.put("color", "red");
-		
-        Event _event = new Event(data);
+        Event _event = new Event("{\"foo\":\"bar\",\"color\":\"red\"}");
         _event.getMessage();
     }
 	
@@ -124,8 +116,7 @@ public class EventTest {
 	@Test
 	public void testSignWith() throws Exception
 	{
-		JsonObject data = new JsonObject(true);
-		Event _event = new Event(data, "");
+		Event _event = new Event("[]", "");
 		
 		Account account = PowerMock.createMock(Account.class);
 		EasyMock.expect(account.signEvent(_event)).andReturn(_event);
@@ -139,8 +130,7 @@ public class EventTest {
 	@Test
 	public void testAddTo()
 	{
-		JsonObject data = new JsonObject(true);
-		Event _event = new Event(data, "");
+		Event _event = new Event("[]", "");
 		
 		EventChain chain = PowerMock.createMock(EventChain.class);
 		EasyMock.expect(chain.add(_event)).andReturn(_event);

@@ -60,8 +60,8 @@ public class EventChainTest {
 	public void testInitFor()
 	{
 		Account account = PowerMock.createMock(Account.class);
-		JsonObject sign = new JsonObject();
-		sign.putByte("publickey", StringUtil.base58Decode("8MeRTc26xZqPmQ3Q29RJBwtgtXDPwR7P9QNArymjPLVQ"));
+		KeyPair sign = new KeyPair();
+		sign.setPublickey(StringUtil.base58Decode("8MeRTc26xZqPmQ3Q29RJBwtgtXDPwR7P9QNArymjPLVQ"));
 		account.sign = sign; 
 		
 		EventChain chain = PowerMock.createPartialMock(EventChain.class, "getNonce");

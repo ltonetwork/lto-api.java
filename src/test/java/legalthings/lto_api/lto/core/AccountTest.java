@@ -33,14 +33,14 @@ private Account account;
 		
 		account.address = StringUtil.base58Decode("3PLSsSDUn3kZdGe8qWEDak9y8oAjLVecXV1");
 		
-		JsonObject sign = new JsonObject();
-		sign.putByte("secretkey", StringUtil.base58Decode("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp"));
-		sign.putByte("publickey", StringUtil.base58Decode("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"));
+		KeyPair sign = new KeyPair();
+		sign.setSecretkey(StringUtil.base58Decode("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp"));
+		sign.setPublickey(StringUtil.base58Decode("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"));
 		account.sign = sign;
 		
-		JsonObject encrypt = new JsonObject();
-		encrypt.putByte("secretkey", StringUtil.base58Decode("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN"));
-		encrypt.putByte("publickey", StringUtil.base58Decode("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6"));
+		KeyPair encrypt = new KeyPair();
+		encrypt.setSecretkey(StringUtil.base58Decode("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN"));
+		encrypt.setPublickey(StringUtil.base58Decode("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6"));
 		account.encrypt = encrypt;
 	}
 
@@ -140,16 +140,16 @@ private Account account;
 
         _account.address = StringUtil.base58Decode("3PPbMwqLtwBGcJrTA5whqJfY95GqnNnFMDX");
         
-        JsonObject sign = new JsonObject();
-		sign.putByte("secretkey", StringUtil.base58Decode("pLX2GgWzkjiiPp2SsowyyHZKrF4thkq1oDLD7tqBpYDwfMvRsPANMutwRvTVZHrw8VzsKjiN8EfdGA9M84smoEz"));
-		sign.putByte("publickey", StringUtil.base58Decode("BvEdG3ATxtmkbCVj9k2yvh3s6ooktBoSmyp8xwDqCQHp"));
+        KeyPair sign = new KeyPair();
+		sign.setSecretkey(StringUtil.base58Decode("pLX2GgWzkjiiPp2SsowyyHZKrF4thkq1oDLD7tqBpYDwfMvRsPANMutwRvTVZHrw8VzsKjiN8EfdGA9M84smoEz"));
+		sign.setPublickey(StringUtil.base58Decode("BvEdG3ATxtmkbCVj9k2yvh3s6ooktBoSmyp8xwDqCQHp"));
 		_account.sign = sign;
 		
-		JsonObject encrypt = new JsonObject();
-		encrypt.putByte("secretkey", StringUtil.base58Decode("3kMEhU5z3v8bmer1ERFUUhW58Dtuhyo9hE5vrhjqAWYT"));
-		encrypt.putByte("publickey", StringUtil.base58Decode("HBqhfdFASRQ5eBBpu2y6c6KKi1az6bMx8v1JxX4iW1Q8"));
+		KeyPair encrypt = new KeyPair();
+		encrypt.setSecretkey(StringUtil.base58Decode("3kMEhU5z3v8bmer1ERFUUhW58Dtuhyo9hE5vrhjqAWYT"));
+		encrypt.setPublickey(StringUtil.base58Decode("HBqhfdFASRQ5eBBpu2y6c6KKi1az6bMx8v1JxX4iW1Q8"));
 		_account.encrypt = encrypt;
-        
+		        
         return _account;
     }
 	
@@ -202,7 +202,7 @@ private Account account;
         EventChain chain = account.createEventChain();
         
         assertTrue(chain instanceof EventChain);
-        assertValidId(account.sign.getByte("publickey"), chain);
+        assertValidId(account.sign.getPublickey(), chain);
     }
 
 }

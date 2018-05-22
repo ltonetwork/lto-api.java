@@ -58,16 +58,16 @@ public class Event {
      * @param object|array $body
      * @param string       $previous
      */
-    public Event(JsonObject body, String previous)
+    public Event(String body, String previous)
     {
     	if (body != null) {
-    		this.body = StringUtil.base58Encode(body.toString());
+    		this.body = StringUtil.base58Encode(body);
     		this.timestamp = new Date();
     	}
     	
     	this.previous = previous;
     }
-    public Event(JsonObject body)
+    public Event(String body)
     {
     	this(body, null);
     }

@@ -26,6 +26,9 @@ public class StringUtil {
 	public static String base58Encode(byte[] string)
 	{
 		try {
+			if (string == null) {
+				return "";
+			}
 			return Base58.encode(string);
 		} catch(Exception e) {
 			throw new RuntimeException(e);

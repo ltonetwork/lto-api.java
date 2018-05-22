@@ -77,11 +77,11 @@ public class EventChain {
     	if (id != null) {
     		throw new BadMethodCallException("Chain id already set");
     	}
-    	if (account.sign == null || account.sign.getByte("publickey") == null) {
+    	if (account.sign == null || account.sign.getPublickey() == null) {
     		throw new InvalidArgumentException("Unable to create new event chain; public sign key unknown");
     	}
     	
-    	byte[] signkey = account.sign.getByte("publickey");
+    	byte[] signkey = account.sign.getPublickey();
     	byte[] generichash = CryptoUtil.crypto_generichash(signkey, 32);
     	
     	String signkeyHashed = HashUtil.Keccak256(generichash).substring(0, 40);
