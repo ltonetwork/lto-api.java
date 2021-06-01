@@ -1,22 +1,11 @@
 package legalthings.lto_api.utils.main;
 
 import org.abstractj.kalium.crypto.Box;
-import org.abstractj.kalium.crypto.Hash;
 import org.abstractj.kalium.crypto.Random;
-import org.abstractj.kalium.crypto.Util;
 
-
-import org.abstractj.kalium.keys.VerifyKey;
-
-import static org.abstractj.kalium.NaCl.*;
 import static org.abstractj.kalium.crypto.Util.zeros;
 
 import legalthings.lto_api.lto.core.KeyPair;
-import legalthings.lto_api.utils.core.JsonObject;
-//import org.abstractj.kalium.crypto.Hash;
-
-import org.libsodium.jni.Sodium;
-import org.libsodium.jni.NaCl;
 
 import jnr.ffi.LibraryLoader;
 
