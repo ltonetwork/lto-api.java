@@ -2,8 +2,8 @@ package legalthings.lto_api.utils.main;
 
 import java.security.MessageDigest;
 
-//import org.ethereum.crypto.cryptohash.Keccak256;
 import org.web3j.crypto.Hash;
+import org.web3j.utils.Numeric;
 
 public class HashUtil {	
 	public static byte[] SHA256(byte[] input) {
@@ -32,19 +32,17 @@ public class HashUtil {
 		}
 	}
 	
-//	public static String Keccak256(String input) {
-//		try {
-//			Keccak256 digest =  new Keccak256();
-//		    digest.update(input.getBytes("UTF-8"));
-//		    return BinHex.bin2hex(digest.digest());
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-//	}
+	public static String Keccak256(String input) {
+		try {
+			byte[] digest = Hash.sha3(input.getBytes());
+			return Numeric.toHexStringNoPrefix(digest);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-//	public static String Keccak256(byte[] input) {
-//		Keccak256 digest =  new Keccak256();
-//	    digest.update(input);
-//	    return BinHex.bin2hex(digest.digest());
-//	}
+	public static String Keccak256(byte[] input) {
+		byte[] digest = Hash.sha3(input);
+	    return Numeric.toHexStringNoPrefix(digest);
+	}
 }
