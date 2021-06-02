@@ -9,6 +9,7 @@ local.properties
 .settings/
 .loadpath
 .recommenders
+.idea
 
 # Compiled class file
 *.class

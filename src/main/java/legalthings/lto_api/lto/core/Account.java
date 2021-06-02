@@ -75,14 +75,6 @@ public class Account {
         return encode(signature, "base58");
     }
 
-    public Event sign(Event event) {
-        event.signkey = getPublicSignKey();
-        event.signature = sign(event.getMessage());
-        event.hash = event.getHash();
-
-        return event;
-    }
-
     public boolean verify(String signature, String message, String encoding) {
         if (sign == null || sign.getPublickey() == null) {
             throw new RuntimeException("Unable to verify message; no public sign key");
@@ -135,22 +127,16 @@ public class Account {
         return CryptoUtil.crypto_box_open(nonce, encryptedMessage, encrypt.getPublickey(), sender.encrypt.getSecretkey());
     }
 
-    public EventChain createEventChain() {
-        EventChain chain = new EventChain();
-        chain.initFor(this);
-        return chain;
-    }
-
     protected byte[] getNonce() {
         return CryptoUtil.random_bytes(CryptoUtil.crypto_box_noncebytes());
     }
 
     protected static String encode(String string, String encoding) {
-        if (encoding == "base58") {
+        if (encoding.equals("base58")) {
             string = StringUtil.base58Encode(string);
         }
 
-        if (encoding == "base64") {
+        if (encoding.equals("base64")) {
             string = StringUtil.base64Encode(string);
         }
 
@@ -158,11 +144,11 @@ public class Account {
     }
 
     protected static String encode(byte[] string, String encoding) {
-        if (encoding == "base58") {
+        if (encoding.equals("base58")) {
             return StringUtil.base58Encode(string);
         }
 
-        if (encoding == "base64") {
+        if (encoding.equals("base64")) {
             return StringUtil.base64Encode(string);
         }
         return null;
