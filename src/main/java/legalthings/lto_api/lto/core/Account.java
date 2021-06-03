@@ -23,24 +23,12 @@ public class Account {
         return getAddress("base58");
     }
 
-    public void setAddress(byte[] address) {
-        this.address = address;
-    }
-
     public KeyPair getEncrypt() {
         return encrypt;
     }
 
-    public void setEncrypt(KeyPair encrypt) {
-        this.encrypt = encrypt;
-    }
-
     public KeyPair getSign() {
         return sign;
-    }
-
-    public void setSign(KeyPair sign) {
-        this.sign = sign;
     }
 
     public String getPublicSignKey(String encoding) {

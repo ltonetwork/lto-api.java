@@ -3,8 +3,8 @@ package legalthings.lto_api.utils.main;
 import java.util.Formatter;
 
 public class HexUtil {
-	private static final char[] DIGITS =
-        {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    private static final char[] DIGITS =
+            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     public static String getHex(byte[] data) {
         final int l = data.length;
@@ -16,7 +16,7 @@ public class HexUtil {
 
         return new String(outData);
     }
-    
+
     public static String getHex(char[] data) {
         final int l = data.length;
         final char[] outData = new char[l << 1];
@@ -24,7 +24,7 @@ public class HexUtil {
             outData[j++] = DIGITS[(0xF0 & (int) data[i]) >>> 4];
             outData[j++] = DIGITS[0x0F & (int) data[i]];
         }
-        
+
         return new String(outData);
     }
 
@@ -47,7 +47,7 @@ public class HexUtil {
 
         return data;
     }
-    
+
     public static String getHexStringByByteArray(byte[] array) {
         if (array == null)
             return null;
