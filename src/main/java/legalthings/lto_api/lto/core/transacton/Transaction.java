@@ -56,4 +56,9 @@ public abstract class Transaction {
     }
 
     abstract public byte[] toBinary();
+
+//    TODO: SHOULD GET PART OF THE KEY?
+    public byte[] getNetwork() {
+        return this.senderPublicKey.getBytes();
+    }
 }
