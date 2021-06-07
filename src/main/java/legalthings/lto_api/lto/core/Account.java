@@ -3,6 +3,8 @@ package legalthings.lto_api.lto.core;
 import legalthings.lto_api.utils.main.CryptoUtil;
 import legalthings.lto_api.utils.main.StringUtil;
 
+import java.nio.charset.StandardCharsets;
+
 public class Account {
 
     private byte[] address;
@@ -61,6 +63,16 @@ public class Account {
         }
         byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey());
         return encode(signature, "base58");
+    }
+
+    public byte[] signBytes(byte[] message) {
+        if (sign == null || sign.getSecretkey() == null) {
+            throw new RuntimeException("Unable to sign message; no secret sign key");
+        }
+        byte[] signature = CryptoUtil.crypto_sign_detached(message, sign.getSecretkey());
+        String encoded_signature = encode(signature, "base58");
+        if (encoded_signature == null) return null;
+        else return encoded_signature.getBytes();
     }
 
     public boolean verify(String signature, String message, String encoding) {

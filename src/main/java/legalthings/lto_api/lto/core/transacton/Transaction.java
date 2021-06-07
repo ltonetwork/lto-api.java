@@ -9,7 +9,7 @@ public abstract class Transaction {
     protected int height;
     protected final int type;
     protected final int version;
-    protected final long fee;
+    protected long fee;
     protected long timestamp;
     protected String id;
     protected String sender;
