@@ -1,142 +1,118 @@
 package legalthings.lto_api.utils.main;
 
-import org.abstractj.kalium.crypto.Box;
-import org.abstractj.kalium.crypto.Random;
-
-import static org.abstractj.kalium.crypto.Util.zeros;
+import com.goterl.lazysodium.LazySodiumJava;
+import com.goterl.lazysodium.SodiumJava;
+import com.goterl.lazysodium.exceptions.SodiumException;
+import com.goterl.lazysodium.interfaces.*;
+import com.goterl.lazysodium.utils.LibraryLoader;
 
 import legalthings.lto_api.lto.core.KeyPair;
 
-import jnr.ffi.LibraryLoader;
+import java.nio.charset.StandardCharsets;
 
 public class CryptoUtil {
-    public static interface Sodium {
-        int crypto_sign_bytes();
 
-        int crypto_sign_publickeybytes();
-
-        int crypto_sign_secretkeybytes();
-
-        int crypto_box_publickeybytes();
-
-        int crypto_box_secretkeybytes();
-
-        int crypto_box_noncebytes();
-
-        int crypto_generichash_bytes();
-
-        int crypto_scalarmult_curve25519_bytes();
-
-        int crypto_sign_detached(byte[] sig, long siglen[], byte[] m, long mlen, byte[] sk);
-
-        int crypto_sign_verify_detached(byte[] sig, byte[] m, long mlen, byte[] pk);
-
-        int crypto_generichash(byte[] out, int outlen, byte[] in, int inlen, byte[] key, int keylen);
-
-        int crypto_sign_ed25519_pk_to_curve25519(byte[] curve25519_pk, byte[] ed25519_pk);
-
-        int crypto_sign_ed25519_sk_to_curve25519(byte[] curve25519_pk, byte[] ed25519_pk);
-
-        int crypto_sign_seed_keypair(byte[] pk, byte[] sk, byte[] seed);
-
-        int crypto_box_seed_keypair(byte[] pk, byte[] sk, byte[] seed);
-
-        int crypto_sign_ed25519_sk_to_pk(byte[] pk, byte[] sk);
-
-        int crypto_scalarmult_curve25519_base(byte[] pk, byte[] sk);
-    }
-
-    private static Sodium sodium = null;
+    private static final LazySodiumJava sodium;
 
     static {
-        sodium = LibraryLoader.create(Sodium.class).load("/usr/local/lib/libsodium.so");
+        sodium = new LazySodiumJava(new SodiumJava(LibraryLoader.Mode.BUNDLED_ONLY));
+    }
+
+    private static com.goterl.lazysodium.utils.KeyPair lazySodiumKeypair(byte[] publickey, byte[] privatekey) {
+        com.goterl.lazysodium.utils.Key pk = com.goterl.lazysodium.utils.Key.fromBytes(publickey);
+        com.goterl.lazysodium.utils.Key sk = com.goterl.lazysodium.utils.Key.fromBytes(privatekey);
+        return new com.goterl.lazysodium.utils.KeyPair(pk, sk);
     }
 
     public static byte[] random_bytes(int size) {
-        return new Random().randomBytes(size);
+        return sodium.randomBytesBuf(size);
     }
 
     public static int crypto_sign_bytes() {
-        return sodium.crypto_sign_bytes();
+        return Sign.BYTES;
     }
 
     public static int crypto_sign_publickeybytes() {
-        return sodium.crypto_sign_publickeybytes();
+        return Sign.PUBLICKEYBYTES;
     }
 
     public static int crypto_box_noncebytes() {
-        return sodium.crypto_box_noncebytes();
+        return Box.NONCEBYTES;
     }
 
     public static byte[] crypto_sign_detached(byte[] message, byte[] secretkey) {
         byte[] signature = new byte[crypto_sign_bytes()];
-        sodium.crypto_sign_detached(signature, null, message, message.length, secretkey);
+        sodium.cryptoSignDetached(signature, message, message.length, secretkey);
         return signature;
     }
 
     public static boolean crypto_sign_verify_detached(byte[] signature, byte[] message, byte[] signkey) {
-        return sodium.crypto_sign_verify_detached(signature, message, message.length, signkey) == 0;
+        return sodium.cryptoSignVerifyDetached(signature, message, message.length, signkey);
     }
 
     public static byte[] crypto_box(byte[] nonce, byte[] message, byte[] publickey, byte[] privatekey) {
-        Box box = new Box(publickey, privatekey);
-        return box.encrypt(nonce, message);
+        com.goterl.lazysodium.utils.KeyPair kp = lazySodiumKeypair(publickey, privatekey);
+        try {
+            return sodium.cryptoBoxEasy(new String(message, StandardCharsets.UTF_8), nonce, kp).getBytes();
+        } catch (SodiumException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static byte[] crypto_box_open(byte[] nonce, byte[] ciphertext, byte[] publickey, byte[] privatekey) {
-        Box box = new Box(publickey, privatekey);
-        return box.decrypt(nonce, ciphertext);
+        com.goterl.lazysodium.utils.KeyPair kp = lazySodiumKeypair(publickey, privatekey);
+        try {
+            return sodium.cryptoBoxOpenEasy(new String(ciphertext, StandardCharsets.UTF_8), nonce, kp).getBytes();
+        } catch (SodiumException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static byte[] crypto_generichash(byte[] message, int length) {
-        byte[] hash = zeros(sodium.crypto_generichash_bytes());
-        sodium.crypto_generichash(hash, sodium.crypto_generichash_bytes(), message, message.length, null, 0);
+        byte[] hash = new byte[GenericHash.BYTES];
+        sodium.cryptoGenericHash(hash, GenericHash.BYTES, message, length, null, 0);
         return hash;
     }
 
     public static KeyPair crypto_sign_seed_keypair(byte[] seed) {
-        byte[] secretkey = zeros(sodium.crypto_sign_secretkeybytes());
-        byte[] publickey = zeros(sodium.crypto_sign_publickeybytes());
+        byte[] secretkey = new byte[Sign.SECRETKEYBYTES];
+        byte[] publickey = new byte[Sign.PUBLICKEYBYTES];
 
-        sodium.crypto_sign_seed_keypair(publickey, secretkey, seed);
+        sodium.cryptoSignSeedKeypair(publickey, secretkey, seed);
 
         return new KeyPair(publickey, secretkey);
     }
 
     public static KeyPair crypto_box_seed_keypair(byte[] seed) {
-        byte[] secretkey = zeros(sodium.crypto_box_secretkeybytes());
-        byte[] publickey = zeros(sodium.crypto_box_publickeybytes());
-
-        sodium.crypto_box_seed_keypair(publickey, secretkey, seed);
-
+        byte[] secretkey = new byte[Box.SECRETKEYBYTES];
+        byte[] publickey = new byte[Box.PUBLICKEYBYTES];
+        sodium.cryptoBoxSeedKeypair(publickey, secretkey, seed);
         return new KeyPair(publickey, secretkey);
     }
 
     public static byte[] crypto_sign_ed25519_pk_to_curve25519(byte[] publickey) {
-        byte[] key = zeros(sodium.crypto_scalarmult_curve25519_bytes());
-        sodium.crypto_sign_ed25519_pk_to_curve25519(key, publickey);
+        byte[] key = new byte[Sign.CURVE25519_PUBLICKEYBYTES];
+        sodium.convertPublicKeyEd25519ToCurve25519(key, publickey);
         return key;
     }
 
     public static byte[] crypto_sign_ed25519_sk_to_curve25519(byte[] secretkey) {
-        byte[] key = zeros(sodium.crypto_scalarmult_curve25519_bytes());
-        sodium.crypto_sign_ed25519_sk_to_curve25519(key, secretkey);
+        byte[] key = new byte[Sign.CURVE25519_SECRETKEYBYTES];
+        sodium.convertPublicKeyEd25519ToCurve25519(key, secretkey);
         return key;
     }
 
     public static byte[] crypto_sign_publickey_from_secretkey(byte[] secretkey) {
-        byte[] publickey = zeros(sodium.crypto_sign_publickeybytes());
-
-        sodium.crypto_sign_ed25519_sk_to_pk(publickey, secretkey);
-
+        byte[] publickey = new byte[Sign.ED25519_PUBLICKEYBYTES];
+        sodium.cryptoSignEd25519SkToPk(publickey, secretkey);
         return publickey;
     }
 
     public static byte[] crypto_box_publickey_from_secretkey(byte[] secretkey) {
-        byte[] publickey = zeros(sodium.crypto_box_publickeybytes());
-
-        sodium.crypto_scalarmult_curve25519_base(publickey, secretkey);
-
+        byte[] publickey = new byte[Box.PUBLICKEYBYTES];
+        sodium.cryptoScalarMultBase(publickey, secretkey);
         return publickey;
     }
 }
