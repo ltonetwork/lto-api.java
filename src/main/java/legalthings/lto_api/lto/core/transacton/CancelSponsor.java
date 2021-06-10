@@ -3,7 +3,7 @@ package legalthings.lto_api.lto.core.transacton;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;
-import legalthings.lto_api.utils.main.StringUtil;
+import legalthings.lto_api.utils.main.Encoder;
 
 public class CancelSponsor extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
@@ -29,8 +29,8 @@ public class CancelSponsor extends Transaction {
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
                 new byte[this.getNetwork()],
-                StringUtil.base58Decode(this.senderPublicKey),
-                StringUtil.base58Decode(this.recipient),
+                Encoder.base58Decode(this.senderPublicKey),
+                Encoder.base58Decode(this.recipient),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.fee)
         );

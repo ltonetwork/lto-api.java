@@ -4,8 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;
-import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
-import legalthings.lto_api.utils.main.StringUtil;
+import legalthings.lto_api.utils.main.Encoder;
 
 public class Association extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
@@ -19,14 +18,7 @@ public class Association extends Transaction {
         super(TYPE, VERSION, MINIMUM_FEE);
         this.party = party;
         this.associationType = type;
-        this.hash = switch (encoding) {
-            case "base58" -> hash;
-            case "base64" -> StringUtil.base58Encode(new String(StringUtil.base64Decode(hash)));
-            case "raw" -> StringUtil.base58Encode(hash);
-//            TODO:
-//            case "hex" ->
-            default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", encoding));
-        };
+        this.hash = Encoder.fromXStringToBase58String(hash, encoding);
     }
 
     public Association(String party, int type) {
@@ -50,7 +42,7 @@ public class Association extends Transaction {
         if (hash.equals("")) {
             hashByte = Ints.toByteArray(0);
         } else {
-            byte[] rawHash = StringUtil.base58Decode(this.hash);
+            byte[] rawHash = Encoder.base58Decode(this.hash);
             hashByte = Bytes.concat(
                     Ints.toByteArray(1),
                     Ints.toByteArray(rawHash.length),
@@ -60,9 +52,9 @@ public class Association extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                StringUtil.base58Decode(this.senderPublicKey),
+                Encoder.base58Decode(this.senderPublicKey),
                 new byte[this.getNetwork()],
-                StringUtil.base58Decode(this.party),
+                Encoder.base58Decode(this.party),
                 Ints.toByteArray(associationType),
                 hashByte,
                 Longs.toByteArray(this.timestamp),
@@ -71,14 +63,7 @@ public class Association extends Transaction {
     }
 
     public String getHash(String encoding) {
-        return switch (encoding) {
-            case "base58" -> this.hash;
-            case "base64" -> StringUtil.base58Encode(new String(StringUtil.base64Decode(this.hash)));
-            case "raw" -> new String(StringUtil.base58Encode(this.hash));
-//            TODO:
-//            case "hex" ->
-            default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", encoding));
-        };
+        return Encoder.fromBase58StringToXString(this.hash, encoding);
     }
 
     public String getHash() {

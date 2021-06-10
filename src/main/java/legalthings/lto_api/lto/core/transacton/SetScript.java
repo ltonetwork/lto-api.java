@@ -4,7 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;
-import legalthings.lto_api.utils.main.StringUtil;
+import legalthings.lto_api.utils.main.Encoder;
 
 public class SetScript extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
@@ -26,13 +26,13 @@ public class SetScript extends Transaction {
             throw new BadMethodCallException("Timestamp not set");
         }
 
-        byte[] binaryScript = StringUtil.base64Decode(this.script.replaceAll("^(base64:)?", ""));
+        byte[] binaryScript = Encoder.base64Decode(this.script.replaceAll("^(base64:)?", ""));
 
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
                 new byte[this.getNetwork()],
-                StringUtil.base58Decode(this.senderPublicKey),
+                Encoder.base58Decode(this.senderPublicKey),
                 Ints.toByteArray(binaryScript.length),
                 binaryScript,
                 Longs.toByteArray(this.fee),

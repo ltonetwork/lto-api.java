@@ -6,7 +6,7 @@ import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.OrderedJSONObject;
 
-import legalthings.lto_api.utils.main.StringUtil;
+import legalthings.lto_api.utils.main.Encoder;
 
 public class JsonObject {
     private static final int OBJECT = 1;
@@ -167,7 +167,7 @@ public class JsonObject {
     public void putByte(String key, byte[] value) {
         try {
             if (type == OBJECT) {
-                object.put(key, StringUtil.base58Encode(value));
+                object.put(key, Encoder.base58Encode(value));
             }
         } catch (JSONException e) {
             // TODO Auto-generated catch block
@@ -177,7 +177,7 @@ public class JsonObject {
 
     public byte[] getByte(String key) {
         if (type == OBJECT) {
-            return has(key) ? StringUtil.base58Decode(getString(key)) : null;
+            return has(key) ? Encoder.base58Decode(getString(key)) : null;
         }
         return null;
     }

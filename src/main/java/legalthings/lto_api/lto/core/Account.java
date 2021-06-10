@@ -1,7 +1,7 @@
 package legalthings.lto_api.lto.core;
 
 import legalthings.lto_api.utils.main.CryptoUtil;
-import legalthings.lto_api.utils.main.StringUtil;
+import legalthings.lto_api.utils.main.Encoder;
 
 public class Account {
 
@@ -140,11 +140,11 @@ public class Account {
 
     protected static String encode(String string, String encoding) {
         if (encoding.equals("base58")) {
-            string = StringUtil.base58Encode(string);
+            string = Encoder.base58Encode(string);
         }
 
         if (encoding.equals("base64")) {
-            string = StringUtil.base64Encode(string);
+            string = Encoder.base64Encode(string);
         }
 
         return string;
@@ -152,11 +152,11 @@ public class Account {
 
     protected static String encode(byte[] string, String encoding) {
         if (encoding.equals("base58")) {
-            return StringUtil.base58Encode(string);
+            return Encoder.base58Encode(string);
         }
 
         if (encoding.equals("base64")) {
-            return StringUtil.base64Encode(string);
+            return Encoder.base64Encode(string);
         }
         return null;
     }
@@ -171,11 +171,11 @@ public class Account {
 
     protected static byte[] decode(String string, String encoding) {
         if (encoding.equals("base58")) {
-            return StringUtil.base58Decode(string);
+            return Encoder.base58Decode(string);
         }
 
         if (encoding.equals("base64")) {
-            return StringUtil.base64Decode(string);
+            return Encoder.base64Decode(string);
         }
 
         return null;

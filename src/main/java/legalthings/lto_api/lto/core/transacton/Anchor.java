@@ -4,8 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;
-import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
-import legalthings.lto_api.utils.main.StringUtil;
+import legalthings.lto_api.utils.main.Encoder;
 
 import java.util.ArrayList;
 
@@ -32,7 +31,7 @@ public class Anchor extends Transaction {
 
         ArrayList<Byte> anchorsBytes = new ArrayList<>();
         for (String anchor : anchors) {
-            for (Byte anc : StringUtil.base58Decode(anchor)) {
+            for (Byte anc : Encoder.base58Decode(anchor)) {
                 anchorsBytes.add(anc);
             }
         }
@@ -40,7 +39,7 @@ public class Anchor extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                StringUtil.base58Decode(this.senderPublicKey),
+                Encoder.base58Decode(this.senderPublicKey),
                 Ints.toByteArray(anchors.size()),
                 Bytes.toArray(anchorsBytes),
                 Longs.toByteArray(this.timestamp),
@@ -49,28 +48,14 @@ public class Anchor extends Transaction {
     }
 
     public void addHash(String hash, String encoding) {
-        switch (encoding) {
-            case "base58" -> anchors.add(hash);
-            case "base64" -> anchors.add(StringUtil.base58Encode(new String(StringUtil.base64Decode(hash)), "base58"));
-            case "raw" -> anchors.add(StringUtil.base58Encode(hash, "base58"));
-//            TODO:
-//            case "hex" ->
-            default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", encoding));
-        }
+        anchors.add(Encoder.fromXStringToBase58String(hash, encoding));
     }
 
     public String getHash(String encoding) {
         if (anchors.size() != 1)
             throw new BadMethodCallException("Method 'getHash' can't be used on a multi-anchor tx");
 
-        return switch (encoding) {
-            case "base58" -> this.anchors.get(0);
-            case "base64" -> StringUtil.base64Encode(new String(StringUtil.base58Decode(this.anchors.get(0))));
-            case "raw" -> new String(StringUtil.base58Decode(this.anchors.get(0)));
-//            TODO:
-//            case "hex" ->
-            default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", encoding));
-        };
+        return Encoder.fromBase58StringToXString(this.anchors.get(0), encoding);
     }
 
     public String[] getHashes(String encoding) {
@@ -78,13 +63,7 @@ public class Anchor extends Transaction {
 
         String[] hashes = new String[this.anchors.size()];
         for (int i = 0; i < this.anchors.size(); i++) {
-            hashes[i] = switch (encoding) {
-                case "base64" -> StringUtil.base64Encode(new String(StringUtil.base58Decode(this.anchors.get(0))));
-                case "raw" -> new String(StringUtil.base58Decode(this.anchors.get(0)));
-//            TODO:
-//            case "hex" ->
-                default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", encoding));
-            };
+            hashes[i] = Encoder.fromBase58StringToXString(this.anchors.get(0), encoding);
         }
 
         return hashes;
