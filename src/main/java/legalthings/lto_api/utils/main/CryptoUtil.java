@@ -9,6 +9,7 @@ import com.goterl.lazysodium.utils.LibraryLoader;
 import legalthings.lto_api.lto.core.KeyPair;
 
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
 public class CryptoUtil {
 
@@ -114,5 +115,12 @@ public class CryptoUtil {
         byte[] publickey = new byte[Box.PUBLICKEYBYTES];
         sodium.cryptoScalarMultBase(publickey, secretkey);
         return publickey;
+    }
+
+    public static boolean isValidAddress(String address, String encoding) {
+        if(encoding.equals("base58") && Pattern.matches("^[1-9A-HJ-NP-Za-km-z]+$", address)) return false;
+        if(encoding.equals("base64") && Pattern.matches("^[A-Za-z0-9+/]+={0,2}$", address)) return false;
+
+        return Encoder.decode(address, encoding).length() == 26;
     }
 }

@@ -1,5 +1,6 @@
 package legalthings.lto_api.utils.main;
 
+import com.google.common.primitives.Chars;
 import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
 import legalthings.lto_api.utils.core.Base58;
 import org.apache.commons.codec.DecoderException;
@@ -71,6 +72,14 @@ public class Encoder {
         return Base64.getDecoder().decode(input);
     }
 
+    public static String base64Decode(String input, Charset charset) {
+        return new String(Base64.getDecoder().decode(input), charset);
+    }
+
+    public static String base64Decode(byte[] input, Charset charset) {
+        return new String(Base64.getDecoder().decode(input), charset);
+    }
+
     public static String hexEncode(String input) {
         return Hex.encodeHexString(input.getBytes());
     }
@@ -101,6 +110,16 @@ public class Encoder {
             case "raw" -> base58Encode(input);
             case "hex" -> base58Encode(hexDecode(input));
             default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", fromEncoding));
+        };
+    }
+
+    public static String decode(String input, String encoding) {
+        return switch (encoding) {
+            case "base58" -> base58Decode(input, StandardCharsets.UTF_8);
+            case "base64" -> base64Decode(input, StandardCharsets.UTF_8);
+            case "raw" -> input;
+            case "hex" -> hexDecode(input);
+            default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", encoding));
         };
     }
 

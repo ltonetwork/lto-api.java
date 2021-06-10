@@ -4,6 +4,8 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;
+import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
+import legalthings.lto_api.utils.main.CryptoUtil;
 import legalthings.lto_api.utils.main.Encoder;
 
 public class Association extends Transaction {
@@ -16,6 +18,11 @@ public class Association extends Transaction {
 
     public Association(String party, int type, String hash, String encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
+
+        if (!CryptoUtil.isValidAddress(party, "base58")) {
+            throw new InvalidArgumentException("Invalid party address; is it base58 encoded?");
+        }
+
         this.party = party;
         this.associationType = type;
         this.hash = Encoder.fromXStringToBase58String(hash, encoding);

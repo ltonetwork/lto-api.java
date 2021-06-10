@@ -3,6 +3,8 @@ package legalthings.lto_api.lto.core.transacton;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;
+import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
+import legalthings.lto_api.utils.main.CryptoUtil;
 import legalthings.lto_api.utils.main.Encoder;
 
 public class Lease extends Transaction {
@@ -14,6 +16,15 @@ public class Lease extends Transaction {
 
     public Lease(int amount, String recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
+
+        if (amount <= 0) {
+            throw new InvalidArgumentException("Invalid amount; should be greater than 0");
+        }
+
+        if (!CryptoUtil.isValidAddress(recipient, "base58")) {
+            throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
+        }
+
         this.amount = amount;
         this.recipient = recipient;
     }
