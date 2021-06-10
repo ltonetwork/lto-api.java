@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 
 import legalthings.lto_api.lto.core.Account;
+import legalthings.lto_api.lto.core.Address;
 
 public abstract class Transaction {
     protected int height;
@@ -12,7 +13,7 @@ public abstract class Transaction {
     protected long fee;
     protected long timestamp;
     protected String id;
-    protected String sender;
+    protected Address sender;
     protected String senderPublicKey;
     protected ArrayList<byte[]> proofs;
 
@@ -34,7 +35,7 @@ public abstract class Transaction {
         this.id = id;
     }
 
-    public void setSender(String sender) {
+    public void setSender(Address sender) {
         this.sender = sender;
     }
 
@@ -44,21 +45,18 @@ public abstract class Transaction {
 
     public void signWith(Account account) {
         if (this.sender == null) {
-            setSender(account.getAddress());
+            setSender(account.getAddressStruct());
             setSenderPublicKey(account.getPublicSignKey());
         }
 
         if (this.timestamp == 0) {
             setTimestamp(Instant.now().toEpochMilli() * 1000);
         }
-
-        proofs.add(account.signBytes(toBinary()));
     }
 
     abstract public byte[] toBinary();
 
-//    TODO: SHOULD GET PART OF THE KEY?
-    public byte[] getNetwork() {
-        return this.senderPublicKey.getBytes();
+    public byte getNetwork() {
+        return this.sender.getChainId();
     }
 }

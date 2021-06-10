@@ -3,26 +3,33 @@ package legalthings.lto_api.lto.core;
 import legalthings.lto_api.utils.main.CryptoUtil;
 import legalthings.lto_api.utils.main.StringUtil;
 
-import java.nio.charset.StandardCharsets;
-
 public class Account {
 
-    private byte[] address;
+    private Address address;
+    private byte[] chainId;
     private KeyPair encrypt;
     private KeyPair sign;
 
-    public Account(byte[] address, KeyPair encrypt, KeyPair sign) {
-        this.address = address;
+    public Account(byte[] address, byte chainId, KeyPair encrypt, KeyPair sign) {
+        this.address = new Address(address, chainId);
         this.encrypt = encrypt;
         this.sign = sign;
     }
 
+    public Address getAddressStruct() {
+        return this.address;
+    }
+
     public String getAddress(String encoding) {
-        return address != null ? encode(address, encoding) : null;
+        return address != null ? encode(this.address.getAddress(), encoding) : null;
     }
 
     public String getAddress() {
         return getAddress("base58");
+    }
+
+    public byte getChainId() {
+        return this.address.getChainId();
     }
 
     public KeyPair getEncrypt() {

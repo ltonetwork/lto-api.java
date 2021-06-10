@@ -1,10 +1,8 @@
 package legalthings.lto_api.lto.core.transacton;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;
-import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
 import legalthings.lto_api.utils.main.StringUtil;
 
 public class Sponsor extends Transaction {
@@ -30,7 +28,7 @@ public class Sponsor extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                this.getNetwork(),
+                new byte[this.getNetwork()],
                 StringUtil.base58Decode(this.senderPublicKey),
                 StringUtil.base58Decode(this.recipient),
                 Longs.toByteArray(this.timestamp),

@@ -75,8 +75,9 @@ public class AccountFactory {
     public Account seed(String seedText) {
         byte[] seed = createAccountSeed(seedText);
         KeyPair signKeys = createSignKeys(seed);
+        byte chainId = 'T';
 
-        return new Account(signKeys.getPublickey(), createEncryptKeys(seed), signKeys);
+        return new Account(signKeys.getPublickey(), chainId, createEncryptKeys(seed), signKeys);
     }
 
     public KeyPair convertSignToEncrypt(KeyPair sign) {
@@ -114,15 +115,15 @@ public class AccountFactory {
         return new KeyPair(publickey, secretkey);
     }
 
-    public Account create(KeyPair sign, KeyPair encrypt, byte[] address) {
+    public Account create(KeyPair sign, byte chainId, KeyPair encrypt, byte[] address) {
         KeyPair signKeys = sign != null ? calcKeys(sign, "sign") : null;
         KeyPair encryptKeys = encrypt != null ? calcKeys(encrypt, "encrypt") : (sign != null ? convertSignToEncrypt(signKeys) : null);
         byte[] accountAddress = calcAddress(address, signKeys, encryptKeys);
 
-        return new Account(accountAddress, encryptKeys, signKeys);
+        return new Account(accountAddress, chainId, encryptKeys, signKeys);
     }
 
-    public Account createPublic(byte[] signkey, byte[] encryptkey) {
+    public Account createPublic(byte[] signkey, byte chainId, byte[] encryptkey) {
         KeyPair sign = null;
         if (signkey != null) {
             sign = new KeyPair(signkey, null);
@@ -133,7 +134,7 @@ public class AccountFactory {
             encrypt = new KeyPair(encryptkey, null);
         }
 
-        return create(sign, encrypt, null);
+        return create(sign, chainId, encrypt, null);
     }
 
     protected int getNonce() {

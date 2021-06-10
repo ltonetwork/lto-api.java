@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import legalthings.lto_api.lto.exceptions.BadMethodCallException;
-import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
 import legalthings.lto_api.utils.main.StringUtil;
 
 public class SetScript extends Transaction {
@@ -32,7 +31,7 @@ public class SetScript extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                this.getNetwork(),
+                new byte[this.getNetwork()],
                 StringUtil.base58Decode(this.senderPublicKey),
                 Ints.toByteArray(binaryScript.length),
                 binaryScript,

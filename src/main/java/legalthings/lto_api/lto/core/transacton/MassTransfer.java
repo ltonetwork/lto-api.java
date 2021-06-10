@@ -7,7 +7,6 @@ import legalthings.lto_api.lto.exceptions.BadMethodCallException;
 import legalthings.lto_api.lto.exceptions.InvalidArgumentException;
 import legalthings.lto_api.utils.main.StringUtil;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class MassTransfer extends Transaction {

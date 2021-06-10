@@ -28,7 +28,7 @@ public class CancelSponsor extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                this.getNetwork(),
+                new byte[this.getNetwork()],
                 StringUtil.base58Decode(this.senderPublicKey),
                 StringUtil.base58Decode(this.recipient),
                 Longs.toByteArray(this.timestamp),

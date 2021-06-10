@@ -61,7 +61,7 @@ public class RevokeAssociation extends Transaction {
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
                 StringUtil.base58Decode(this.senderPublicKey),
-                this.getNetwork(),
+                new byte[this.getNetwork()],
                 StringUtil.base58Decode(this.party),
                 Ints.toByteArray(associationType),
                 hashByte,
