@@ -5,10 +5,10 @@ import legalthings.lto_api.utils.main.Encoder;
 
 public class Account {
 
-    private Address address;
+    private final Address address;
     private byte[] chainId;
-    private KeyPair encrypt;
-    private KeyPair sign;
+    private final KeyPair encrypt;
+    private final KeyPair sign;
 
     public Account(byte[] address, byte chainId, KeyPair encrypt, KeyPair sign) {
         this.address = new Address(address, chainId);

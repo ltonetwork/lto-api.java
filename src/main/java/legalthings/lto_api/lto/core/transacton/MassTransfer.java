@@ -18,7 +18,7 @@ public class MassTransfer extends Transaction {
     private final ArrayList<TransferShort> transfers;
     private String attachment = "";
 
-    public MassTransfer(int amount, String recipient) {
+    public MassTransfer() {
         super(TYPE, VERSION, BASE_FEE);
         transfers = new ArrayList<>();
     }

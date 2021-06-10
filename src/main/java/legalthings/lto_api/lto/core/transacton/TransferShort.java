@@ -1,8 +1,8 @@
 package legalthings.lto_api.lto.core.transacton;
 
 public class TransferShort {
-    private String recipient;
-    private int amount;
+    private final String recipient;
+    private final int amount;
 
     public TransferShort(String recipient, int amount) {
         this.recipient = recipient;
