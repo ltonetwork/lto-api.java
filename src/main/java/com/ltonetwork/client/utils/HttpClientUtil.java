@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class HttpClientUtil {
 
-    private static HttpClient client;
+    private static HttpClient client = HttpClient.newHttpClient();
 
     public static HttpResponse<String> get(URI uri) {
         HttpRequest request = HttpRequest.newBuilder()
