@@ -24,15 +24,20 @@ public class PublicNode {
         return apiKey;
     }
 
-//    TODO: Make it return proper transaction and not a JSON.
+    //    TODO: Make it return proper transaction and not a JSON.
     public JsonObject getTransaction(int id) throws URISyntaxException {
         HttpResponse<String> resp = HttpClientUtil.get(new URI(String.format("%s/transactions/info/%d", this.url, id)));
         return new JsonObject(resp.body());
     }
 
-//    TODO: Make it return proper transaction and not a JSON.
+    //    TODO: Make it return proper transaction and not a JSON.
     public JsonObject getUnconfirmed() throws URISyntaxException {
         HttpResponse<String> resp = HttpClientUtil.get(new URI(String.format("%s/transactions/unconfirmed", this.url)));
+        return new JsonObject(resp.body());
+    }
+
+    public JsonObject compile(String script) throws URISyntaxException {
+        HttpResponse<String> resp = HttpClientUtil.postScript(new URI(String.format("%s/utils/script/compile", this.url)), script);
         return new JsonObject(resp.body());
     }
 }
