@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.utils.JsonObject;
 
 public class RevokeAssociation extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
@@ -26,6 +27,13 @@ public class RevokeAssociation extends Transaction {
         this.party = party;
         this.associationType = type;
         this.hash = "";
+    }
+
+    public RevokeAssociation(JsonObject json) {
+        super(json);
+        this.party = (String) json.get("party");
+        this.associationType = (int) json.get("associationType");
+        this.hash = (String) json.get("hash");
     }
 
     public byte[] toBinary() {

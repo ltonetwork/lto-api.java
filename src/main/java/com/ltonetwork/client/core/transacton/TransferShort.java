@@ -2,9 +2,9 @@ package com.ltonetwork.client.core.transacton;
 
 public class TransferShort {
     private final String recipient;
-    private final int amount;
+    private final long amount;
 
-    public TransferShort(String recipient, int amount) {
+    public TransferShort(String recipient, long amount) {
         this.recipient = recipient;
         this.amount = amount;
     }
@@ -13,7 +13,7 @@ public class TransferShort {
         return recipient;
     }
 
-    public int getAmount() {
+    public long getAmount() {
         return amount;
     }
 }

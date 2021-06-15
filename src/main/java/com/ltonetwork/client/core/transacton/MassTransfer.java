@@ -7,8 +7,10 @@ import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.utils.JsonObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MassTransfer extends Transaction {
     private final static long BASE_FEE = 100_000_000;
@@ -21,6 +23,24 @@ public class MassTransfer extends Transaction {
     public MassTransfer() {
         super(TYPE, VERSION, BASE_FEE);
         transfers = new ArrayList<>();
+    }
+
+    public MassTransfer(JsonObject json) {
+        super(json);
+
+        JsonObject jsonTransfers = new JsonObject((String) json.get("transfers"), true);
+        ArrayList<TransferShort> transfers = new ArrayList<>();
+        Iterator<?> it = jsonTransfers.keys();
+
+        while (it.hasNext()) {
+            JsonObject curr = new JsonObject(it.next().toString());
+            transfers.add(new TransferShort(
+                    (String) json.get("recipient"),
+                    (long) json.get("amount")
+            ));
+        }
+
+        this.transfers = transfers;
     }
 
     public void setAttachment(String message, String encoding) {
@@ -62,7 +82,7 @@ public class MassTransfer extends Transaction {
             for (Byte rec : Encoder.base58Decode(transfer.getRecipient())) {
                 transfersBytes.add(rec);
             }
-            for (Byte am : Ints.toByteArray(transfer.getAmount())) {
+            for (Byte am : Longs.toByteArray(transfer.getAmount())) {
                 transfersBytes.add(am);
             }
         }

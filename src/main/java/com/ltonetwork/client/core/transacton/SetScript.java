@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.utils.JsonObject;
 
 public class SetScript extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
@@ -14,6 +15,12 @@ public class SetScript extends Transaction {
 
     public SetScript(String script) {
         super(TYPE, VERSION, MINIMUM_FEE);
+        this.script = (script == null) ? null : script.replaceAll("^(base64:)?", "base64:");
+    }
+
+    public SetScript(JsonObject json) {
+        super(json);
+        String script = (String) json.get("script");
         this.script = (script == null) ? null : script.replaceAll("^(base64:)?", "base64:");
     }
 

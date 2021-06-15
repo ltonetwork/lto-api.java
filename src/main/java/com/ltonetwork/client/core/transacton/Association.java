@@ -7,6 +7,7 @@ import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.utils.JsonObject;
 
 public class Association extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
@@ -33,6 +34,13 @@ public class Association extends Transaction {
         this.party = party;
         this.associationType = type;
         this.hash = "";
+    }
+
+    public Association(JsonObject json) {
+        super(json);
+        this.party = (String) json.get("party");
+        this.associationType = (int) json.get("associationType");
+        this.hash = (String) json.get("hash");
     }
 
     public byte[] toBinary() {

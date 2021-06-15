@@ -6,6 +6,7 @@ import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.utils.JsonObject;
 
 public class CancelSponsor extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
@@ -21,6 +22,11 @@ public class CancelSponsor extends Transaction {
         }
 
         this.recipient = recipient;
+    }
+
+    public CancelSponsor(JsonObject json) {
+        super(json);
+        this.recipient = (String) json.get("recipient");
     }
 
     public byte[] toBinary() {

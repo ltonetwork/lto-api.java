@@ -5,8 +5,10 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.utils.JsonObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Anchor extends Transaction {
     private final static long MINIMUM_FEE = 35_000_000;
@@ -18,6 +20,19 @@ public class Anchor extends Transaction {
         super(TYPE, VERSION, MINIMUM_FEE);
         anchors = new ArrayList<>();
         addHash(hash, encoding);
+    }
+
+    public Anchor(JsonObject json) {
+        super(json);
+        JsonObject jsonAnchors = new JsonObject((String) json.get("anchors"), true);
+        ArrayList<String> anchors = new ArrayList<>();
+        Iterator<?> it = jsonAnchors.keys();
+
+        while (it.hasNext()) {
+            anchors.add(it.next().toString());
+        }
+
+        this.anchors = anchors;
     }
 
     public byte[] toBinary() {
