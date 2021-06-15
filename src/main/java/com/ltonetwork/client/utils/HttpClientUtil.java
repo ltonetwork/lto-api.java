@@ -40,7 +40,7 @@ public class HttpClientUtil {
         return sendRequest(request);
     }
 
-    public static HttpResponse<String> post(URI uri, Map<String, String> params) {
+    public static HttpResponse<String> post(URI uri, Map<String, Object> params) {
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = "";
 
@@ -63,7 +63,7 @@ public class HttpClientUtil {
         return sendRequest(request);
     }
 
-    public static HttpResponse<String> post(URI uri, Map<String, String> params, Map<String, String> headers) {
+    public static HttpResponse<String> post(URI uri, Map<String, Object> params, Map<String, String> headers) {
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = "";
 
