@@ -54,6 +54,36 @@ public class PublicNode {
         return new JsonObject(resp.body());
     }
 
+    public JsonObject get(String endpoint) throws URISyntaxException {
+        HttpResponse<String> resp = HttpClientUtil.get(new URI(url + endpoint));
+        return new JsonObject(resp.body());
+    }
+
+    public JsonObject get(String endpoint, Map<String, String> headers) throws URISyntaxException {
+        HttpResponse<String> resp = HttpClientUtil.get(new URI(url + endpoint), headers);
+        return new JsonObject(resp.body());
+    }
+
+    public JsonObject post(String endpoint, Map<String, Object> params) throws URISyntaxException {
+        HttpResponse<String> resp = HttpClientUtil.post(new URI(url + endpoint), params);
+        return new JsonObject(resp.body());
+    }
+
+    public JsonObject post(String endpoint, Map<String, Object> params, Map<String, String> headers) throws URISyntaxException {
+        HttpResponse<String> resp = HttpClientUtil.post(new URI(url + endpoint), params, headers);
+        return new JsonObject(resp.body());
+    }
+
+    public JsonObject delete(String endpoint) throws URISyntaxException {
+        HttpResponse<String> resp = HttpClientUtil.delete(new URI(url + endpoint));
+        return new JsonObject(resp.body());
+    }
+
+    public JsonObject delete(String endpoint, Map<String, String> headers) throws URISyntaxException {
+        HttpResponse<String> resp = HttpClientUtil.delete(new URI(url + endpoint), headers);
+        return new JsonObject(resp.body());
+    }
+
     private Transaction getTransactionObject(JsonObject json) {
         return switch ((int) json.get("type")) {
             case 4 -> new Transfer(json);

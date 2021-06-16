@@ -1,4 +1,4 @@
-package com.ltonetwork.client.lto.core;
+package com.ltonetwork.client.core;
 
 import org.junit.runner.RunWith;
 

@@ -40,6 +40,30 @@ public class HttpClientUtil {
         return sendRequest(request);
     }
 
+    public static HttpResponse<String> delete(URI uri) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .timeout(Duration.ofSeconds(15))
+                .header("Accept", "application/json")
+                .DELETE()
+                .build();
+        return sendRequest(request);
+    }
+
+    public static HttpResponse<String> delete(URI uri, Map<String, String> headers) {
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .uri(uri)
+                .timeout(Duration.ofSeconds(30))
+                .header("Accept", "application/json")
+                .DELETE();
+
+        addHeaders(requestBuilder, headers);
+
+        HttpRequest request = requestBuilder.build();
+
+        return sendRequest(request);
+    }
+
     public static HttpResponse<String> post(URI uri, Map<String, Object> params) {
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = "";
