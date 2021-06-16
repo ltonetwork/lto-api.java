@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
+import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
@@ -44,12 +45,12 @@ public class MassTransfer extends Transaction {
         this.transfers = transfers;
     }
 
-    public void setAttachment(String message, Encoder.Encoding encoding) {
+    public void setAttachment(String message, Encoding encoding) {
         this.attachment = Encoder.base58Encode(Encoder.decode(message, encoding));
     }
 
     public void setAttachment(String message) {
-        setAttachment(message, Encoder.Encoding.RAW);
+        setAttachment(message, Encoding.RAW);
     }
 
     public void addTransfer(String recipient, int amount) {
@@ -58,7 +59,7 @@ public class MassTransfer extends Transaction {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
         }
 
-        if (!CryptoUtil.isValidAddress(recipient, Encoder.Encoding.BASE58)) {
+        if (!CryptoUtil.isValidAddress(recipient, Encoding.BASE58)) {
             throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 

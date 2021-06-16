@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
+import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
@@ -17,7 +18,7 @@ public class Anchor extends Transaction {
     private final static int VERSION = 1;
     private final ArrayList<String> anchors;
 
-    public Anchor(String hash, Encoder.Encoding encoding) {
+    public Anchor(String hash, Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
         anchors = new ArrayList<>();
         addHash(hash, encoding);
@@ -63,11 +64,11 @@ public class Anchor extends Transaction {
         );
     }
 
-    public void addHash(String hash, Encoder.Encoding encoding) {
+    public void addHash(String hash, Encoding encoding) {
         anchors.add(Encoder.base58Encode(Encoder.decode(hash, encoding)));
     }
 
-    public String getHash(Encoder.Encoding encoding) {
+    public String getHash(Encoding encoding) {
         if (anchors.size() != 1)
             throw new BadMethodCallException("Method 'getHash' can't be used on a multi-anchor tx");
 
@@ -77,8 +78,8 @@ public class Anchor extends Transaction {
         );
     }
 
-    public String[] getHashes(Encoder.Encoding encoding) {
-        if (encoding == Encoder.Encoding.BASE58) return this.anchors.toArray(new String[0]);
+    public String[] getHashes(Encoding encoding) {
+        if (encoding == Encoding.BASE58) return this.anchors.toArray(new String[0]);
 
         String[] hashes = new String[this.anchors.size()];
         for (int i = 0; i < this.anchors.size(); i++) {

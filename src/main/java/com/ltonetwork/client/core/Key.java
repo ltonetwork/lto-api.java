@@ -1,5 +1,7 @@
 package com.ltonetwork.client.core;
 
+import com.ltonetwork.client.types.Encoding;
+
 import java.nio.charset.StandardCharsets;
 
 import static com.ltonetwork.client.utils.Encoder.*;

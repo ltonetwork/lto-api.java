@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
+import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
@@ -19,10 +20,10 @@ public class Association extends Transaction {
     private final int associationType;
     private final String hash;
 
-    public Association(String party, int type, String hash, Encoder.Encoding encoding) {
+    public Association(String party, int type, String hash, Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
 
-        if (!CryptoUtil.isValidAddress(party, Encoder.Encoding.BASE58)) {
+        if (!CryptoUtil.isValidAddress(party, Encoding.BASE58)) {
             throw new InvalidArgumentException("Invalid party address; is it base58 encoded?");
         }
 
@@ -79,7 +80,7 @@ public class Association extends Transaction {
         );
     }
 
-    public String getHash(Encoder.Encoding encoding) {
+    public String getHash(Encoding encoding) {
         return Encoder.encode(
                 Encoder.base58Decode(hash, StandardCharsets.UTF_8),
                 encoding
@@ -87,6 +88,6 @@ public class Association extends Transaction {
     }
 
     public String getHash() {
-        return getHash(Encoder.Encoding.BASE58);
+        return getHash(Encoding.BASE58);
     }
 }

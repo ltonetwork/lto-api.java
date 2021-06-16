@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
+import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
@@ -19,7 +20,7 @@ public class Sponsor extends Transaction {
     public Sponsor(String recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
 
-        if (!CryptoUtil.isValidAddress(recipient, Encoder.Encoding.BASE58)) {
+        if (!CryptoUtil.isValidAddress(recipient, Encoding.BASE58)) {
             throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 

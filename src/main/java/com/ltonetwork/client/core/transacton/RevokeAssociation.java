@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
+import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
@@ -17,7 +18,7 @@ public class RevokeAssociation extends Transaction {
     private final int associationType;
     private final String hash;
 
-    public RevokeAssociation(String party, int type, String hash, Encoder.Encoding encoding) {
+    public RevokeAssociation(String party, int type, String hash, Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
         this.party = party;
         this.associationType = type;

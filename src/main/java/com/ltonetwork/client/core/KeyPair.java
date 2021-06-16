@@ -1,5 +1,6 @@
 package com.ltonetwork.client.core;
 
+import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.Encoder;
 
 public class KeyPair {
@@ -15,7 +16,7 @@ public class KeyPair {
         }
     }
 
-    public KeyPair(byte[] publickey, byte[] secretkey, Encoder.Encoding encoding) {
+    public KeyPair(byte[] publickey, byte[] secretkey, Encoding encoding) {
         if (publickey != null) {
             this.publickey = new Key(
                     publickey.clone(),
@@ -39,7 +40,7 @@ public class KeyPair {
         this.secretkey = secretkey;
     }
 
-    public void setSecretkey(byte[] secretkey, Encoder.Encoding encoding) {
+    public void setSecretkey(byte[] secretkey, Encoding encoding) {
         this.secretkey = new Key(
                 secretkey.clone(),
                 encoding
@@ -54,7 +55,7 @@ public class KeyPair {
         this.publickey = publickey;
     }
 
-    public void setPublickey(byte[] publickey, Encoder.Encoding encoding) {
+    public void setPublickey(byte[] publickey, Encoding encoding) {
         this.publickey = new Key(
                 publickey.clone(),
                 encoding

@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
+import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
@@ -24,7 +25,7 @@ public class Lease extends Transaction {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
         }
 
-        if (!CryptoUtil.isValidAddress(recipient, Encoder.Encoding.BASE58)) {
+        if (!CryptoUtil.isValidAddress(recipient, Encoding.BASE58)) {
             throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 

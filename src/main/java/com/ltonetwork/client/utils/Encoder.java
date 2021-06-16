@@ -1,5 +1,6 @@
 package com.ltonetwork.client.utils;
 
+import com.ltonetwork.client.types.Encoding;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
@@ -11,13 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class Encoder {
-
-    public enum Encoding {
-        BASE58,
-        BASE64,
-        RAW,
-        HEX
-    }
 
     public static String base58Encode(String input, String charset) {
         try {

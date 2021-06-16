@@ -1,6 +1,7 @@
 package com.ltonetwork.client.core;
 
 import com.ltonetwork.client.exceptions.InvalidAccountException;
+import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.*;
 
 import java.util.Arrays;
@@ -54,7 +55,7 @@ public class AccountFactory {
 
     public byte[] createAddress(Key publickey, String type) {
         if (type.equals("sign")) {
-            publickey = new Key (CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(publickey.getValueBytes()), Encoder.Encoding.RAW);
+            publickey = new Key (CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(publickey.getValueBytes()), Encoding.RAW);
         }
 
         String publickeyHash = HashUtil.Keccak256(CryptoUtil.crypto_generichash(publickey.getValueBytes(), 32)).substring(0, 40);
@@ -91,13 +92,13 @@ public class AccountFactory {
             int last = secretkey.length - 1;
             secretkey[last] = secretkey[last] % 2 == 1 ? ((byte) ((secretkey[last] | 0x80) & ~0x40)) : secretkey[last];
 
-            encrypt.setSecretkey(new Key(secretkey, Encoder.Encoding.RAW));
+            encrypt.setSecretkey(new Key(secretkey, Encoding.RAW));
         }
 
         if (sign != null && sign.getPublickey() != null) {
             encrypt.setPublickey(new Key(
                     CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(sign.getPublickey().getValueBytes()),
-                    Encoder.Encoding.RAW)
+                    Encoding.RAW)
             );
         }
 
@@ -118,8 +119,8 @@ public class AccountFactory {
         }
 
         return new KeyPair(
-                new Key(publickey, Encoder.Encoding.RAW),
-                new Key(secretkey, Encoder.Encoding.RAW)
+                new Key(publickey, Encoding.RAW),
+                new Key(secretkey, Encoding.RAW)
         );
     }
 

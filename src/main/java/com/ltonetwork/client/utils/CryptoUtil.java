@@ -9,7 +9,7 @@ import com.goterl.lazysodium.interfaces.Sign;
 import com.goterl.lazysodium.utils.LibraryLoader;
 import com.ltonetwork.client.core.Key;
 import com.ltonetwork.client.core.KeyPair;
-import com.ltonetwork.client.utils.Encoder.Encoding;
+import com.ltonetwork.client.types.Encoding;
 
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;

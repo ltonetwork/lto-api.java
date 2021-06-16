@@ -3,7 +3,7 @@ package com.ltonetwork.client.core.transacton;
 import com.ltonetwork.client.core.Account;
 import com.ltonetwork.client.core.Address;
 import com.ltonetwork.client.core.Key;
-import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.JsonObject;
 
 import java.nio.charset.StandardCharsets;
@@ -36,7 +36,7 @@ public abstract class Transaction {
         this.timestamp = (long) json.get("timestamp");
         if (json.get("id") != null) this.id = (String) json.get("id");
         this.sender = new Address(json.get("sender").toString().getBytes(StandardCharsets.UTF_8));
-        this.senderPublicKey = new Key((String) json.get("senderPublicKey"), Encoder.Encoding.BASE58);
+        this.senderPublicKey = new Key((String) json.get("senderPublicKey"), Encoding.BASE58);
         this.proofs = fetchProofs(new JsonObject((String) json.get("proofs"), true));
     }
 
