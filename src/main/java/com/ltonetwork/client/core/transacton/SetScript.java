@@ -7,6 +7,8 @@ import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
+import java.nio.charset.StandardCharsets;
+
 public class SetScript extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
     private final static int TYPE = 13;
@@ -53,7 +55,7 @@ public class SetScript extends Transaction {
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
                 new byte[this.getNetwork()],
-                Encoder.base58Decode(this.senderPublicKey),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 Ints.toByteArray(binaryScript.length),
                 binaryScript,
                 Longs.toByteArray(this.fee),

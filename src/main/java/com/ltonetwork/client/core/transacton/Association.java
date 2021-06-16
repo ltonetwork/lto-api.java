@@ -9,6 +9,8 @@ import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
+import java.nio.charset.StandardCharsets;
+
 public class Association extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
     private final static int TYPE = 16;
@@ -17,16 +19,16 @@ public class Association extends Transaction {
     private final int associationType;
     private final String hash;
 
-    public Association(String party, int type, String hash, String encoding) {
+    public Association(String party, int type, String hash, Encoder.Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
 
-        if (!CryptoUtil.isValidAddress(party, "base58")) {
+        if (!CryptoUtil.isValidAddress(party, Encoder.Encoding.BASE58)) {
             throw new InvalidArgumentException("Invalid party address; is it base58 encoded?");
         }
 
         this.party = party;
         this.associationType = type;
-        this.hash = Encoder.fromXStringToBase58String(hash, encoding);
+        this.hash = Encoder.base58Encode(Encoder.decode(hash, encoding));
     }
 
     public Association(String party, int type) {
@@ -67,7 +69,7 @@ public class Association extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                Encoder.base58Decode(this.senderPublicKey),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 new byte[this.getNetwork()],
                 Encoder.base58Decode(this.party),
                 Ints.toByteArray(associationType),
@@ -77,11 +79,14 @@ public class Association extends Transaction {
         );
     }
 
-    public String getHash(String encoding) {
-        return Encoder.fromBase58StringToXString(this.hash, encoding);
+    public String getHash(Encoder.Encoding encoding) {
+        return Encoder.encode(
+                Encoder.base58Decode(hash, StandardCharsets.UTF_8),
+                encoding
+        );
     }
 
     public String getHash() {
-        return getHash("base58");
+        return getHash(Encoder.Encoding.BASE58);
     }
 }

@@ -3,10 +3,13 @@ package com.ltonetwork.client.utils;
 import com.goterl.lazysodium.LazySodiumJava;
 import com.goterl.lazysodium.SodiumJava;
 import com.goterl.lazysodium.exceptions.SodiumException;
-import com.goterl.lazysodium.interfaces.*;
+import com.goterl.lazysodium.interfaces.Box;
+import com.goterl.lazysodium.interfaces.GenericHash;
+import com.goterl.lazysodium.interfaces.Sign;
 import com.goterl.lazysodium.utils.LibraryLoader;
-
+import com.ltonetwork.client.core.Key;
 import com.ltonetwork.client.core.KeyPair;
+import com.ltonetwork.client.utils.Encoder.Encoding;
 
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
@@ -83,14 +86,20 @@ public class CryptoUtil {
 
         sodium.cryptoSignSeedKeypair(publickey, secretkey, seed);
 
-        return new KeyPair(publickey, secretkey);
+        return new KeyPair(
+                new Key(publickey, Encoding.RAW),
+                new Key(secretkey, Encoding.RAW)
+        );
     }
 
     public static KeyPair crypto_box_seed_keypair(byte[] seed) {
         byte[] secretkey = new byte[Box.SECRETKEYBYTES];
         byte[] publickey = new byte[Box.PUBLICKEYBYTES];
         sodium.cryptoBoxSeedKeypair(publickey, secretkey, seed);
-        return new KeyPair(publickey, secretkey);
+        return new KeyPair(
+                new Key(publickey, Encoding.RAW),
+                new Key(secretkey, Encoding.RAW)
+        );
     }
 
     public static byte[] crypto_sign_ed25519_pk_to_curve25519(byte[] publickey) {
@@ -117,9 +126,9 @@ public class CryptoUtil {
         return publickey;
     }
 
-    public static boolean isValidAddress(String address, String encoding) {
-        if(encoding.equals("base58") && Pattern.matches("^[1-9A-HJ-NP-Za-km-z]+$", address)) return false;
-        if(encoding.equals("base64") && Pattern.matches("^[A-Za-z0-9+/]+={0,2}$", address)) return false;
+    public static boolean isValidAddress(String address, Encoding encoding) {
+        if (encoding.equals(Encoding.BASE58) && Pattern.matches("^[1-9A-HJ-NP-Za-km-z]+$", address)) return false;
+        if (encoding.equals(Encoding.BASE64) && Pattern.matches("^[A-Za-z0-9+/]+={0,2}$", address)) return false;
 
         return Encoder.decode(address, encoding).length() == 26;
     }

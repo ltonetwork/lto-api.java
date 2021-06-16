@@ -8,6 +8,8 @@ import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
+import java.nio.charset.StandardCharsets;
+
 public class Lease extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
     private final static int TYPE = 8;
@@ -22,7 +24,7 @@ public class Lease extends Transaction {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
         }
 
-        if (!CryptoUtil.isValidAddress(recipient, "base58")) {
+        if (!CryptoUtil.isValidAddress(recipient, Encoder.Encoding.BASE58)) {
             throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 
@@ -48,7 +50,7 @@ public class Lease extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                Encoder.base58Decode(this.senderPublicKey),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),

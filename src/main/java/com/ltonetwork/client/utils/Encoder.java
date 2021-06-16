@@ -1,7 +1,5 @@
 package com.ltonetwork.client.utils;
 
-import com.ltonetwork.client.exceptions.InvalidArgumentException;
-import com.ltonetwork.client.utils.Base58;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
@@ -12,11 +10,18 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-
 public class Encoder {
-    public static String base58Encode(String string, String charset) {
+
+    public enum Encoding {
+        BASE58,
+        BASE64,
+        RAW,
+        HEX
+    }
+
+    public static String base58Encode(String input, String charset) {
         try {
-            return Base58.encode(string.getBytes(charset));
+            return Base58.encode(input.getBytes(charset));
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -24,27 +29,35 @@ public class Encoder {
         return null;
     }
 
-    public static String base58Encode(String string) {
-        return base58Encode(string, "UTF-8");
+    public static String base58Encode(String input) {
+        return base58Encode(input, "UTF-8");
     }
 
-    public static String base58Encode(byte[] string) {
+    public static String base58Encode(byte[] input) {
         try {
-            if (string == null) {
+            if (input == null) {
                 return "";
             }
-            return Base58.encode(string);
+            return Base58.encode(input);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String base58Decode(String string, Charset charset) {
-        return new String(Base58.decode(string), charset);
+    public static String base58Decode(String input, Charset charset) {
+        return new String(Base58.decode(input), charset);
     }
 
-    public static byte[] base58Decode(String string) {
-        return Base58.decode(string);
+    public static String base58Decode(byte[] input, Charset charset) {
+        return new String(Base58.decode(new String(input)));
+    }
+
+    public static byte[] base58Decode(byte[] input) {
+        return Base58.decode(new String(input));
+    }
+
+    public static byte[] base58Decode(String input) {
+        return Base58.decode(input);
     }
 
     public static String base64Encode(String input) {
@@ -83,7 +96,11 @@ public class Encoder {
         return Hex.encodeHexString(input.getBytes());
     }
 
-    public static String hexDecode(String input) {
+    public static String hexEncode(byte[] input) {
+        return Hex.encodeHexString(input);
+    }
+
+    public static String hexDecode(String input, Charset charset) {
         try {
             return new String(Hex.decodeHex(input));
         } catch (DecoderException e) {
@@ -92,38 +109,53 @@ public class Encoder {
         }
     }
 
-    public static String fromBase58StringToXString(String input, String toEncoding) {
-        return switch (toEncoding) {
-            case "base58" -> input;
-            case "base64" -> base64Encode(base58Decode(input));
-            case "raw" -> base58Decode(input, StandardCharsets.UTF_8);
-            case "hex" -> hexEncode(base58Decode(input, StandardCharsets.UTF_8));
-            default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", toEncoding));
-        };
+    public static String hexDecode(byte[] input, Charset charset) {
+        try {
+            return new String(Hex.decodeHex(new String(input)));
+        } catch (DecoderException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public static String fromXStringToBase58String(String input, String fromEncoding) {
-        return switch (fromEncoding) {
-            case "base58" -> input;
-            case "base64" -> base58Encode(base64Decode(input));
-            case "raw" -> base58Encode(input);
-            case "hex" -> base58Encode(hexDecode(input));
-            default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", fromEncoding));
-        };
+    public static byte[] hexDecode(String input) {
+        try {
+            return Hex.decodeHex(input);
+        } catch (DecoderException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public static String decode(String input, String encoding) {
-        return switch (encoding) {
-            case "base58" -> base58Decode(input, StandardCharsets.UTF_8);
-            case "base64" -> base64Decode(input, StandardCharsets.UTF_8);
-            case "raw" -> input;
-            case "hex" -> hexDecode(input);
-            default -> throw new InvalidArgumentException(String.format("Failed to encode to %s", encoding));
-        };
+    public static byte[] hexDecode(byte[] input) {
+        try {
+            return Hex.decodeHex(new String(input));
+        } catch (DecoderException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static String repeat(String string, int times) {
         return new String(new char[times]).replace("\0", string);
+    }
+
+    public static String decode(String input, Encoding encoding) {
+        return switch (encoding){
+            case BASE58 -> base58Decode(input, StandardCharsets.UTF_8);
+            case BASE64 -> base64Decode(input, StandardCharsets.UTF_8);
+            case RAW -> input;
+            case HEX -> hexDecode(input, StandardCharsets.UTF_8);
+        };
+    }
+
+    public static String encode(String input, Encoding encoding) {
+        return switch (encoding){
+            case BASE58 -> base58Encode(input);
+            case BASE64 -> base64Encode(input);
+            case RAW -> input;
+            case HEX -> hexEncode(input);
+        };
     }
 
     static byte[] packN(int value) {

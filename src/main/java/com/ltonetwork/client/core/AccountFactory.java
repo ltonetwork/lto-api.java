@@ -1,13 +1,10 @@
 package com.ltonetwork.client.core;
 
+import com.ltonetwork.client.exceptions.InvalidAccountException;
+import com.ltonetwork.client.utils.*;
+
 import java.util.Arrays;
 import java.util.Random;
-
-import com.ltonetwork.client.exceptions.InvalidAccountException;
-import com.ltonetwork.client.utils.BinHex;
-import com.ltonetwork.client.utils.CryptoUtil;
-import com.ltonetwork.client.utils.HashUtil;
-import com.ltonetwork.client.utils.PackUtil;
 
 public class AccountFactory {
     public static final char ADDRESS_VERSION = 0x1;
@@ -55,12 +52,12 @@ public class AccountFactory {
         return HashUtil.SHA256(secureSeed);
     }
 
-    public byte[] createAddress(byte[] publickey, String type) {
+    public byte[] createAddress(Key publickey, String type) {
         if (type.equals("sign")) {
-            publickey = CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(publickey);
+            publickey = new Key (CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(publickey.getValueBytes()), Encoder.Encoding.RAW);
         }
 
-        String publickeyHash = HashUtil.Keccak256(CryptoUtil.crypto_generichash(publickey, 32)).substring(0, 40);
+        String publickeyHash = HashUtil.Keccak256(CryptoUtil.crypto_generichash(publickey.getValueBytes(), 32)).substring(0, 40);
 
         byte[] packed = PackUtil.packCaH40(ADDRESS_VERSION, network, publickeyHash);
         String chksum = HashUtil.Keccak256(CryptoUtil.crypto_generichash(packed, packed.length)).substring(0, 8);
@@ -68,7 +65,7 @@ public class AccountFactory {
         return PackUtil.packCaH40H8(ADDRESS_VERSION, network, publickeyHash, chksum);
     }
 
-    public byte[] createAddress(byte[] publickey) {
+    public byte[] createAddress(Key publickey) {
         return createAddress(publickey, "encrypt");
     }
 
@@ -77,23 +74,31 @@ public class AccountFactory {
         KeyPair signKeys = createSignKeys(seed);
         byte chainId = 'T';
 
-        return new Account(signKeys.getPublickey(), chainId, createEncryptKeys(seed), signKeys);
+        return new Account(
+                signKeys.getPublickey().getValueBytes(),
+                chainId,
+                createEncryptKeys(seed),
+                signKeys
+        );
     }
 
     public KeyPair convertSignToEncrypt(KeyPair sign) {
         KeyPair encrypt = new KeyPair();
 
         if (sign != null && sign.getSecretkey() != null) {
-            byte[] secretkey = CryptoUtil.crypto_sign_ed25519_sk_to_curve25519(sign.getSecretkey());
+            byte[] secretkey = CryptoUtil.crypto_sign_ed25519_sk_to_curve25519(sign.getSecretkey().getValueBytes());
 
             int last = secretkey.length - 1;
             secretkey[last] = secretkey[last] % 2 == 1 ? ((byte) ((secretkey[last] | 0x80) & ~0x40)) : secretkey[last];
 
-            encrypt.setSecretkey(secretkey);
+            encrypt.setSecretkey(new Key(secretkey, Encoder.Encoding.RAW));
         }
 
         if (sign != null && sign.getPublickey() != null) {
-            encrypt.setPublickey(CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(sign.getPublickey()));
+            encrypt.setPublickey(new Key(
+                    CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(sign.getPublickey().getValueBytes()),
+                    Encoder.Encoding.RAW)
+            );
         }
 
         return encrypt;
@@ -104,15 +109,18 @@ public class AccountFactory {
             return new KeyPair(keys.getPublickey(), null);
         }
 
-        byte[] secretkey = keys.getSecretkey();
+        byte[] secretkey = keys.getSecretkey().getValueBytes();
 
         byte[] publickey = type.equals("sign") ? CryptoUtil.crypto_sign_publickey_from_secretkey(secretkey) : CryptoUtil.crypto_box_publickey_from_secretkey(secretkey);
 
-        if (keys.getPublickey() != null && !Arrays.equals(keys.getPublickey(), publickey)) {
+        if (keys.getPublickey() != null && !Arrays.equals(keys.getPublickey().getValueBytes(), publickey)) {
             throw new InvalidAccountException("Public " + type + " key doesn't match private " + type + " key");
         }
 
-        return new KeyPair(publickey, secretkey);
+        return new KeyPair(
+                new Key(publickey, Encoder.Encoding.RAW),
+                new Key(secretkey, Encoder.Encoding.RAW)
+        );
     }
 
     public Account create(KeyPair sign, byte chainId, KeyPair encrypt, byte[] address) {
@@ -123,15 +131,21 @@ public class AccountFactory {
         return new Account(accountAddress, chainId, encryptKeys, signKeys);
     }
 
-    public Account createPublic(byte[] signkey, byte chainId, byte[] encryptkey) {
+    public Account createPublic(Key signkey, byte chainId, Key encryptkey) {
         KeyPair sign = null;
         if (signkey != null) {
-            sign = new KeyPair(signkey, null);
+            sign = new KeyPair(
+                    signkey,
+                    null
+            );
         }
 
         KeyPair encrypt = null;
         if (encryptkey != null) {
-            encrypt = new KeyPair(encryptkey, null);
+            encrypt = new KeyPair(
+                    encryptkey,
+                    null
+            );
         }
 
         return create(sign, chainId, encrypt, null);

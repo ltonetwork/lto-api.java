@@ -1,17 +1,32 @@
 package com.ltonetwork.client.core;
 
-public class KeyPair {
-    private byte[] secretkey;
-    private byte[] publickey;
+import com.ltonetwork.client.utils.Encoder;
 
-    public KeyPair(byte[] publickey, byte[] secretkey) {
+public class KeyPair {
+    private Key secretkey;
+    private Key publickey;
+
+    public KeyPair(Key publickey, Key secretkey) {
         if (publickey != null) {
-            this.publickey = new byte[publickey.length];
-            System.arraycopy(publickey, 0, this.publickey, 0, publickey.length);
+            this.publickey = publickey;
         }
         if (secretkey != null) {
-            this.secretkey = new byte[secretkey.length];
-            System.arraycopy(secretkey, 0, this.secretkey, 0, secretkey.length);
+            this.secretkey = secretkey;
+        }
+    }
+
+    public KeyPair(byte[] publickey, byte[] secretkey, Encoder.Encoding encoding) {
+        if (publickey != null) {
+            this.publickey = new Key(
+                    publickey.clone(),
+                    encoding
+            );
+        }
+        if (secretkey != null) {
+            this.secretkey = new Key(
+                    secretkey.clone(),
+                    encoding
+            );
         }
     }
 
@@ -20,23 +35,33 @@ public class KeyPair {
         this.secretkey = null;
     }
 
-    public void setSecretkey(byte[] secretkey) {
-        this.secretkey = new byte[secretkey.length];
-
-        System.arraycopy(secretkey, 0, this.secretkey, 0, secretkey.length);
+    public void setSecretkey(Key secretkey) {
+        this.secretkey = secretkey;
     }
 
-    public byte[] getSecretkey() {
+    public void setSecretkey(byte[] secretkey, Encoder.Encoding encoding) {
+        this.secretkey = new Key(
+                secretkey.clone(),
+                encoding
+        );
+    }
+
+    public Key getSecretkey() {
         return this.secretkey;
     }
 
-    public void setPublickey(byte[] publickey) {
-        this.publickey = new byte[publickey.length];
-
-        System.arraycopy(publickey, 0, this.publickey, 0, publickey.length);
+    public void setPublickey(Key publickey) {
+        this.publickey = publickey;
     }
 
-    public byte[] getPublickey() {
+    public void setPublickey(byte[] publickey, Encoder.Encoding encoding) {
+        this.publickey = new Key(
+                publickey.clone(),
+                encoding
+        );
+    }
+
+    public Key getPublickey() {
         return this.publickey;
     }
 }

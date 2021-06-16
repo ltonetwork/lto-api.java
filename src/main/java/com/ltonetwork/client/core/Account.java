@@ -6,7 +6,6 @@ import com.ltonetwork.client.utils.Encoder;
 public class Account {
 
     private final Address address;
-    private byte[] chainId;
     private final KeyPair encrypt;
     private final KeyPair sign;
 
@@ -16,12 +15,18 @@ public class Account {
         this.sign = sign;
     }
 
+    public Account(Address address, KeyPair encrypt, KeyPair sign) {
+        this.address = address;
+        this.encrypt = encrypt;
+        this.sign = sign;
+    }
+
     public Address getAddressStruct() {
         return this.address;
     }
 
     public String getAddress(String encoding) {
-        return address != null ? encode(this.address.getAddress(), encoding) : null;
+        return encode(this.address.getAddress(), encoding);
     }
 
     public String getAddress() {
@@ -40,27 +45,19 @@ public class Account {
         return sign;
     }
 
-    public String getPublicSignKey(String encoding) {
-        return sign != null ? encode(sign.getPublickey(), encoding) : null;
+    public Key getPublicSignKey() {
+        return sign.getPublickey();
     }
 
-    public String getPublicSignKey() {
-        return getPublicSignKey("base58");
-    }
-
-    public String getPublicEncryptKey(String encoding) {
-        return encrypt != null ? encode(encrypt.getPublickey(), encoding) : null;
-    }
-
-    public String getPublicEncryptKey() {
-        return getPublicEncryptKey("base58");
+    public Key getPublicEncryptKey() {
+        return encrypt.getPublickey();
     }
 
     public String sign(String message, String encoding) {
         if (sign == null || sign.getSecretkey() == null) {
             throw new RuntimeException("Unable to sign message; no secret sign key");
         }
-        byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey());
+        byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey().getValueBytes());
         return encode(signature, encoding);
     }
 
@@ -68,7 +65,7 @@ public class Account {
         if (sign == null || sign.getSecretkey() == null) {
             throw new RuntimeException("Unable to sign message; no secret sign key");
         }
-        byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey());
+        byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey().getValueBytes());
         return encode(signature, "base58");
     }
 
@@ -76,7 +73,7 @@ public class Account {
         if (sign == null || sign.getSecretkey() == null) {
             throw new RuntimeException("Unable to sign message; no secret sign key");
         }
-        byte[] signature = CryptoUtil.crypto_sign_detached(message, sign.getSecretkey());
+        byte[] signature = CryptoUtil.crypto_sign_detached(message, sign.getSecretkey().getValueBytes());
         String encoded_signature = encode(signature, "base58");
         if (encoded_signature == null) return null;
         else return encoded_signature.getBytes();
@@ -90,8 +87,12 @@ public class Account {
         byte[] rawSignature = decode(signature, encoding);
 
         return rawSignature.length == CryptoUtil.crypto_sign_bytes() &&
-                sign.getPublickey().length == CryptoUtil.crypto_sign_publickeybytes() &&
-                CryptoUtil.crypto_sign_verify_detached(rawSignature, message.getBytes(), sign.getPublickey());
+                sign.getPublickey().getValueBytes().length == CryptoUtil.crypto_sign_publickeybytes() &&
+                CryptoUtil.crypto_sign_verify_detached(
+                        rawSignature,
+                        message.getBytes(),
+                        sign.getPublickey().getValueBytes()
+                );
     }
 
     public boolean verify(String signature, String message) {
@@ -108,7 +109,12 @@ public class Account {
 
         byte[] nonce = getNonce();
 
-        byte[] retEncrypt = CryptoUtil.crypto_box(nonce, message.getBytes(), recipient.encrypt.getPublickey(), encrypt.getSecretkey());
+        byte[] retEncrypt = CryptoUtil.crypto_box(
+                nonce,
+                message.getBytes(),
+                recipient.encrypt.getPublickey().getValueBytes(),
+                encrypt.getSecretkey().getValueBytes()
+        );
 
         byte[] ret = new byte[retEncrypt.length + nonce.length];
         System.arraycopy(retEncrypt, 0, ret, 0, retEncrypt.length);
@@ -131,7 +137,12 @@ public class Account {
         byte[] nonce = new byte[24];
         System.arraycopy(ciphertext, ciphertext.length - 24, nonce, 0, 24);
 
-        return CryptoUtil.crypto_box_open(nonce, encryptedMessage, encrypt.getPublickey(), sender.encrypt.getSecretkey());
+        return CryptoUtil.crypto_box_open(
+                nonce,
+                encryptedMessage,
+                encrypt.getPublickey().getValueBytes(),
+                sender.encrypt.getSecretkey().getValueBytes()
+        );
     }
 
     protected byte[] getNonce() {

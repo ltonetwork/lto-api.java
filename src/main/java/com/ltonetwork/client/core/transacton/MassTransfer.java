@@ -9,6 +9,7 @@ import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -43,12 +44,12 @@ public class MassTransfer extends Transaction {
         this.transfers = transfers;
     }
 
-    public void setAttachment(String message, String encoding) {
-        this.attachment = Encoder.fromXStringToBase58String(message, encoding);
+    public void setAttachment(String message, Encoder.Encoding encoding) {
+        this.attachment = Encoder.base58Encode(Encoder.decode(message, encoding));
     }
 
     public void setAttachment(String message) {
-        setAttachment(message, "raw");
+        setAttachment(message, Encoder.Encoding.RAW);
     }
 
     public void addTransfer(String recipient, int amount) {
@@ -57,7 +58,7 @@ public class MassTransfer extends Transaction {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
         }
 
-        if (!CryptoUtil.isValidAddress(recipient, "base58")) {
+        if (!CryptoUtil.isValidAddress(recipient, Encoder.Encoding.BASE58)) {
             throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 
@@ -90,7 +91,7 @@ public class MassTransfer extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                Encoder.base58Decode(this.senderPublicKey),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 Ints.toByteArray(transfers.size()),
                 Bytes.toArray(transfersBytes),
                 Longs.toByteArray(this.timestamp),

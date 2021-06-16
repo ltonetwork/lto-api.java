@@ -8,6 +8,8 @@ import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
+import java.nio.charset.StandardCharsets;
+
 public class CancelSponsor extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
     private final static int TYPE = 19;
@@ -17,7 +19,7 @@ public class CancelSponsor extends Transaction {
     public CancelSponsor(String recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
 
-        if (!CryptoUtil.isValidAddress(recipient, "base58")) {
+        if (!CryptoUtil.isValidAddress(recipient, Encoder.Encoding.BASE58)) {
             throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 
@@ -42,7 +44,7 @@ public class CancelSponsor extends Transaction {
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
                 new byte[this.getNetwork()],
-                Encoder.base58Decode(this.senderPublicKey),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 Encoder.base58Decode(this.recipient),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.fee)

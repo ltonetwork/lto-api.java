@@ -7,6 +7,7 @@ import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -16,7 +17,7 @@ public class Anchor extends Transaction {
     private final static int VERSION = 1;
     private final ArrayList<String> anchors;
 
-    public Anchor(String hash, String encoding) {
+    public Anchor(String hash, Encoder.Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
         anchors = new ArrayList<>();
         addHash(hash, encoding);
@@ -54,7 +55,7 @@ public class Anchor extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                Encoder.base58Decode(this.senderPublicKey),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 Ints.toByteArray(anchors.size()),
                 Bytes.toArray(anchorsBytes),
                 Longs.toByteArray(this.timestamp),
@@ -62,23 +63,29 @@ public class Anchor extends Transaction {
         );
     }
 
-    public void addHash(String hash, String encoding) {
-        anchors.add(Encoder.fromXStringToBase58String(hash, encoding));
+    public void addHash(String hash, Encoder.Encoding encoding) {
+        anchors.add(Encoder.base58Encode(Encoder.decode(hash, encoding)));
     }
 
-    public String getHash(String encoding) {
+    public String getHash(Encoder.Encoding encoding) {
         if (anchors.size() != 1)
             throw new BadMethodCallException("Method 'getHash' can't be used on a multi-anchor tx");
 
-        return Encoder.fromBase58StringToXString(this.anchors.get(0), encoding);
+        return Encoder.encode(
+                Encoder.base58Decode(this.anchors.get(0), StandardCharsets.UTF_8),
+                encoding
+        );
     }
 
-    public String[] getHashes(String encoding) {
-        if (encoding.equals("base58")) return this.anchors.toArray(new String[0]);
+    public String[] getHashes(Encoder.Encoding encoding) {
+        if (encoding == Encoder.Encoding.BASE58) return this.anchors.toArray(new String[0]);
 
         String[] hashes = new String[this.anchors.size()];
         for (int i = 0; i < this.anchors.size(); i++) {
-            hashes[i] = Encoder.fromBase58StringToXString(this.anchors.get(0), encoding);
+            hashes[i] = Encoder.encode(
+                    Encoder.base58Decode(this.anchors.get(0), StandardCharsets.UTF_8),
+                    encoding
+            );
         }
 
         return hashes;
