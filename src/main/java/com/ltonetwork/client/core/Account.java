@@ -1,5 +1,6 @@
 package com.ltonetwork.client.core;
 
+import com.ltonetwork.client.types.Signature;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 
@@ -53,50 +54,36 @@ public class Account {
         return encrypt.getPublickey();
     }
 
-    public String sign(String message, String encoding) {
+    public Signature sign(String message) {
         if (sign == null || sign.getSecretkey() == null) {
             throw new RuntimeException("Unable to sign message; no secret sign key");
         }
         byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey().getValueBytes());
-        return encode(signature, encoding);
+        return new Signature(signature);
     }
 
-    public String sign(String message) {
-        if (sign == null || sign.getSecretkey() == null) {
-            throw new RuntimeException("Unable to sign message; no secret sign key");
-        }
-        byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey().getValueBytes());
-        return encode(signature, "base58");
-    }
-
-    public byte[] signBytes(byte[] message) {
+    public Signature sign(byte[] message) {
         if (sign == null || sign.getSecretkey() == null) {
             throw new RuntimeException("Unable to sign message; no secret sign key");
         }
         byte[] signature = CryptoUtil.crypto_sign_detached(message, sign.getSecretkey().getValueBytes());
-        String encoded_signature = encode(signature, "base58");
-        if (encoded_signature == null) return null;
-        else return encoded_signature.getBytes();
+        return new Signature(signature);
     }
 
-    public boolean verify(String signature, String message, String encoding) {
+    public boolean verify(Signature signature, String message) {
         if (sign == null || sign.getPublickey() == null) {
             throw new RuntimeException("Unable to verify message; no public sign key");
         }
 
-        byte[] rawSignature = decode(signature, encoding);
-
-        return rawSignature.length == CryptoUtil.crypto_sign_bytes() &&
-                sign.getPublickey().getValueBytes().length == CryptoUtil.crypto_sign_publickeybytes() &&
-                CryptoUtil.crypto_sign_verify_detached(
-                        rawSignature,
-                        message.getBytes(),
-                        sign.getPublickey().getValueBytes()
-                );
+        return signature.verify(sign.getPublickey(), message);
     }
 
-    public boolean verify(String signature, String message) {
-        return verify(signature, message, "base58");
+    public boolean verify(Signature signature, byte[] message) {
+        if (sign == null || sign.getPublickey() == null) {
+            throw new RuntimeException("Unable to verify message; no public sign key");
+        }
+
+        return signature.verify(sign.getPublickey(), message);
     }
 
     public byte[] encrypt(Account recipient, String message) {

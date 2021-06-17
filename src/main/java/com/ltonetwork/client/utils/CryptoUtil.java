@@ -127,8 +127,8 @@ public class CryptoUtil {
     }
 
     public static boolean isValidAddress(String address, Encoding encoding) {
-        if (encoding.equals(Encoding.BASE58) && Pattern.matches("^[1-9A-HJ-NP-Za-km-z]+$", address)) return false;
-        if (encoding.equals(Encoding.BASE64) && Pattern.matches("^[A-Za-z0-9+/]+={0,2}$", address)) return false;
+        if (encoding.equals(Encoding.BASE58) && Encoder.isBase58Encoded(address)) return false;
+        if (encoding.equals(Encoding.BASE64) && Encoder.isBase64Encoded(address)) return false;
 
         return Encoder.decode(address, encoding).length() == 26;
     }

@@ -10,6 +10,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.regex.Pattern;
 
 public class Encoder {
 
@@ -150,6 +151,14 @@ public class Encoder {
             case RAW -> input;
             case HEX -> hexEncode(input);
         };
+    }
+
+    public static boolean isBase58Encoded(String input) {
+        return Pattern.matches("^[1-9A-HJ-NP-Za-km-z]+$", input);
+    }
+
+    public static boolean isBase64Encoded(String input) {
+        return Pattern.matches("^[A-Za-z0-9+/]+={0,2}$", input);
     }
 
     static byte[] packN(int value) {

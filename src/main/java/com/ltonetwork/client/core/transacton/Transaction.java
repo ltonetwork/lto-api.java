@@ -4,6 +4,7 @@ import com.ltonetwork.client.core.Account;
 import com.ltonetwork.client.core.Address;
 import com.ltonetwork.client.core.Key;
 import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.TransactionId;
 import com.ltonetwork.client.utils.JsonObject;
 
 import java.nio.charset.StandardCharsets;
@@ -17,7 +18,7 @@ public abstract class Transaction {
     protected int version;
     protected long fee;
     protected long timestamp;
-    protected String id;
+    protected TransactionId id;
     protected Address sender;
     protected Key senderPublicKey;
     protected ArrayList<byte[]> proofs;
@@ -34,22 +35,14 @@ public abstract class Transaction {
         this.version = (int) json.get("version");
         this.fee = (long) json.get("fee");
         this.timestamp = (long) json.get("timestamp");
-        if (json.get("id") != null) this.id = (String) json.get("id");
+        if (json.get("id") != null) this.id = new TransactionId((String) json.get("id"));
         this.sender = new Address(json.get("sender").toString().getBytes(StandardCharsets.UTF_8));
         this.senderPublicKey = new Key((String) json.get("senderPublicKey"), Encoding.BASE58);
         this.proofs = fetchProofs(new JsonObject((String) json.get("proofs"), true));
     }
 
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public void setSender(Address sender) {
