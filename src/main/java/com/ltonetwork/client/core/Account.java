@@ -10,12 +10,6 @@ public class Account {
     private final KeyPair encrypt;
     private final KeyPair sign;
 
-    public Account(byte[] address, byte chainId, KeyPair encrypt, KeyPair sign) {
-        this.address = new Address(address, chainId);
-        this.encrypt = encrypt;
-        this.sign = sign;
-    }
-
     public Account(Address address, KeyPair encrypt, KeyPair sign) {
         this.address = address;
         this.encrypt = encrypt;

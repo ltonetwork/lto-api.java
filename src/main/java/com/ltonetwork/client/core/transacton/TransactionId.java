@@ -1,4 +1,4 @@
-package com.ltonetwork.client.types;
+package com.ltonetwork.client.core.transacton;
 
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.utils.Encoder;

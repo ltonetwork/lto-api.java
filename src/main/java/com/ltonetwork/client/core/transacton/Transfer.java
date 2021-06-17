@@ -3,10 +3,10 @@ package com.ltonetwork.client.core.transacton;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.ltonetwork.client.core.Address;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.Encoding;
-import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
@@ -16,19 +16,19 @@ public class Transfer extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
     private final static int TYPE = 4;
     private final static int VERSION = 2;
-    private long amount;
+    private final long amount;
     private String attachment = "";
-    private final String recipient;
+    private final Address recipient;
 
-    public Transfer(int amount, String recipient) {
+    public Transfer(int amount, Address recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
+
+        if(recipient.getChainId() != sender.getChainId()) {
+            throw new InvalidArgumentException("Receiver and sender should be on the same chain");
+        }
 
         if (amount <= 0) {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
-        }
-
-        if (!CryptoUtil.isValidAddress(recipient, Encoding.BASE58)) {
-            throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 
         this.amount = amount;
@@ -38,7 +38,7 @@ public class Transfer extends Transaction {
     public Transfer(JsonObject json) {
         super(json);
         this.amount = (long) json.get("amount");
-        this.recipient = (String) json.get("recipient");
+        this.recipient = new Address(json.get("recipient").toString(), super.sender.getChainId());
     }
 
     public void setAttachment(String message, Encoding encoding) {
@@ -67,7 +67,7 @@ public class Transfer extends Transaction {
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),
-                Encoder.base58Decode(this.recipient),
+                Encoder.base58Decode(this.recipient.getAddress()),
                 Ints.toByteArray(attachment.length()),
                 binaryAttachment
         );

@@ -2,10 +2,9 @@ package com.ltonetwork.client.core.transacton;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import com.ltonetwork.client.core.Address;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
-import com.ltonetwork.client.types.Encoding;
-import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
@@ -15,13 +14,12 @@ public class Sponsor extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
     private final static int TYPE = 18;
     private final static int VERSION = 1;
-    private final String recipient;
+    private final Address recipient;
 
-    public Sponsor(String recipient) {
+    public Sponsor(Address recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
-
-        if (!CryptoUtil.isValidAddress(recipient, Encoding.BASE58)) {
-            throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
+        if(recipient.getChainId() != sender.getChainId()) {
+            throw new InvalidArgumentException("Receiver and sender should be on the same chain");
         }
 
         this.recipient = recipient;
@@ -29,7 +27,7 @@ public class Sponsor extends Transaction {
 
     public Sponsor(JsonObject json) {
         super(json);
-        this.recipient = (String) json.get("recipient");
+        this.recipient = new Address((String) json.get("recipient"));
     }
 
     public byte[] toBinary() {
@@ -46,7 +44,7 @@ public class Sponsor extends Transaction {
                 Longs.toByteArray(this.version),
                 new byte[this.getNetwork()],
                 this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
-                Encoder.base58Decode(this.recipient),
+                Encoder.base58Decode(this.recipient.getAddress()),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.fee)
         );

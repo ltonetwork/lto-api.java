@@ -3,6 +3,7 @@ package com.ltonetwork.client.core;
 import com.ltonetwork.client.exceptions.InvalidAccountException;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.*;
+import org.bouncycastle.jcajce.provider.symmetric.HC256;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -76,8 +77,7 @@ public class AccountFactory {
         byte chainId = 'T';
 
         return new Account(
-                signKeys.getPublickey().getValueBytes(),
-                chainId,
+                new Address(signKeys.getPublickey().toBase58(), chainId),
                 createEncryptKeys(seed),
                 signKeys
         );
@@ -128,8 +128,9 @@ public class AccountFactory {
         KeyPair signKeys = sign != null ? calcKeys(sign, "sign") : null;
         KeyPair encryptKeys = encrypt != null ? calcKeys(encrypt, "encrypt") : (sign != null ? convertSignToEncrypt(signKeys) : null);
         byte[] accountAddress = calcAddress(address, signKeys, encryptKeys);
+        Address addr = new Address(new String(accountAddress), chainId);
 
-        return new Account(accountAddress, chainId, encryptKeys, signKeys);
+        return new Account(addr, encryptKeys, signKeys);
     }
 
     public Account createPublic(Key signkey, byte chainId, Key encryptkey) {
