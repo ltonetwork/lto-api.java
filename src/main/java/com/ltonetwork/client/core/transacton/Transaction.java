@@ -4,6 +4,7 @@ import com.ltonetwork.client.core.Account;
 import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Key;
 import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.Signature;
 import com.ltonetwork.client.utils.JsonObject;
 
 import java.nio.charset.StandardCharsets;
@@ -20,7 +21,7 @@ public abstract class Transaction {
     protected TransactionId id;
     protected Address sender;
     protected Key senderPublicKey;
-    protected ArrayList<byte[]> proofs;
+    protected ArrayList<Signature> proofs;
 
     public Transaction(int type, int version, long fee) {
         this.type = type;
@@ -61,6 +62,8 @@ public abstract class Transaction {
         if (this.timestamp == 0) {
             setTimestamp(Instant.now().toEpochMilli() * 1000);
         }
+
+        this.proofs.add(new Signature(this.toBinary(), account.getSign().getSecretkey()));
     }
 
     abstract public byte[] toBinary();
@@ -73,13 +76,13 @@ public abstract class Transaction {
         return this.sender.getChainId();
     }
 
-    private ArrayList<byte[]> fetchProofs(JsonObject jsonProofs) {
-        ArrayList<byte[]> proofs = new ArrayList<>();
+    private ArrayList<Signature> fetchProofs(JsonObject jsonProofs) {
+        ArrayList<Signature> proofs = new ArrayList<>();
         Iterator<?> it = jsonProofs.keys();
 
         while (it.hasNext()) {
             JsonObject curr = new JsonObject(it.next().toString());
-            proofs.add(curr.toString().getBytes(StandardCharsets.UTF_8));
+            proofs.add(new Signature(curr.toString().getBytes(StandardCharsets.UTF_8)));
         }
 
         return proofs;

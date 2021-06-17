@@ -6,16 +6,23 @@ import com.ltonetwork.client.utils.Encoder;
 public class Signature {
     private byte[] value;
 
+    /** Create a signature from bytes.*/
     public Signature(byte[] value) {
         this.value = value;
     }
 
+    /** Create a signature from String.*/
     public Signature(String value, Encoding encoding) {
         switch (encoding) {
             case BASE58 -> this.value = Encoder.base58Decode(value);
             case BASE64 -> this.value = Encoder.base64Decode(value);
             case HEX -> this.value = Encoder.hexDecode(value);
         }
+    }
+
+    /** Sign message with a key and create signature.*/
+    public Signature(byte[] message, Key secretkey) {
+        this.value = CryptoUtil.crypto_sign_detached(message, secretkey.getValueBytes());
     }
 
     public byte[] byteArray(){
