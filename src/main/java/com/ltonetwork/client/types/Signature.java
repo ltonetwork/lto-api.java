@@ -1,8 +1,5 @@
 package com.ltonetwork.client.types;
 
-import com.ltonetwork.client.core.Key;
-import com.ltonetwork.client.core.KeyPair;
-import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 

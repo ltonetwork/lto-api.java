@@ -1,9 +1,11 @@
 package com.ltonetwork.client.core;
 
 import com.ltonetwork.client.exceptions.InvalidAccountException;
+import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.Key;
+import com.ltonetwork.client.types.KeyPair;
 import com.ltonetwork.client.utils.*;
-import org.bouncycastle.jcajce.provider.symmetric.HC256;
 
 import java.util.Arrays;
 import java.util.Random;

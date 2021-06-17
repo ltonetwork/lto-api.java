@@ -2,7 +2,7 @@ package com.ltonetwork.client.core.transacton;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import com.ltonetwork.client.core.Address;
+import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.utils.Encoder;

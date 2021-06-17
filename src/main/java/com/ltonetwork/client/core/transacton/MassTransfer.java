@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
+import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
@@ -37,8 +38,8 @@ public class MassTransfer extends Transaction {
         while (it.hasNext()) {
             JsonObject curr = new JsonObject(it.next().toString());
             transfers.add(new TransferShort(
-                    (String) json.get("recipient"),
-                    (long) json.get("amount")
+                    new Address((String) curr.get("recipient")),
+                    (long) curr.get("amount")
             ));
         }
 
@@ -63,7 +64,7 @@ public class MassTransfer extends Transaction {
             throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 
-        transfers.add(new TransferShort(recipient, amount));
+        transfers.add(new TransferShort(new Address(recipient, sender.getChainId()), amount));
         this.fee += ITEM_FEE;
     }
 
@@ -81,7 +82,7 @@ public class MassTransfer extends Transaction {
         ArrayList<Byte> transfersBytes = new ArrayList<>();
 
         for (TransferShort transfer : transfers) {
-            for (Byte rec : Encoder.base58Decode(transfer.getRecipient())) {
+            for (Byte rec : Encoder.base58Decode(transfer.getRecipient().getAddress())) {
                 transfersBytes.add(rec);
             }
             for (Byte am : Longs.toByteArray(transfer.getAmount())) {

@@ -1,8 +1,8 @@
 package com.ltonetwork.client.core.transacton;
 
 import com.ltonetwork.client.core.Account;
-import com.ltonetwork.client.core.Address;
-import com.ltonetwork.client.core.Key;
+import com.ltonetwork.client.types.Address;
+import com.ltonetwork.client.types.Key;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.utils.JsonObject;
 

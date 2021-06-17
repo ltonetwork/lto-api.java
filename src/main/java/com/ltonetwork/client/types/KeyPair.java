@@ -1,7 +1,4 @@
-package com.ltonetwork.client.core;
-
-import com.ltonetwork.client.types.Encoding;
-import com.ltonetwork.client.utils.Encoder;
+package com.ltonetwork.client.types;
 
 public class KeyPair {
     private Key secretkey;

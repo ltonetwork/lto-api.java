@@ -1,5 +1,8 @@
 package com.ltonetwork.client.core;
 
+import com.ltonetwork.client.types.Address;
+import com.ltonetwork.client.types.Key;
+import com.ltonetwork.client.types.KeyPair;
 import com.ltonetwork.client.types.Signature;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;

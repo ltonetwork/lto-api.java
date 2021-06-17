@@ -1,4 +1,4 @@
-package com.ltonetwork.client.core;
+package com.ltonetwork.client.types;
 
 import com.ltonetwork.client.types.Encoding;
 
