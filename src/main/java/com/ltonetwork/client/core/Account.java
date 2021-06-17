@@ -1,9 +1,8 @@
 package com.ltonetwork.client.core;
 
-import com.ltonetwork.client.types.Address;
-import com.ltonetwork.client.types.Key;
-import com.ltonetwork.client.types.KeyPair;
-import com.ltonetwork.client.types.Signature;
+import com.ltonetwork.client.exceptions.InvalidArgumentException;
+import com.ltonetwork.client.types.*;
+import com.ltonetwork.client.utils.Base58;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 
@@ -23,12 +22,16 @@ public class Account {
         return this.address;
     }
 
-    public String getAddress(String encoding) {
-        return encode(this.address.getAddress(), encoding);
+    public String getAddress(Encoding encoding) {
+        return switch(encoding) {
+            case BASE58 -> this.address.getAddress();
+            case BASE64 -> this.address.getAddressBase64();
+            default -> throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");
+        };
     }
 
     public String getAddress() {
-        return getAddress("base58");
+        return getAddress(Encoding.BASE58);
     }
 
     public byte getChainId() {
@@ -131,52 +134,5 @@ public class Account {
 
     protected byte[] getNonce() {
         return CryptoUtil.random_bytes(CryptoUtil.crypto_box_noncebytes());
-    }
-
-    protected static String encode(String string, String encoding) {
-        if (encoding.equals("base58")) {
-            string = Encoder.base58Encode(string);
-        }
-
-        if (encoding.equals("base64")) {
-            string = Encoder.base64Encode(string);
-        }
-
-        return string;
-    }
-
-    protected static String encode(byte[] string, String encoding) {
-        if (encoding.equals("base58")) {
-            return Encoder.base58Encode(string);
-        }
-
-        if (encoding.equals("base64")) {
-            return Encoder.base64Encode(string);
-        }
-        return null;
-    }
-
-    protected static String encode(String string) {
-        return encode(string, "base58");
-    }
-
-    protected static String encode(byte[] string) {
-        return encode(string, "base58");
-    }
-
-    protected static byte[] decode(String string, String encoding) {
-        if (encoding.equals("base58")) {
-            return Encoder.base58Decode(string);
-        }
-
-        if (encoding.equals("base64")) {
-            return Encoder.base64Decode(string);
-        }
-
-        return null;
-    }
-
-    protected static byte[] decode(String string) {
-        return decode(string, "base58");
     }
 }

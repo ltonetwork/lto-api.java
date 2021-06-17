@@ -13,8 +13,8 @@ import java.nio.charset.StandardCharsets;
 
 public class CancelSponsor extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
-    private final static int TYPE = 19;
-    private final static int VERSION = 1;
+    private final static byte TYPE = 19;
+    private final static byte VERSION = 1;
     private final String recipient;
 
     public CancelSponsor(String recipient) {

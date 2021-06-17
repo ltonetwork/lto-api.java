@@ -11,8 +11,8 @@ import java.nio.charset.StandardCharsets;
 
 public class SetScript extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
-    private final static int TYPE = 13;
-    private final static int VERSION = 1;
+    private final static byte TYPE = 13;
+    private final static byte VERSION = 1;
     private final String script;
     private int complexity;
     private long extraFee;

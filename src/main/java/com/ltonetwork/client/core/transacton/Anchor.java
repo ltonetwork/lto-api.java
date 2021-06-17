@@ -14,8 +14,8 @@ import java.util.Iterator;
 
 public class Anchor extends Transaction {
     private final static long MINIMUM_FEE = 35_000_000;
-    private final static int TYPE = 15;
-    private final static int VERSION = 1;
+    private final static byte TYPE = 15;
+    private final static byte VERSION = 1;
     private final ArrayList<String> anchors;
 
     public Anchor(String hash, Encoding encoding) {

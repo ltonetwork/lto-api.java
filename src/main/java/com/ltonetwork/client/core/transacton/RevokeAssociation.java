@@ -12,8 +12,8 @@ import java.nio.charset.StandardCharsets;
 
 public class RevokeAssociation extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
-    private final static int TYPE = 17;
-    private final static int VERSION = 1;
+    private final static byte TYPE = 17;
+    private final static byte VERSION = 1;
     private final String party;
     private final int associationType;
     private final String hash;

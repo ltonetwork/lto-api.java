@@ -14,8 +14,8 @@ import java.util.Iterator;
 
 public abstract class Transaction {
     protected int height;
-    protected int type;
-    protected int version;
+    protected byte type;
+    protected byte version;
     protected long fee;
     protected long timestamp;
     protected TransactionId id;
@@ -23,7 +23,7 @@ public abstract class Transaction {
     protected Key senderPublicKey;
     protected ArrayList<Signature> proofs;
 
-    public Transaction(int type, int version, long fee) {
+    public Transaction(byte type, byte version, long fee) {
         this.type = type;
         this.version = version;
         this.fee = fee;
@@ -31,8 +31,8 @@ public abstract class Transaction {
 
     public Transaction(JsonObject json) {
         if (json.get("height") != null) this.height = (int) json.get("height");
-        this.type = (int) json.get("type");
-        this.version = (int) json.get("version");
+        this.type = (byte) json.get("type");
+        this.version = (byte) json.get("version");
         this.fee = (long) json.get("fee");
         this.timestamp = (long) json.get("timestamp");
         if (json.get("id") != null) this.id = new TransactionId((String) json.get("id"));

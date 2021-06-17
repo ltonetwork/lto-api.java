@@ -12,8 +12,8 @@ import java.nio.charset.StandardCharsets;
 
 public class Sponsor extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
-    private final static int TYPE = 18;
-    private final static int VERSION = 1;
+    private final static byte TYPE = 18;
+    private final static byte VERSION = 1;
     private final Address recipient;
 
     public Sponsor(Address recipient) {

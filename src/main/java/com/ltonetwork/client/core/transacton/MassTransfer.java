@@ -18,8 +18,8 @@ import java.util.Iterator;
 public class MassTransfer extends Transaction {
     private final static long BASE_FEE = 100_000_000;
     private final static long ITEM_FEE = 10_000_000;
-    private final static int TYPE = 11;
-    private final static int VERSION = 1;
+    private final static byte TYPE = 11;
+    private final static byte VERSION = 1;
     private final ArrayList<TransferShort> transfers;
     private String attachment = "";
 

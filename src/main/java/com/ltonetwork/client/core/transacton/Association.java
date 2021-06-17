@@ -4,9 +4,8 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
-import com.ltonetwork.client.exceptions.InvalidArgumentException;
+import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
-import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.JsonObject;
 
@@ -14,25 +13,21 @@ import java.nio.charset.StandardCharsets;
 
 public class Association extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
-    private final static int TYPE = 16;
-    private final static int VERSION = 1;
-    private final String party;
+    private final static byte TYPE = 16;
+    private final static byte VERSION = 1;
+    private final Address party;
     private final int associationType;
     private final String hash;
 
-    public Association(String party, int type, String hash, Encoding encoding) {
+    public Association(Address party, int type, String hash, Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
-
-        if (!CryptoUtil.isValidAddress(party, Encoding.BASE58)) {
-            throw new InvalidArgumentException("Invalid party address; is it base58 encoded?");
-        }
 
         this.party = party;
         this.associationType = type;
         this.hash = Encoder.base58Encode(Encoder.decode(hash, encoding));
     }
 
-    public Association(String party, int type) {
+    public Association(Address party, int type) {
         super(TYPE, VERSION, MINIMUM_FEE);
         this.party = party;
         this.associationType = type;
@@ -41,7 +36,7 @@ public class Association extends Transaction {
 
     public Association(JsonObject json) {
         super(json);
-        this.party = (String) json.get("party");
+        this.party = new Address((String) json.get("party"));
         this.associationType = (int) json.get("associationType");
         this.hash = (String) json.get("hash");
     }
@@ -72,7 +67,7 @@ public class Association extends Transaction {
                 Longs.toByteArray(this.version),
                 this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 new byte[this.getNetwork()],
-                Encoder.base58Decode(this.party),
+                Encoder.base58Decode(this.party.getAddress()),
                 Ints.toByteArray(associationType),
                 hashByte,
                 Longs.toByteArray(this.timestamp),

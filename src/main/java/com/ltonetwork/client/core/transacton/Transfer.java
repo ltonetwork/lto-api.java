@@ -14,8 +14,8 @@ import java.nio.charset.StandardCharsets;
 
 public class Transfer extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
-    private final static int TYPE = 4;
-    private final static int VERSION = 2;
+    private final static byte TYPE = 4;
+    private final static byte VERSION = 2;
     private final long amount;
     private String attachment = "";
     private final Address recipient;
