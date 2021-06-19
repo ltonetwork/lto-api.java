@@ -12,6 +12,8 @@ public class SetScript extends Transaction {
     private final static int TYPE = 13;
     private final static int VERSION = 1;
     private final String script;
+    private int complexity;
+    private long extraFee;
 
     public SetScript(String script) {
         super(TYPE, VERSION, MINIMUM_FEE);
@@ -21,7 +23,19 @@ public class SetScript extends Transaction {
     public SetScript(JsonObject json) {
         super(json);
         String script = (String) json.get("script");
+        if (json.get("complexity") != null) this.complexity = (Integer) json.get("complexity");
+        if (json.get("extraFee") != null) this.extraFee = (Integer) json.get("extraFee");
         this.script = (script == null) ? null : script.replaceAll("^(base64:)?", "base64:");
+    }
+
+    public long getEstimatedFee() {
+        if(extraFee == 0) throw new BadMethodCallException("Can't estimate fee; the script hasn't been compiled");
+        return MINIMUM_FEE + extraFee;
+    }
+
+    public int getComplexity() {
+        if(complexity == 0) throw new BadMethodCallException("Can't fetch complexity; the script hasn't been compiled");
+        return complexity;
     }
 
     public byte[] toBinary() {

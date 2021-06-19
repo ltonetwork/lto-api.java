@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.util.Map;
+import java.util.Set;
 
 public class PublicNode {
     private final String url;
@@ -38,12 +39,13 @@ public class PublicNode {
         return getTransactionObject(new JsonObject(resp.body()));
     }
 
-    public JsonObject compile(String script) throws URISyntaxException {
+    public Transaction compile(String script) throws URISyntaxException {
         HttpResponse<String> resp = HttpClientUtil.postScript(new URI(String.format("%s/utils/script/compile", this.url)), script);
-        return new JsonObject(resp.body());
+
+        return getTransactionObject(new JsonObject(resp.body()));
     }
 
-    public JsonObject broadcast(Transaction transaction) throws URISyntaxException {
+    public Transaction broadcast(Transaction transaction) throws URISyntaxException {
         if (!transaction.isSigned()) throw new BadMethodCallException("Transaction is not signed");
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -51,7 +53,7 @@ public class PublicNode {
 
         HttpResponse<String> resp = HttpClientUtil.post(new URI(String.format("%s/transactions/broadcast", this.url)), tx);
 
-        return new JsonObject(resp.body());
+        return getTransactionObject(new JsonObject(resp.body()));
     }
 
     public JsonObject get(String endpoint) throws URISyntaxException {
