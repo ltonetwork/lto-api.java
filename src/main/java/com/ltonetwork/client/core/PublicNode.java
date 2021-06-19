@@ -5,7 +5,7 @@ import com.ltonetwork.client.core.transacton.*;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.utils.HttpClientUtil;
-import com.ltonetwork.client.utils.JsonObject;
+import com.ltonetwork.client.types.JsonObject;
 
 import java.net.URI;
 import java.net.http.HttpResponse;

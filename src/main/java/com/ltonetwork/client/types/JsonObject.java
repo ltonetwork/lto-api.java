@@ -1,7 +1,8 @@
-package com.ltonetwork.client.utils;
+package com.ltonetwork.client.types;
 
 import java.util.Iterator;
 
+import com.ltonetwork.client.utils.Encoder;
 import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.OrderedJSONObject;

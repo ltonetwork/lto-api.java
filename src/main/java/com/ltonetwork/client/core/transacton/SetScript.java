@@ -5,7 +5,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.utils.Encoder;
-import com.ltonetwork.client.utils.JsonObject;
+import com.ltonetwork.client.types.JsonObject;
 
 import java.nio.charset.StandardCharsets;
 

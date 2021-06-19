@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
+import org.bitcoinj.core.Base58;
+
 public class Encoder {
 
     public static String base58Encode(String input, String charset) {

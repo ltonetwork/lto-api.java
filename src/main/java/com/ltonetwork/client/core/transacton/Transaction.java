@@ -5,7 +5,7 @@ import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Key;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.Signature;
-import com.ltonetwork.client.utils.JsonObject;
+import com.ltonetwork.client.types.JsonObject;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
