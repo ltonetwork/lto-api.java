@@ -109,7 +109,7 @@ public class CryptoUtil {
 
     public static byte[] crypto_sign_ed25519_sk_to_curve25519(byte[] secretkey) {
         byte[] key = new byte[Sign.CURVE25519_SECRETKEYBYTES];
-        sodium.convertPublicKeyEd25519ToCurve25519(key, secretkey);
+        sodium.convertSecretKeyEd25519ToCurve25519(key, secretkey);
         return key;
     }
 
@@ -126,8 +126,8 @@ public class CryptoUtil {
     }
 
     public static boolean isValidAddress(String address, Encoding encoding) {
-        if (encoding.equals(Encoding.BASE58) && Encoder.isBase58Encoded(address)) return false;
-        if (encoding.equals(Encoding.BASE64) && Encoder.isBase64Encoded(address)) return false;
+        if (encoding.equals(Encoding.BASE58) && !Encoder.isBase58Encoded(address)) return false;
+        if (encoding.equals(Encoding.BASE64) && !Encoder.isBase64Encoded(address)) return false;
 
         return Encoder.decode(address, encoding).length() == 26;
     }

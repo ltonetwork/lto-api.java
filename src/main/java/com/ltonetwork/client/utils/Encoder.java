@@ -5,7 +5,6 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.bitcoinj.core.Base58;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -117,10 +116,6 @@ public class Encoder {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public static String repeat(String string, int times) {
-        return new String(new char[times]).replace("\0", string);
     }
 
     public static String decode(String input, Encoding encoding) {
