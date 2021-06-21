@@ -3,6 +3,7 @@ package com.ltonetwork.client.utils;
 import com.ltonetwork.client.types.Encoding;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.bitcoinj.core.Base58;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -11,8 +12,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.regex.Pattern;
-
-import org.bitcoinj.core.Base58;
 
 public class Encoder {
 
@@ -138,7 +137,7 @@ public class Encoder {
     }
 
     public static String decode(String input, Encoding encoding) {
-        return switch (encoding){
+        return switch (encoding) {
             case BASE58 -> base58Decode(input, StandardCharsets.UTF_8);
             case BASE64 -> base64Decode(input, StandardCharsets.UTF_8);
             case RAW -> input;
@@ -147,7 +146,7 @@ public class Encoder {
     }
 
     public static String encode(String input, Encoding encoding) {
-        return switch (encoding){
+        return switch (encoding) {
             case BASE58 -> base58Encode(input);
             case BASE64 -> base64Encode(input);
             case RAW -> input;

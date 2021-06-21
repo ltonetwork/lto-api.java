@@ -2,11 +2,11 @@ package com.ltonetwork.client.core.transacton;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
-import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.JsonObject;
+import com.ltonetwork.client.utils.Encoder;
 
 import java.nio.charset.StandardCharsets;
 
@@ -18,7 +18,7 @@ public class Sponsor extends Transaction {
 
     public Sponsor(Address recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
-        if(recipient.getChainId() != sender.getChainId()) {
+        if (recipient.getChainId() != sender.getChainId()) {
             throw new InvalidArgumentException("Receiver and sender should be on the same chain");
         }
 

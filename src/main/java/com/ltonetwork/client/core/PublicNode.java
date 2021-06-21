@@ -4,13 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ltonetwork.client.core.transacton.*;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
-import com.ltonetwork.client.utils.HttpClientUtil;
 import com.ltonetwork.client.types.JsonObject;
+import com.ltonetwork.client.utils.HttpClientUtil;
 
 import java.net.URI;
 import java.net.http.HttpResponse;
 import java.util.Map;
-import java.util.Set;
 
 public class PublicNode {
     private final URI uri;

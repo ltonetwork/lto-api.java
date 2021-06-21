@@ -6,12 +6,16 @@ import com.ltonetwork.client.utils.Encoder;
 public class Signature {
     private byte[] value;
 
-    /** Create a signature from bytes.*/
+    /**
+     * Create a signature from bytes.
+     */
     public Signature(byte[] value) {
         this.value = value;
     }
 
-    /** Create a signature from String.*/
+    /**
+     * Create a signature from String.
+     */
     public Signature(String value, Encoding encoding) {
         switch (encoding) {
             case BASE58 -> this.value = Encoder.base58Decode(value);
@@ -20,28 +24,30 @@ public class Signature {
         }
     }
 
-    /** Sign message with a key and create signature.*/
+    /**
+     * Sign message with a key and create signature.
+     */
     public Signature(byte[] message, Key secretkey) {
         this.value = CryptoUtil.crypto_sign_detached(message, secretkey.getValueBytes());
     }
 
-    public byte[] byteArray(){
+    public byte[] byteArray() {
         return value;
     }
 
-    public String base58(){
+    public String base58() {
         return Encoder.base58Encode(value);
     }
 
-    public String base64(){
+    public String base64() {
         return Encoder.base64Encode(value);
     }
 
-    public String hex(){
+    public String hex() {
         return Encoder.hexEncode(value);
     }
 
-    public boolean verify(Key publickey, String message){
+    public boolean verify(Key publickey, String message) {
         return this.value.length == CryptoUtil.crypto_sign_bytes() &&
                 publickey.getValueBytes().length == CryptoUtil.crypto_sign_publickeybytes() &&
                 CryptoUtil.crypto_sign_verify_detached(
@@ -51,11 +57,11 @@ public class Signature {
                 );
     }
 
-    public boolean verify(KeyPair kp, String message){
+    public boolean verify(KeyPair kp, String message) {
         return verify(kp.getPublickey(), message);
     }
 
-    public boolean verify(Key publickey, byte[] message){
+    public boolean verify(Key publickey, byte[] message) {
         return this.value.length == CryptoUtil.crypto_sign_bytes() &&
                 publickey.getValueBytes().length == CryptoUtil.crypto_sign_publickeybytes() &&
                 CryptoUtil.crypto_sign_verify_detached(
@@ -65,7 +71,7 @@ public class Signature {
                 );
     }
 
-    public boolean verify(KeyPair kp, byte[] message){
+    public boolean verify(KeyPair kp, byte[] message) {
         return verify(kp.getPublickey(), message);
     }
 

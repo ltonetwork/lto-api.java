@@ -21,7 +21,7 @@ public class Account {
     }
 
     public String getAddress(Encoding encoding) {
-        return switch(encoding) {
+        return switch (encoding) {
             case BASE58 -> this.address.getAddress();
             case BASE64 -> this.address.getAddressBase64();
             default -> throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");

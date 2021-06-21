@@ -4,8 +4,8 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
-import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.types.JsonObject;
+import com.ltonetwork.client.utils.Encoder;
 
 import java.nio.charset.StandardCharsets;
 
@@ -31,12 +31,13 @@ public class SetScript extends Transaction {
     }
 
     public long getEstimatedFee() {
-        if(extraFee == 0) throw new BadMethodCallException("Can't estimate fee; the script hasn't been compiled");
+        if (extraFee == 0) throw new BadMethodCallException("Can't estimate fee; the script hasn't been compiled");
         return MINIMUM_FEE + extraFee;
     }
 
     public int getComplexity() {
-        if(complexity == 0) throw new BadMethodCallException("Can't fetch complexity; the script hasn't been compiled");
+        if (complexity == 0)
+            throw new BadMethodCallException("Can't fetch complexity; the script hasn't been compiled");
         return complexity;
     }
 

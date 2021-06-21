@@ -5,7 +5,10 @@ import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.Key;
 import com.ltonetwork.client.types.KeyPair;
-import com.ltonetwork.client.utils.*;
+import com.ltonetwork.client.utils.BinHex;
+import com.ltonetwork.client.utils.CryptoUtil;
+import com.ltonetwork.client.utils.HashUtil;
+import com.ltonetwork.client.utils.PackUtil;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -58,7 +61,7 @@ public class AccountFactory {
 
     public byte[] createAddress(Key publickey, String type) {
         if (type.equals("sign")) {
-            publickey = new Key (CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(publickey.getValueBytes()), Encoding.RAW);
+            publickey = new Key(CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(publickey.getValueBytes()), Encoding.RAW);
         }
 
         String publickeyHash = HashUtil.Keccak256(CryptoUtil.crypto_generichash(publickey.getValueBytes(), 32)).substring(0, 40);
