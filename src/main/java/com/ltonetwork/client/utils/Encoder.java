@@ -15,29 +15,16 @@ import java.util.regex.Pattern;
 
 public class Encoder {
 
-    public static String base58Encode(String input, String charset) {
-        try {
-            return Base58.encode(input.getBytes(charset));
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
+    public static String base58Encode(String input, Charset charset) {
+        return Base58.encode(input.getBytes(charset));
     }
 
     public static String base58Encode(String input) {
-        return base58Encode(input, "UTF-8");
+        return base58Encode(input, StandardCharsets.UTF_8);
     }
 
     public static String base58Encode(byte[] input) {
-        try {
-            if (input == null) {
-                return "";
-            }
-            return Base58.encode(input);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return Base58.encode(input);
     }
 
     public static String base58Decode(String input, Charset charset) {
@@ -45,7 +32,7 @@ public class Encoder {
     }
 
     public static String base58Decode(byte[] input, Charset charset) {
-        return new String(Base58.decode(new String(input)));
+        return new String(Base58.decode(new String(input, charset)));
     }
 
     public static byte[] base58Decode(byte[] input) {
