@@ -3,6 +3,7 @@ package com.ltonetwork.client.core;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.*;
 import com.ltonetwork.client.utils.CryptoUtil;
+import com.ltonetwork.client.utils.Encoder;
 
 public class Account {
 
