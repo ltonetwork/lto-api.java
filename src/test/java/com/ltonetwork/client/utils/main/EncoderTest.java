@@ -1,6 +1,7 @@
 package com.ltonetwork.client.utils.main;
 
 import com.ltonetwork.client.utils.Encoder;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -8,12 +9,19 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.Assert.*;
 
 public class EncoderTest {
+    String hello;
+    byte[] helloBytes;
+    String complex;
+    byte[] complexBytes;
 
-    String hello = "Hello";
-    byte[] helloBytes = "Hello".getBytes(StandardCharsets.UTF_8);
+    @Before
+    public void init() {
+        hello = "Hello";
+        helloBytes = "Hello".getBytes(StandardCharsets.UTF_8);
 
-    String complex = "nф!#+3ϟϪЂʧ";
-    byte[] complexBytes = "nф!#+3ϟϪЂʧ".getBytes(StandardCharsets.UTF_8);
+        complex = "nф!#+3ϟϪЂʧ";
+        complexBytes = "nф!#+3ϟϪЂʧ".getBytes(StandardCharsets.UTF_8);
+    }
 
     @Test
     public void testBase58EncodeSimple() {

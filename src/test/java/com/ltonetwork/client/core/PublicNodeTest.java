@@ -1,5 +1,6 @@
 package com.ltonetwork.client.core;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URI;
@@ -7,11 +8,14 @@ import java.net.URI;
 import static org.junit.Assert.assertEquals;
 
 public class PublicNodeTest {
+    PublicNode pb;
 
-    URI uri = URI.create("https://testnet.lto.network");
-    String apiKey = "secret";
-
-    PublicNode pb = new PublicNode(uri, apiKey);
+    @Before
+    public void init() {
+        URI uri = URI.create("https://testnet.lto.network");
+        String apiKey = "secret";
+        pb = new PublicNode(uri, apiKey);
+    }
 
     @Test
     public void testGetUri() {

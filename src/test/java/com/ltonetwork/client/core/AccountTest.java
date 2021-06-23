@@ -1,8 +1,8 @@
 package com.ltonetwork.client.core;
 
-import com.goterl.lazysodium.exceptions.SodiumException;
 import com.ltonetwork.client.types.*;
 import com.ltonetwork.client.utils.Encoder;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -10,28 +10,33 @@ import org.junit.rules.ExpectedException;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AccountTest {
+    Account account;
+    KeyPair sign;
+    KeyPair encrypt;
 
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
-    KeyPair sign = new KeyPair(
-            new Key(Encoder.base58Decode("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"), Encoding.RAW),
-            new Key(Encoder.base58Decode("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp"), Encoding.RAW)
-    );
+    @Before
+    public void init() {
+        sign = new KeyPair(
+                new Key(Encoder.base58Decode("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"), Encoding.RAW),
+                new Key(Encoder.base58Decode("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp"), Encoding.RAW)
+        );
 
-    KeyPair encrypt = new KeyPair(
-            new Key(Encoder.base58Decode("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN"), Encoding.RAW),
-            new Key(Encoder.base58Decode("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6"), Encoding.RAW)
-    );
+        encrypt = new KeyPair(
+                new Key(Encoder.base58Decode("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN"), Encoding.RAW),
+                new Key(Encoder.base58Decode("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6"), Encoding.RAW)
+        );
 
-    // Test network
-    byte b = 84;
-    Address address = new Address("3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy", b);
+        // Test network
+        byte b = 84;
+        Address address = new Address("3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy", b);
 
-    Account account = new Account(address, encrypt, sign);
+        account = new Account(address, encrypt, sign);
+    }
 
     @Test
     public void testGetAddress() {
