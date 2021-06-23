@@ -28,8 +28,8 @@ public class PublicNode {
         return apiKey;
     }
 
-    public Transaction getTransaction(int id) {
-        HttpResponse<String> resp = HttpClientUtil.get(URI.create(String.format("%s/transactions/info/%d", this.uri.toString(), id)));
+    public Transaction getTransaction(String id) {
+        HttpResponse<String> resp = HttpClientUtil.get(URI.create(String.format("%s/transactions/info/%s", this.uri.toString(), id)));
         return getTransactionObject(new JsonObject(resp.body()));
     }
 
@@ -86,6 +86,7 @@ public class PublicNode {
     }
 
     private Transaction getTransactionObject(JsonObject json) {
+        System.out.println(json);
         return switch ((int) json.get("type")) {
             case 4 -> new Transfer(json);
             case 8 -> new Lease(json);

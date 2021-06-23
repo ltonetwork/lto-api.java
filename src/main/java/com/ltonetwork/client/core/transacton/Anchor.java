@@ -26,12 +26,11 @@ public class Anchor extends Transaction {
 
     public Anchor(JsonObject json) {
         super(json);
-        JsonObject jsonAnchors = new JsonObject((String) json.get("anchors"), true);
+        JsonObject jsonAnchors = new JsonObject(json.get("anchors").toString(), true);
         ArrayList<String> anchors = new ArrayList<>();
-        Iterator<?> it = jsonAnchors.keys();
 
-        while (it.hasNext()) {
-            anchors.add(it.next().toString());
+        for(int i=0; i<jsonAnchors.length(); i++) {
+            anchors.add(jsonAnchors.get(i));
         }
 
         this.anchors = anchors;

@@ -27,7 +27,7 @@ public class Sponsor extends Transaction {
 
     public Sponsor(JsonObject json) {
         super(json);
-        this.recipient = new Address((String) json.get("recipient"));
+        this.recipient = new Address(json.get("recipient").toString(), super.sender.getChainId());
     }
 
     public byte[] toBinary() {

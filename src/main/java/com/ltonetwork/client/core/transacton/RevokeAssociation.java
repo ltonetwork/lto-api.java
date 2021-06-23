@@ -34,9 +34,9 @@ public class RevokeAssociation extends Transaction {
 
     public RevokeAssociation(JsonObject json) {
         super(json);
-        this.party = (String) json.get("party");
-        this.associationType = (int) json.get("associationType");
-        this.hash = (String) json.get("hash");
+        this.party = json.get("party").toString();
+        this.associationType = Integer.parseInt(json.get("associationType").toString());
+        this.hash = json.get("hash").toString();
     }
 
     public byte[] toBinary() {

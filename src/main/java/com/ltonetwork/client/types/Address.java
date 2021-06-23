@@ -11,9 +11,9 @@ public class Address {
     private byte chainId;
 
     public Address(String address, byte chainId) {
-        if (!CryptoUtil.isValidAddress(address, Encoding.BASE58))
+        if (!CryptoUtil.isValidAddress(address, Encoding.BASE58)) {
             throw new InvalidArgumentException("Address should be base58 encoded");
-
+        }
         this.address = address;
         this.chainId = chainId;
     }

@@ -24,9 +24,9 @@ public class SetScript extends Transaction {
 
     public SetScript(JsonObject json) {
         super(json);
-        String script = (String) json.get("script");
-        if (json.get("complexity") != null) this.complexity = (Integer) json.get("complexity");
-        if (json.get("extraFee") != null) this.extraFee = (Integer) json.get("extraFee");
+        String script = json.get("script").toString();
+        if (json.has("complexity")) this.complexity = Integer.parseInt(json.get("complexity").toString());
+        if (json.has("extraFee")) this.extraFee = Integer.parseInt(json.get("extraFee").toString());
         this.script = (script == null) ? null : script.replaceAll("^(base64:)?", "base64:");
     }
 

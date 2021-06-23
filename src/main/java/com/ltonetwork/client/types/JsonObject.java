@@ -198,4 +198,11 @@ public class JsonObject {
         }
         return null;
     }
+
+    public int length() {
+        if (type == ARRAY) {
+            return array.length();
+        }
+        return 0;
+    }
 }

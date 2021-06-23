@@ -36,9 +36,9 @@ public class Association extends Transaction {
 
     public Association(JsonObject json) {
         super(json);
-        this.party = new Address((String) json.get("party"));
-        this.associationType = (int) json.get("associationType");
-        this.hash = (String) json.get("hash");
+        this.party = new Address( json.get("party").toString());
+        this.associationType = Integer.parseInt(json.get("associationType").toString());
+        this.hash = json.get("hash").toString();
     }
 
     public byte[] toBinary() {

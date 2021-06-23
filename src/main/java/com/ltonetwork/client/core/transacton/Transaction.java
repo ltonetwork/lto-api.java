@@ -26,15 +26,19 @@ public abstract class Transaction {
     }
 
     public Transaction(JsonObject json) {
-        if (json.get("height") != null) this.height = (int) json.get("height");
-        this.type = (byte) json.get("type");
-        this.version = (byte) json.get("version");
-        this.fee = (long) json.get("fee");
-        this.timestamp = (long) json.get("timestamp");
-        if (json.get("id") != null) this.id = new TransactionId((String) json.get("id"));
-        this.sender = new Address(json.get("sender").toString());
-        this.senderPublicKey = new Key((String) json.get("senderPublicKey"), Encoding.BASE58);
-        this.proofs = fetchProofs(new JsonObject((String) json.get("proofs"), true));
+        if (json.has("height")) this.height = Integer.parseInt(json.get("height").toString());
+        this.type = Byte.parseByte(json.get("type").toString());
+        this.version = Byte.parseByte(json.get("version").toString());
+        this.fee = Long.parseLong(json.get("fee").toString());
+        this.timestamp = Long.parseLong(json.get("timestamp").toString());
+        if (json.has("id")) this.id = new TransactionId(json.get("id").toString());
+        if (json.has("chainId")) {
+            this.sender = new Address(json.get("sender").toString(), Byte.parseByte(json.get("chainId").toString()));
+        } else {
+            this.sender = new Address(json.get("sender").toString());
+        }
+        this.senderPublicKey = new Key(json.get("senderPublicKey").toString(), Encoding.BASE58);
+        this.proofs = fetchProofs(new JsonObject(json.get("proofs").toString(), true));
     }
 
     public void setTimestamp(long timestamp) {
@@ -74,11 +78,9 @@ public abstract class Transaction {
 
     private ArrayList<Signature> fetchProofs(JsonObject jsonProofs) {
         ArrayList<Signature> proofs = new ArrayList<>();
-        Iterator<?> it = jsonProofs.keys();
 
-        while (it.hasNext()) {
-            JsonObject curr = new JsonObject(it.next().toString());
-            proofs.add(new Signature(curr.toString().getBytes(StandardCharsets.UTF_8)));
+        for(int i=0; i<jsonProofs.length(); i++) {
+            proofs.add(new Signature(jsonProofs.get(i), Encoding.BASE58));
         }
 
         return proofs;

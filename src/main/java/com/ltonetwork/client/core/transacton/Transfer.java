@@ -37,7 +37,7 @@ public class Transfer extends Transaction {
 
     public Transfer(JsonObject json) {
         super(json);
-        this.amount = (long) json.get("amount");
+        this.amount = Integer.parseInt(json.get("amount").toString());
         this.recipient = new Address(json.get("recipient").toString(), super.sender.getChainId());
     }
 

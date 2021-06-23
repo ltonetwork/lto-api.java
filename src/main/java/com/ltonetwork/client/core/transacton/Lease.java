@@ -30,8 +30,8 @@ public class Lease extends Transaction {
 
     public Lease(JsonObject json) {
         super(json);
-        this.amount = (long) json.get("amount");
-        this.recipient = new Address((String) json.get("recipient"));
+        this.amount = Long.parseLong(json.get("amount").toString());
+        this.recipient = new Address(json.get("recipient").toString());
     }
 
     public byte[] toBinary() {

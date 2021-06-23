@@ -31,15 +31,14 @@ public class MassTransfer extends Transaction {
     public MassTransfer(JsonObject json) {
         super(json);
 
-        JsonObject jsonTransfers = new JsonObject((String) json.get("transfers"), true);
+        JsonObject jsonTransfers = new JsonObject(json.get("transfers").toString(), true);
         ArrayList<TransferShort> transfers = new ArrayList<>();
-        Iterator<?> it = jsonTransfers.keys();
 
-        while (it.hasNext()) {
-            JsonObject curr = new JsonObject(it.next().toString());
+        for(int i=0; i<jsonTransfers.length(); i++) {
+            JsonObject curr = new JsonObject(jsonTransfers.get(i), false);
             transfers.add(new TransferShort(
-                    new Address((String) curr.get("recipient")),
-                    (long) curr.get("amount")
+                    new Address(curr.get("recipient").toString()),
+                    Long.parseLong(curr.get("amount").toString())
             ));
         }
 
