@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 public class Address {
     private final String address;
-    private byte chainId;
+    private byte chainId = 0;
 
     public Address(String address, byte chainId) {
         if (!CryptoUtil.isValidAddress(address, Encoding.BASE58)) {

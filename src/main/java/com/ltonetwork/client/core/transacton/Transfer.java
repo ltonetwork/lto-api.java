@@ -17,15 +17,11 @@ public class Transfer extends Transaction {
     private final static byte TYPE = 4;
     private final static byte VERSION = 2;
     private final long amount;
-    private String attachment = "";
+    private String attachment;
     private final Address recipient;
 
     public Transfer(int amount, Address recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
-
-        if (recipient.getChainId() != sender.getChainId()) {
-            throw new InvalidArgumentException("Receiver and sender should be on the same chain");
-        }
 
         if (amount <= 0) {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
@@ -37,7 +33,7 @@ public class Transfer extends Transaction {
 
     public Transfer(JsonObject json) {
         super(json);
-        this.amount = Integer.parseInt(json.get("amount").toString());
+        this.amount = Long.parseLong(json.get("amount").toString());
         this.recipient = new Address(json.get("recipient").toString(), super.sender.getChainId());
     }
 
@@ -46,7 +42,8 @@ public class Transfer extends Transaction {
     }
 
     public void setAttachment(String message) {
-        setAttachment(message, Encoding.RAW);
+        Encoder.isBase58Encoded(message);
+        setAttachment(message, Encoding.BASE58);
     }
 
     public byte[] toBinary() {
@@ -58,18 +55,23 @@ public class Transfer extends Transaction {
             throw new BadMethodCallException("Timestamp not set");
         }
 
-        byte[] binaryAttachment = Encoder.base58Decode(this.attachment);
-
-        return Bytes.concat(
+        byte[] binaryAttachment = Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
                 this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),
-                Encoder.base58Decode(this.recipient.getAddress()),
-                Ints.toByteArray(attachment.length()),
-                binaryAttachment
-        );
+                Encoder.base58Decode(this.recipient.getAddress()));
+
+        if (attachment != null) {
+            binaryAttachment = Bytes.concat(
+                    binaryAttachment,
+                    Ints.toByteArray(attachment.length()),
+                    Encoder.base58Decode(this.attachment)
+            );
+        }
+
+        return binaryAttachment;
     }
 }

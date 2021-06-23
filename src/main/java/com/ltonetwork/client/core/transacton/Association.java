@@ -17,7 +17,7 @@ public class Association extends Transaction {
     private final static byte VERSION = 1;
     private final Address party;
     private final int associationType;
-    private final String hash;
+    private String hash;
 
     public Association(Address party, int type, String hash, Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
@@ -31,14 +31,13 @@ public class Association extends Transaction {
         super(TYPE, VERSION, MINIMUM_FEE);
         this.party = party;
         this.associationType = type;
-        this.hash = "";
     }
 
     public Association(JsonObject json) {
         super(json);
-        this.party = new Address( json.get("party").toString());
+        this.party = new Address(json.get("party").toString());
         this.associationType = Integer.parseInt(json.get("associationType").toString());
-        this.hash = json.get("hash").toString();
+        if (json.has("hash")) this.hash = json.get("hash").toString();
     }
 
     public byte[] toBinary() {
@@ -50,32 +49,34 @@ public class Association extends Transaction {
             throw new BadMethodCallException("Timestamp not set");
         }
 
-        byte[] hashByte;
+        byte[] ret = Bytes.concat(
+                Longs.toByteArray(this.type),
+                Longs.toByteArray(this.version),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
+                new byte[this.getNetwork()],
+                Encoder.base58Decode(this.party.getAddress()),
+                Ints.toByteArray(associationType)
+        );
 
-        if (hash.equals("")) {
-            hashByte = Ints.toByteArray(0);
-        } else {
+        if (hash != null) {
             byte[] rawHash = Encoder.base58Decode(this.hash);
-            hashByte = Bytes.concat(
+            ret = Bytes.concat(
+                    ret,
                     Ints.toByteArray(1),
                     Ints.toByteArray(rawHash.length),
                     rawHash);
         }
 
         return Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
-                new byte[this.getNetwork()],
-                Encoder.base58Decode(this.party.getAddress()),
-                Ints.toByteArray(associationType),
-                hashByte,
+                ret,
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.fee)
         );
     }
 
     public String getHash(Encoding encoding) {
+        if (hash == null)
+            throw new BadMethodCallException("Can't get hash; missing");
         return Encoder.encode(
                 Encoder.base58Decode(hash, StandardCharsets.UTF_8),
                 encoding
