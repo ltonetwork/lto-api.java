@@ -8,12 +8,10 @@ import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
-import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class MassTransfer extends Transaction {
     private final static long BASE_FEE = 100_000_000;
@@ -21,7 +19,7 @@ public class MassTransfer extends Transaction {
     private final static byte TYPE = 11;
     private final static byte VERSION = 1;
     private final ArrayList<TransferShort> transfers;
-    private String attachment = "";
+    private String attachment;
 
     public MassTransfer() {
         super(TYPE, VERSION, BASE_FEE);
@@ -34,7 +32,7 @@ public class MassTransfer extends Transaction {
         JsonObject jsonTransfers = new JsonObject(json.get("transfers").toString(), true);
         ArrayList<TransferShort> transfers = new ArrayList<>();
 
-        for(int i=0; i<jsonTransfers.length(); i++) {
+        for (int i = 0; i < jsonTransfers.length(); i++) {
             JsonObject curr = new JsonObject(jsonTransfers.get(i), false);
             transfers.add(new TransferShort(
                     new Address(curr.get("recipient").toString()),
@@ -43,6 +41,7 @@ public class MassTransfer extends Transaction {
         }
 
         this.transfers = transfers;
+        if (json.has("attachment")) this.attachment = json.get("attachment").toString();
     }
 
     public void setAttachment(String message, Encoding encoding) {
@@ -53,17 +52,13 @@ public class MassTransfer extends Transaction {
         setAttachment(message, Encoding.RAW);
     }
 
-    public void addTransfer(String recipient, int amount) {
+    public void addTransfer(Address recipient, int amount) {
 
         if (amount <= 0) {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
         }
 
-        if (!CryptoUtil.isValidAddress(recipient, Encoding.BASE58)) {
-            throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
-        }
-
-        transfers.add(new TransferShort(new Address(recipient, sender.getChainId()), amount));
+        transfers.add(new TransferShort(recipient, amount));
         this.fee += ITEM_FEE;
     }
 
@@ -76,7 +71,12 @@ public class MassTransfer extends Transaction {
             throw new BadMethodCallException("Timestamp not set");
         }
 
-        byte[] binaryAttachment = Encoder.base58Decode(this.attachment);
+        byte[] ret = Bytes.concat(
+                Longs.toByteArray(this.type),
+                Longs.toByteArray(this.version),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
+                Ints.toByteArray(transfers.size())
+        );
 
         ArrayList<Byte> transfersBytes = new ArrayList<>();
 
@@ -89,16 +89,21 @@ public class MassTransfer extends Transaction {
             }
         }
 
-        return Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
-                Ints.toByteArray(transfers.size()),
+        ret = Bytes.concat(
+                ret,
                 Bytes.toArray(transfersBytes),
                 Longs.toByteArray(this.timestamp),
-                Longs.toByteArray(this.fee),
-                Ints.toByteArray(attachment.length()),
-                binaryAttachment
+                Longs.toByteArray(this.fee)
         );
+
+        if (attachment != null) {
+            ret = Bytes.concat(
+                    ret,
+                    Ints.toByteArray(attachment.length()),
+                    Encoder.base58Decode(this.attachment)
+            );
+        }
+
+        return ret;
     }
 }

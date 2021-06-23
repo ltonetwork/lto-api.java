@@ -10,7 +10,6 @@ import com.ltonetwork.client.utils.Encoder;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Anchor extends Transaction {
     private final static long MINIMUM_FEE = 35_000_000;
@@ -29,7 +28,7 @@ public class Anchor extends Transaction {
         JsonObject jsonAnchors = new JsonObject(json.get("anchors").toString(), true);
         ArrayList<String> anchors = new ArrayList<>();
 
-        for(int i=0; i<jsonAnchors.length(); i++) {
+        for (int i = 0; i < jsonAnchors.length(); i++) {
             anchors.add(jsonAnchors.get(i));
         }
 
@@ -83,7 +82,7 @@ public class Anchor extends Transaction {
         String[] hashes = new String[this.anchors.size()];
         for (int i = 0; i < this.anchors.size(); i++) {
             hashes[i] = Encoder.encode(
-                    Encoder.base58Decode(this.anchors.get(0), StandardCharsets.UTF_8),
+                    Encoder.base58Decode(this.anchors.get(i), StandardCharsets.UTF_8),
                     encoding
             );
         }
