@@ -4,8 +4,8 @@ import com.ltonetwork.client.TestUtil;
 import com.ltonetwork.client.core.Account;
 import com.ltonetwork.client.core.transacton.Transfer;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
-import com.ltonetwork.client.types.*;
-import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.types.Address;
+import com.ltonetwork.client.types.JsonObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,19 +74,19 @@ public class TransferTest {
     public void testCreateWithJson() {
         JsonObject json = new JsonObject(
                 "{\n" +
-                "  \"type\": 4,\n" +
-                "  \"id\": \"oYv8LBTsLRyAq1w7n9UXudAf5Luu9CuRXkYSnxLX2oa\",\n" +
-                "  \"sender\": \"3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy\",\n" +
-                "  \"senderPublicKey\": \"8wFR3b8WnbFaxQEdRnogTqC5doYUrotm3P7upvxPaWUo\",\n" +
-                "  \"fee\": 100000,\n" +
-                "  \"timestamp\": 1538728794530,\n" +
-                "  \"signature\": \"5Ae37E2XfWXYPSgLp1TTM69noSWnDJrRGgk2Pb6aSptDdzU2yteitoYfzk91x5oRuT3BNhu1zFyJ9iND4RbFUbBk\",\n" +
-                "  \"version\": 1,\n" +
-                "  \"recipient\": \"3Mv7ajrPLKewkBNqfxwRZoRwW6fziehp7dQ\",\n" +
-                "  \"amount\": 999900000000000,\n" +
-                "  \"attachment\": \"\",\n" +
-                "  \"height\": 22654\n" +
-                "}", false);
+                        "  \"type\": 4,\n" +
+                        "  \"id\": \"oYv8LBTsLRyAq1w7n9UXudAf5Luu9CuRXkYSnxLX2oa\",\n" +
+                        "  \"sender\": \"3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy\",\n" +
+                        "  \"senderPublicKey\": \"8wFR3b8WnbFaxQEdRnogTqC5doYUrotm3P7upvxPaWUo\",\n" +
+                        "  \"fee\": 100000,\n" +
+                        "  \"timestamp\": 1538728794530,\n" +
+                        "  \"proofs\": [\"65E82MLn6RdF7Y2VrdtFWkHd97teqLSwVdbGyEfy7x6aczkHRDZMvNUfdTAYgqDXzDDKKEkQqVhMVMg6EEEvE3C3\"],\n" +
+                        "  \"version\": 1,\n" +
+                        "  \"recipient\": \"3Mv7ajrPLKewkBNqfxwRZoRwW6fziehp7dQ\",\n" +
+                        "  \"amount\": 999900000000000,\n" +
+                        "  \"attachment\": \"\",\n" +
+                        "  \"height\": 22654\n" +
+                        "}", false);
 
         Transfer jsonTx = new Transfer(json);
         assertEquals(110, jsonTx.toBinary().length);

@@ -100,7 +100,7 @@ public class RevokeAssociationTest {
                         "  \"senderPublicKey\": \"8wFR3b8WnbFaxQEdRnogTqC5doYUrotm3P7upvxPaWUo\",\n" +
                         "  \"fee\": 100000,\n" +
                         "  \"timestamp\": 1538728794530,\n" +
-                        "  \"signature\": \"5Ae37E2XfWXYPSgLp1TTM69noSWnDJrRGgk2Pb6aSptDdzU2yteitoYfzk91x5oRuT3BNhu1zFyJ9iND4RbFUbBk\",\n" +
+                        "  \"proofs\": [\"65E82MLn6RdF7Y2VrdtFWkHd97teqLSwVdbGyEfy7x6aczkHRDZMvNUfdTAYgqDXzDDKKEkQqVhMVMg6EEEvE3C3\"],\n" +
                         "  \"version\": 1,\n" +
                         "  \"recipient\": \"3Mv7ajrPLKewkBNqfxwRZoRwW6fziehp7dQ\",\n" +
                         "  \"party\": \"3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy\",\n" +
