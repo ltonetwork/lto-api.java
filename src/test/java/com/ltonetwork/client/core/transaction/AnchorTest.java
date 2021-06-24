@@ -32,7 +32,7 @@ public class AnchorTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(122, tx.toBinary().length);
+        assertEquals(101, tx.toBinary().length);
     }
 
     @Test

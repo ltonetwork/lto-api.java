@@ -86,7 +86,6 @@ public class PublicNode {
     }
 
     private Transaction getTransactionObject(JsonObject json) {
-        System.out.println(json);
         return switch ((int) json.get("type")) {
             case 4 -> new Transfer(json);
             case 8 -> new Lease(json);

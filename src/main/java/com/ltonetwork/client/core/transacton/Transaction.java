@@ -25,8 +25,6 @@ public abstract class Transaction {
     }
 
     public Transaction(JsonObject json) {
-        System.out.println(json.get("id").toString());
-        System.out.println(json.get("id").toString().length());
         if (json.has("height")) this.height = Integer.parseInt(json.get("height").toString());
         this.type = Byte.parseByte(json.get("type").toString());
         this.version = Byte.parseByte(json.get("version").toString());

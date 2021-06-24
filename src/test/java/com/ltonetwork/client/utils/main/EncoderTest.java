@@ -85,17 +85,6 @@ public class EncoderTest {
     }
 
     @Test
-    public void testBase64EncodeComplex() {
-        String complexEncoded = "btGEISMrM8+fz6rQgsqn";
-
-        String retCase1 = Encoder.base64Encode(complex);
-        assertEquals(complexEncoded, retCase1);
-
-        String retCase2 = Encoder.base64Encode(complexBytes);
-        assertEquals(complexEncoded, retCase2);
-    }
-
-    @Test
     public void testBase64DecodeSimple() {
         String helloEncoded = "SGVsbG8=";
         byte[] helloBytesEncoded = "SGVsbG8=".getBytes(StandardCharsets.UTF_8);
@@ -137,17 +126,6 @@ public class EncoderTest {
     }
 
     @Test
-    public void testHexEncodeComplex() {
-        String complexEncoded = "6ed18421232b33cf9fcfaad082caa7";
-
-        String retCase1 = Encoder.hexEncode(complex);
-        assertEquals(complexEncoded, retCase1);
-
-        String retCase2 = Encoder.hexEncode(complexBytes);
-        assertEquals(complexEncoded, retCase2);
-    }
-
-    @Test
     public void testHexDecodeSimple() {
         String helloEncoded = "48656c6c6f";
         byte[] helloBytesEncoded = "48656c6c6f".getBytes(StandardCharsets.UTF_8);
@@ -163,24 +141,6 @@ public class EncoderTest {
 
         byte[] retCase4 = Encoder.hexDecode(helloBytesEncoded);
         assertArrayEquals(helloBytes, retCase4);
-    }
-
-    @Test
-    public void testHexDecodeComplex() {
-        String complexEncoded = "6ed18421232b33cf9fcfaad082caa7";
-        byte[] complexBytesEncoded = "6ed18421232b33cf9fcfaad082caa7".getBytes(StandardCharsets.UTF_8);
-
-        String retCase1 = Encoder.hexDecode(complexEncoded, StandardCharsets.UTF_8);
-        assertEquals(complex, retCase1);
-
-        String retCase2 = Encoder.hexDecode(complexBytesEncoded, StandardCharsets.UTF_8);
-        assertEquals(complex, retCase2);
-
-        byte[] retCase3 = Encoder.hexDecode(complexEncoded);
-        assertArrayEquals(complexBytes, retCase3);
-
-        byte[] retCase4 = Encoder.hexDecode(complexBytesEncoded);
-        assertArrayEquals(complexBytes, retCase4);
     }
 
     @Test

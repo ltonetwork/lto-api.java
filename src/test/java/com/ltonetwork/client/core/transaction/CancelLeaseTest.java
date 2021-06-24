@@ -58,6 +58,6 @@ public class CancelLeaseTest {
                         "}", false);
 
         CancelLease jsonTx = new CancelLease(json);
-        assertEquals(110, jsonTx.toBinary().length);
+        assertEquals(76, jsonTx.toBinary().length);
     }
 }
