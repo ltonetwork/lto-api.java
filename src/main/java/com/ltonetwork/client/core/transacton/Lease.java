@@ -2,10 +2,11 @@ package com.ltonetwork.client.core.transacton;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.utils.CryptoUtil;
+import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.utils.JsonObject;
 
 public class Lease extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
@@ -14,7 +15,7 @@ public class Lease extends Transaction {
     private final long amount;
     private final String recipient;
 
-    public Lease(int amount, String recipient) {
+    public Lease(long amount, String recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
 
         if (amount <= 0) {
@@ -27,6 +28,12 @@ public class Lease extends Transaction {
 
         this.amount = amount;
         this.recipient = recipient;
+    }
+
+    public Lease(JsonObject json) {
+        super(json);
+        this.amount = (long) json.get("amount");
+        this.recipient = (String) json.get("recipient");
     }
 
     public byte[] toBinary() {

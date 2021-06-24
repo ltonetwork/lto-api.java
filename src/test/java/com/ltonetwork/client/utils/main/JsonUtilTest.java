@@ -1,10 +1,11 @@
-package legalthings.lto_api.utils.main;
+package com.ltonetwork.client.utils.main;
 
 import static org.junit.Assert.*;
 
+import com.ltonetwork.client.utils.JsonUtil;
 import org.junit.Test;
 
-import legalthings.lto_api.utils.core.JsonObject;
+import com.ltonetwork.client.utils.JsonObject;
 
 public class JsonUtilTest {
 

@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.client.utils.JsonObject;
 
 public class CancelLease extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
@@ -15,6 +16,11 @@ public class CancelLease extends Transaction {
     public CancelLease(int leaseId) {
         super(TYPE, VERSION, MINIMUM_FEE);
         this.leaseId = leaseId;
+    }
+
+    public CancelLease(JsonObject json) {
+        super(json);
+        this.leaseId = (long) json.get("id");
     }
 
     public byte[] toBinary() {

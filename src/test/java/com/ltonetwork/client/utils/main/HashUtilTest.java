@@ -1,7 +1,8 @@
-package legalthings.lto_api.utils.main;
+package com.ltonetwork.client.utils.main;
 
 import static org.junit.Assert.*;
 
+import com.ltonetwork.client.utils.HashUtil;
 import org.junit.Test;
 
 public class HashUtilTest {
