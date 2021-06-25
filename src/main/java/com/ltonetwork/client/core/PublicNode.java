@@ -86,18 +86,43 @@ public class PublicNode {
     }
 
     private Transaction getTransactionObject(JsonObject json) {
-        return switch ((int) json.get("type")) {
-            case 4 -> new Transfer(json);
-            case 8 -> new Lease(json);
-            case 9 -> new CancelLease(json);
-            case 11 -> new MassTransfer(json);
-            case 13 -> new SetScript(json);
-            case 15 -> new Anchor(json);
-            case 16 -> new Association(json);
-            case 17 -> new RevokeAssociation(json);
-            case 18 -> new Sponsor(json);
-            case 19 -> new CancelSponsor(json);
-            default -> throw new InvalidArgumentException("Unknown transaction type");
-        };
+        Transaction ret;
+
+        switch ((int) json.get("type")) {
+            case 4:
+                ret = new Transfer(json);
+                break;
+            case 8:
+                ret = new Lease(json);
+                break;
+            case 9:
+                ret = new CancelLease(json);
+                break;
+            case 11:
+                ret = new MassTransfer(json);
+                break;
+            case 13:
+                ret = new SetScript(json);
+                break;
+            case 15:
+                ret = new Anchor(json);
+                break;
+            case 16:
+                ret = new Association(json);
+                break;
+            case 17:
+                ret = new RevokeAssociation(json);
+                break;
+            case 18:
+                ret = new Sponsor(json);
+                break;
+            case 19:
+                ret = new CancelSponsor(json);
+                break;
+            default:
+                throw new InvalidArgumentException("Unknown transaction type");
+        }
+
+        return ret;
     }
 }

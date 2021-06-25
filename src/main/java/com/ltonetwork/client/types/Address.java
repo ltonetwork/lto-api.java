@@ -27,21 +27,23 @@ public class Address {
         }
 
         switch (encoding) {
-            case BASE58 -> {
+            case BASE58: {
                 if (!CryptoUtil.isValidAddress(address, Encoding.BASE58)) {
                     throw new InvalidArgumentException("Address is not properly base58 encoded");
                 }
                 this.address = address;
                 this.chainId = chainId;
+                break;
             }
-            case BASE64 -> {
+            case BASE64: {
                 if (!CryptoUtil.isValidAddress(address, Encoding.BASE64)) {
                     throw new InvalidArgumentException("Address is not properly base64 encoded");
                 }
                 this.address = Encoder.base58Encode(Encoder.base64Decode(address, StandardCharsets.UTF_8));
                 this.chainId = chainId;
+                break;
             }
-            default -> throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");
+            default: throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");
         }
     }
 

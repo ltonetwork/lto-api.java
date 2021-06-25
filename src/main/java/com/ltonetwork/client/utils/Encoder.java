@@ -119,21 +119,48 @@ public class Encoder {
     }
 
     public static String decode(String input, Encoding encoding) {
-        return switch (encoding) {
-            case BASE58 -> base58Decode(input, StandardCharsets.UTF_8);
-            case BASE64 -> base64Decode(input, StandardCharsets.UTF_8);
-            case RAW -> input;
-            case HEX -> hexDecode(input, StandardCharsets.UTF_8);
-        };
+        String ret;
+        switch (encoding) {
+            case BASE58:
+                ret = base58Decode(input, StandardCharsets.UTF_8);
+                break;
+            case BASE64:
+                ret = base64Decode(input, StandardCharsets.UTF_8);
+                break;
+            case RAW:
+                ret = input;
+                break;
+            case HEX:
+                ret = hexDecode(input, StandardCharsets.UTF_8);
+                break;
+            default:
+                ret = null;
+        }
+
+        return ret;
     }
 
     public static String encode(String input, Encoding encoding) {
-        return switch (encoding) {
-            case BASE58 -> base58Encode(input);
-            case BASE64 -> base64Encode(input);
-            case RAW -> input;
-            case HEX -> hexEncode(input);
-        };
+        String ret;
+
+        switch (encoding) {
+            case BASE58:
+                ret = base58Encode(input);
+                break;
+            case BASE64:
+                ret = base64Encode(input);
+                break;
+            case RAW:
+                ret = input;
+                break;
+            case HEX:
+                ret = hexEncode(input);
+                break;
+            default:
+                ret = null;
+        }
+
+        return ret;
     }
 
     public static boolean isBase58Encoded(String input) {

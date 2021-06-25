@@ -18,9 +18,15 @@ public class Signature {
      */
     public Signature(String value, Encoding encoding) {
         switch (encoding) {
-            case BASE58 -> this.value = Encoder.base58Decode(value);
-            case BASE64 -> this.value = Encoder.base64Decode(value);
-            case HEX -> this.value = Encoder.hexDecode(value);
+            case BASE58:
+                this.value = Encoder.base58Decode(value);
+                break;
+            case BASE64:
+                this.value = Encoder.base64Decode(value);
+                break;
+            case HEX:
+                this.value = Encoder.hexDecode(value);
+                break;
         }
     }
 

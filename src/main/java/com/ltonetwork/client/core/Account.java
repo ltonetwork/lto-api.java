@@ -3,7 +3,6 @@ package com.ltonetwork.client.core;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.*;
 import com.ltonetwork.client.utils.CryptoUtil;
-import com.ltonetwork.client.utils.Encoder;
 
 public class Account {
 
@@ -22,11 +21,20 @@ public class Account {
     }
 
     public String getAddress(Encoding encoding) {
-        return switch (encoding) {
-            case BASE58 -> this.address.getAddress();
-            case BASE64 -> this.address.getAddressBase64();
-            default -> throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");
-        };
+        String ret;
+
+        switch (encoding) {
+            case BASE58:
+                ret = this.address.getAddress();
+                break;
+            case BASE64:
+                ret = this.address.getAddressBase64();
+                break;
+            default:
+                throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");
+        }
+
+        return ret;
     }
 
     public String getAddress() {

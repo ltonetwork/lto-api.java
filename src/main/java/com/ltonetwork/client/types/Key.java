@@ -28,38 +28,94 @@ public class Key {
     }
 
     public String toBase58() {
-        return switch (this.encoding) {
-            case BASE58 -> new String(this.valueBytes);
-            case BASE64 -> base58Encode(base64Decode(this.valueBytes));
-            case RAW -> base58Encode(this.valueBytes);
-            case HEX -> base58Encode(hexDecode(this.valueBytes));
-        };
+        String ret;
+
+        switch (this.encoding) {
+            case BASE58:
+                ret = new String(this.valueBytes);
+                break;
+            case BASE64:
+                ret = base58Encode(base64Decode(this.valueBytes));
+                break;
+            case RAW:
+                ret = base58Encode(this.valueBytes);
+                break;
+            case HEX:
+                ret = base58Encode(hexDecode(this.valueBytes));
+                break;
+            default:
+                ret = null;
+        }
+
+        return ret;
     }
 
     public String toBase64() {
-        return switch (this.encoding) {
-            case BASE58 -> base64Encode(base58Decode(this.valueBytes));
-            case BASE64 -> new String(this.valueBytes);
-            case RAW -> base64Encode(this.valueBytes);
-            case HEX -> base64Encode(hexDecode(this.valueBytes));
-        };
+        String ret;
+
+        switch (this.encoding) {
+            case BASE58:
+                ret = base64Encode(base58Decode(this.valueBytes));
+                break;
+            case BASE64:
+                ret = new String(this.valueBytes);
+                break;
+            case RAW:
+                ret = base64Encode(this.valueBytes);
+                break;
+            case HEX:
+                ret = base64Encode(hexDecode(this.valueBytes));
+                break;
+            default:
+                ret = null;
+        }
+
+        return ret;
     }
 
     public byte[] toRaw() {
-        return switch (this.encoding) {
-            case BASE58 -> base58Decode(this.valueBytes);
-            case BASE64 -> base64Decode(this.valueBytes);
-            case RAW -> new String(this.valueBytes).getBytes(StandardCharsets.UTF_8);
-            case HEX -> hexDecode(this.valueBytes);
-        };
+        byte[] ret;
+
+        switch (this.encoding) {
+            case BASE58:
+                ret = base58Decode(this.valueBytes);
+                break;
+            case BASE64:
+                ret = base64Decode(this.valueBytes);
+                break;
+            case RAW:
+                ret = new String(this.valueBytes).getBytes(StandardCharsets.UTF_8);
+                break;
+            case HEX:
+                ret = hexDecode(this.valueBytes);
+                break;
+            default:
+                ret = null;
+        }
+
+        return ret;
     }
 
     public String toHex() {
-        return switch (this.encoding) {
-            case BASE58 -> hexEncode(base58Decode(this.valueBytes));
-            case BASE64 -> hexEncode(base64Decode(this.valueBytes));
-            case RAW -> hexEncode(this.valueBytes);
-            case HEX -> new String(this.valueBytes);
-        };
+        String ret;
+
+        switch (this.encoding) {
+            case BASE58:
+                ret = hexEncode(base58Decode(this.valueBytes));
+                break;
+            case BASE64:
+                ret = hexEncode(base64Decode(this.valueBytes));
+                break;
+            case RAW:
+                ret = hexEncode(this.valueBytes);
+                break;
+            case HEX:
+                ret = new String(this.valueBytes);
+                break;
+            default:
+                ret = null;
+        }
+
+        return ret;
     }
 }
