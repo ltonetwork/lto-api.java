@@ -1,9 +1,9 @@
 package com.ltonetwork.client.utils;
 
-import java.security.MessageDigest;
-
 import org.web3j.crypto.Hash;
 import org.web3j.utils.Numeric;
+
+import java.security.MessageDigest;
 
 public class HashUtil {
     public static byte[] SHA256(byte[] input) {

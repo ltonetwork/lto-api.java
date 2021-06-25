@@ -5,27 +5,26 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
-import com.ltonetwork.client.utils.CryptoUtil;
+import com.ltonetwork.client.types.Address;
+import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
-import com.ltonetwork.client.utils.JsonObject;
+
+import java.nio.charset.StandardCharsets;
 
 public class Transfer extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
-    private final static int TYPE = 4;
-    private final static int VERSION = 2;
-    private long amount;
-    private String attachment = "";
-    private final String recipient;
+    private final static byte TYPE = 4;
+    private final static byte VERSION = 2;
+    private final long amount;
+    private String attachment;
+    private final Address recipient;
 
-    public Transfer(int amount, String recipient) {
+    public Transfer(int amount, Address recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
 
         if (amount <= 0) {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
-        }
-
-        if (!CryptoUtil.isValidAddress(recipient, "base58")) {
-            throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 
         this.amount = amount;
@@ -34,16 +33,17 @@ public class Transfer extends Transaction {
 
     public Transfer(JsonObject json) {
         super(json);
-        this.amount = (long) json.get("amount");
-        this.recipient = (String) json.get("recipient");
+        this.amount = Long.parseLong(json.get("amount").toString());
+        this.recipient = new Address(json.get("recipient").toString(), super.sender.getChainId());
     }
 
-    public void setAttachment(String message, String encoding) {
-        this.attachment = Encoder.fromXStringToBase58String(message, encoding);
+    public void setAttachment(String message, Encoding encoding) {
+        this.attachment = Encoder.base58Encode(Encoder.decode(message, encoding));
     }
 
     public void setAttachment(String message) {
-        setAttachment(message, "raw");
+        Encoder.isBase58Encoded(message);
+        setAttachment(message, Encoding.BASE58);
     }
 
     public byte[] toBinary() {
@@ -55,18 +55,23 @@ public class Transfer extends Transaction {
             throw new BadMethodCallException("Timestamp not set");
         }
 
-        byte[] binaryAttachment = Encoder.base58Decode(this.attachment);
-
-        return Bytes.concat(
+        byte[] binaryAttachment = Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                Encoder.base58Decode(this.senderPublicKey),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),
-                Encoder.base58Decode(this.recipient),
-                Ints.toByteArray(attachment.length()),
-                binaryAttachment
-        );
+                Encoder.base58Decode(this.recipient.getAddress()));
+
+        if (attachment != null) {
+            binaryAttachment = Bytes.concat(
+                    binaryAttachment,
+                    Ints.toByteArray(attachment.length()),
+                    Encoder.base58Decode(this.attachment)
+            );
+        }
+
+        return binaryAttachment;
     }
 }

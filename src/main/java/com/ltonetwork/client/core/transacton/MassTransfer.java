@@ -5,20 +5,21 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
-import com.ltonetwork.client.utils.CryptoUtil;
+import com.ltonetwork.client.types.Address;
+import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
-import com.ltonetwork.client.utils.JsonObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class MassTransfer extends Transaction {
     private final static long BASE_FEE = 100_000_000;
     private final static long ITEM_FEE = 10_000_000;
-    private final static int TYPE = 11;
-    private final static int VERSION = 1;
+    private final static byte TYPE = 11;
+    private final static byte VERSION = 1;
     private final ArrayList<TransferShort> transfers;
-    private String attachment = "";
+    private String attachment;
 
     public MassTransfer() {
         super(TYPE, VERSION, BASE_FEE);
@@ -28,37 +29,33 @@ public class MassTransfer extends Transaction {
     public MassTransfer(JsonObject json) {
         super(json);
 
-        JsonObject jsonTransfers = new JsonObject((String) json.get("transfers"), true);
+        JsonObject jsonTransfers = new JsonObject(json.get("transfers").toString(), true);
         ArrayList<TransferShort> transfers = new ArrayList<>();
-        Iterator<?> it = jsonTransfers.keys();
 
-        while (it.hasNext()) {
-            JsonObject curr = new JsonObject(it.next().toString());
+        for (int i = 0; i < jsonTransfers.length(); i++) {
+            JsonObject curr = new JsonObject(jsonTransfers.get(i), false);
             transfers.add(new TransferShort(
-                    (String) json.get("recipient"),
-                    (long) json.get("amount")
+                    new Address(curr.get("recipient").toString()),
+                    Long.parseLong(curr.get("amount").toString())
             ));
         }
 
         this.transfers = transfers;
+        if (json.has("attachment")) this.attachment = json.get("attachment").toString();
     }
 
-    public void setAttachment(String message, String encoding) {
-        this.attachment = Encoder.fromXStringToBase58String(message, encoding);
+    public void setAttachment(String message, Encoding encoding) {
+        this.attachment = Encoder.base58Encode(Encoder.decode(message, encoding));
     }
 
     public void setAttachment(String message) {
-        setAttachment(message, "raw");
+        setAttachment(message, Encoding.RAW);
     }
 
-    public void addTransfer(String recipient, int amount) {
+    public void addTransfer(Address recipient, int amount) {
 
         if (amount <= 0) {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
-        }
-
-        if (!CryptoUtil.isValidAddress(recipient, "base58")) {
-            throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 
         transfers.add(new TransferShort(recipient, amount));
@@ -74,12 +71,17 @@ public class MassTransfer extends Transaction {
             throw new BadMethodCallException("Timestamp not set");
         }
 
-        byte[] binaryAttachment = Encoder.base58Decode(this.attachment);
+        byte[] ret = Bytes.concat(
+                Longs.toByteArray(this.type),
+                Longs.toByteArray(this.version),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
+                Ints.toByteArray(transfers.size())
+        );
 
         ArrayList<Byte> transfersBytes = new ArrayList<>();
 
         for (TransferShort transfer : transfers) {
-            for (Byte rec : Encoder.base58Decode(transfer.getRecipient())) {
+            for (Byte rec : Encoder.base58Decode(transfer.getRecipient().getAddress())) {
                 transfersBytes.add(rec);
             }
             for (Byte am : Longs.toByteArray(transfer.getAmount())) {
@@ -87,16 +89,21 @@ public class MassTransfer extends Transaction {
             }
         }
 
-        return Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                Encoder.base58Decode(this.senderPublicKey),
-                Ints.toByteArray(transfers.size()),
+        ret = Bytes.concat(
+                ret,
                 Bytes.toArray(transfersBytes),
                 Longs.toByteArray(this.timestamp),
-                Longs.toByteArray(this.fee),
-                Ints.toByteArray(attachment.length()),
-                binaryAttachment
+                Longs.toByteArray(this.fee)
         );
+
+        if (attachment != null) {
+            ret = Bytes.concat(
+                    ret,
+                    Ints.toByteArray(attachment.length()),
+                    Encoder.base58Decode(this.attachment)
+            );
+        }
+
+        return ret;
     }
 }

@@ -1,5 +1,7 @@
 package com.ltonetwork.client.utils;
 
+import com.ltonetwork.client.types.JsonObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;

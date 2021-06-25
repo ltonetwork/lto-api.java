@@ -1,72 +1,56 @@
 package com.ltonetwork.client.core.transacton;
 
 import com.ltonetwork.client.core.Account;
-import com.ltonetwork.client.core.Address;
-import com.ltonetwork.client.utils.JsonObject;
+import com.ltonetwork.client.types.*;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public abstract class Transaction {
     protected int height;
-    protected int type;
-    protected int version;
+    protected byte type;
+    protected byte version;
     protected long fee;
     protected long timestamp;
-    protected String id;
+    protected TransactionId id;
     protected Address sender;
-    protected String senderPublicKey;
-    protected ArrayList<byte[]> proofs;
+    protected Key senderPublicKey;
+    protected ArrayList<Signature> proofs;
 
-    public Transaction(int type, int version, long fee) {
+    public Transaction(byte type, byte version, long fee) {
         this.type = type;
         this.version = version;
         this.fee = fee;
+        this.proofs = new ArrayList<>();
     }
 
     public Transaction(JsonObject json) {
-        if (json.get("height") != null) this.height = (int) json.get("height");
-        this.type = (int) json.get("type");
-        this.version = (int) json.get("version");
-        this.fee = (long) json.get("fee");
-        this.timestamp = (long) json.get("timestamp");
-        if (json.get("id") != null) this.id = (String) json.get("id");
-        this.sender = new Address(json.get("sender").toString().getBytes(StandardCharsets.UTF_8));
-        this.senderPublicKey = (String) json.get("senderPublicKey");
-        this.proofs = fetchProofs(new JsonObject((String) json.get("proofs"), true));
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setSender(Address sender) {
-        this.sender = sender;
-    }
-
-    public void setSenderPublicKey(String senderPublicKey) {
-        this.senderPublicKey = senderPublicKey;
+        if (json.has("height")) this.height = Integer.parseInt(json.get("height").toString());
+        this.type = Byte.parseByte(json.get("type").toString());
+        this.version = Byte.parseByte(json.get("version").toString());
+        this.fee = Long.parseLong(json.get("fee").toString());
+        this.timestamp = Long.parseLong(json.get("timestamp").toString());
+        if (json.has("id")) this.id = new TransactionId(json.get("id").toString());
+        if (json.has("chainId")) {
+            this.sender = new Address(json.get("sender").toString(), Byte.parseByte(json.get("chainId").toString()));
+        } else {
+            this.sender = new Address(json.get("sender").toString());
+        }
+        this.senderPublicKey = new Key(json.get("senderPublicKey").toString(), Encoding.BASE58);
+        if (json.has("proofs")) this.proofs = fetchProofs(new JsonObject(json.get("proofs").toString(), true));
     }
 
     public void signWith(Account account) {
         if (this.sender == null) {
-            setSender(account.getAddressStruct());
-            setSenderPublicKey(account.getPublicSignKey());
+            this.sender = account.getAddressStruct();
+            this.senderPublicKey = account.getPublicSignKey();
         }
 
         if (this.timestamp == 0) {
-            setTimestamp(Instant.now().toEpochMilli() * 1000);
+            this.timestamp = Instant.now().toEpochMilli() * 1000;
         }
+
+        this.proofs.add(new Signature(this.toBinary(), account.getSign().getSecretkey()));
     }
 
     abstract public byte[] toBinary();
@@ -79,13 +63,11 @@ public abstract class Transaction {
         return this.sender.getChainId();
     }
 
-    private ArrayList<byte[]> fetchProofs(JsonObject jsonProofs) {
-        ArrayList<byte[]> proofs = new ArrayList<>();
-        Iterator<?> it = jsonProofs.keys();
+    private ArrayList<Signature> fetchProofs(JsonObject jsonProofs) {
+        ArrayList<Signature> proofs = new ArrayList<>();
 
-        while (it.hasNext()) {
-            JsonObject curr = new JsonObject(it.next().toString());
-            proofs.add(curr.toString().getBytes(StandardCharsets.UTF_8));
+        for (int i = 0; i < jsonProofs.length(); i++) {
+            proofs.add(new Signature(jsonProofs.get(i), Encoding.BASE58));
         }
 
         return proofs;

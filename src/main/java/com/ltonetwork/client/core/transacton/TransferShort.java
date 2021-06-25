@@ -1,15 +1,17 @@
 package com.ltonetwork.client.core.transacton;
 
+import com.ltonetwork.client.types.Address;
+
 public class TransferShort {
-    private final String recipient;
+    private final Address recipient;
     private final long amount;
 
-    public TransferShort(String recipient, long amount) {
+    public TransferShort(Address recipient, long amount) {
         this.recipient = recipient;
         this.amount = amount;
     }
 
-    public String getRecipient() {
+    public Address getRecipient() {
         return recipient;
     }
 

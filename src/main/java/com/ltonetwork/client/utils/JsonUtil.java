@@ -1,5 +1,7 @@
 package com.ltonetwork.client.utils;
 
+import com.ltonetwork.client.types.JsonObject;
+
 public class JsonUtil {
     public static String jsonEncode(JsonObject object) {
         return object.toString();

@@ -1,44 +1,173 @@
 package com.ltonetwork.client.utils.main;
 
-import static org.junit.Assert.*;
-
 import com.ltonetwork.client.utils.Encoder;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.Assert.*;
+
 public class EncoderTest {
+    String hello;
+    byte[] helloBytes;
+    String complex;
+    byte[] complexBytes;
 
-    @Test
-    public void testBase58() {
-        String case1 = "Hello";
-        String retCase1 = Encoder.base58Encode(case1);
-        assertEquals("9Ajdvzr", retCase1);
+    @Before
+    public void init() {
+        hello = "Hello";
+        helloBytes = "Hello".getBytes(StandardCharsets.UTF_8);
 
-        String retCase2 = new String(Encoder.base58Decode(retCase1));
-        assertEquals("Hello", retCase2);
-
-        String case3 = "3PLSsSDUn3kZdGe8qWEDak9y8oAjLVecXV1";
-        assertEquals(case3, Encoder.base58Encode(Encoder.base58Decode(case3)));
+        complex = "nф!#+3ϟϪЂʧ";
+        complexBytes = "nф!#+3ϟϪЂʧ".getBytes(StandardCharsets.UTF_8);
     }
 
     @Test
-    public void testBase64() {
-        String case1 = "Hello";
-        String retCase1 = new String(Encoder.base64Encode(case1));
-        assertEquals("SGVsbG8=", retCase1);
+    public void testBase58EncodeSimple() {
+        String helloEncoded = "9Ajdvzr";
 
-        String retCase2 = new String(Encoder.base64Decode(retCase1));
-        assertEquals("Hello", retCase2);
+        String retCase1 = Encoder.base58Encode(hello, StandardCharsets.US_ASCII);
+        assertEquals(helloEncoded, retCase1);
 
-        String case3 = "3PLSsSDUn3kZdGe8qWEDak9y8oAjLVecXV1";
-        String encodedCase3 = new String(Encoder.base64Encode(case3));
-        String decodedCase3 = new String(Encoder.base64Decode(encodedCase3));
-        assertEquals(case3, decodedCase3);
+        String retCase2 = Encoder.base58Encode(hello);
+        assertEquals(helloEncoded, retCase2);
+
+        String retCase3 = Encoder.base58Encode(hello.getBytes(StandardCharsets.UTF_8));
+        assertEquals(helloEncoded, retCase3);
     }
 
     @Test
-    public void testRepeat() {
-        String case1 = "Hi";
-        String retCase1 = Encoder.repeat(case1, 5);
-        assertEquals("HiHiHiHiHi", retCase1);
+    public void testBase58EncodeComplex() {
+        String retCase = Encoder.base58Encode(complex, StandardCharsets.UTF_8);
+        assertEquals("46pbidXQtvZ6tvvRhDVok", retCase);
+    }
+
+    @Test
+    public void testBase58DecodeSimple() {
+        String helloEncoded = "9Ajdvzr";
+        byte[] helloBytesEncoded = "9Ajdvzr".getBytes(StandardCharsets.UTF_8);
+
+        String retCase1 = Encoder.base58Decode(helloEncoded, StandardCharsets.UTF_8);
+        assertEquals(hello, retCase1);
+
+        String retCase2 = Encoder.base58Decode(helloBytesEncoded, StandardCharsets.UTF_8);
+        assertEquals(hello, retCase2);
+
+        byte[] retCase3 = Encoder.base58Decode(helloEncoded);
+        assertArrayEquals(helloBytes, retCase3);
+
+        byte[] retCase4 = Encoder.base58Decode(helloBytesEncoded);
+        assertArrayEquals(helloBytes, retCase4);
+    }
+
+    @Test
+    public void testBase58DecodeComplex() {
+        String complexEncoded = "46pbidXQtvZ6tvvRhDVok";
+        byte[] complexBytesEncoded = "46pbidXQtvZ6tvvRhDVok".getBytes(StandardCharsets.UTF_8);
+
+        String retCase1 = Encoder.base58Decode(complexEncoded, StandardCharsets.UTF_8);
+        assertEquals(complex, retCase1);
+
+        byte[] retCase2 = Encoder.base58Decode(complexBytesEncoded);
+        assertArrayEquals(complexBytes, retCase2);
+    }
+
+    @Test
+    public void testBase64EncodeSimple() {
+        String helloEncoded = "SGVsbG8=";
+
+        String retCase1 = Encoder.base64Encode(hello);
+        assertEquals(helloEncoded, retCase1);
+
+        String retCase2 = Encoder.base64Encode(helloBytes);
+        assertEquals(helloEncoded, retCase2);
+    }
+
+    @Test
+    public void testBase64DecodeSimple() {
+        String helloEncoded = "SGVsbG8=";
+        byte[] helloBytesEncoded = "SGVsbG8=".getBytes(StandardCharsets.UTF_8);
+
+        String retCase1 = Encoder.base64Decode(helloEncoded, StandardCharsets.UTF_8);
+        assertEquals(hello, retCase1);
+
+        String retCase2 = Encoder.base64Decode(helloBytesEncoded, StandardCharsets.UTF_8);
+        assertEquals(hello, retCase2);
+
+        byte[] retCase3 = Encoder.base64Decode(helloEncoded);
+        assertArrayEquals(helloBytes, retCase3);
+
+        byte[] retCase4 = Encoder.base64Decode(helloBytesEncoded);
+        assertArrayEquals(helloBytes, retCase4);
+    }
+
+    @Test
+    public void testBase64DecodeComplex() {
+        String complexEncoded = "btGEISMrM8+fz6rQgsqn";
+        byte[] complexBytesEncoded = "btGEISMrM8+fz6rQgsqn".getBytes(StandardCharsets.UTF_8);
+
+        String retCase1 = Encoder.base64Decode(complexEncoded, StandardCharsets.UTF_8);
+        assertEquals(complex, retCase1);
+
+        byte[] retCase2 = Encoder.base64Decode(complexBytesEncoded);
+        assertArrayEquals(complexBytes, retCase2);
+    }
+
+    @Test
+    public void testHexEncodeSimple() {
+        String helloEncoded = "48656c6c6f";
+
+        String retCase1 = Encoder.hexEncode(hello);
+        assertEquals(helloEncoded, retCase1);
+
+        String retCase2 = Encoder.hexEncode(helloBytes);
+        assertEquals(helloEncoded, retCase2);
+    }
+
+    @Test
+    public void testHexDecodeSimple() {
+        String helloEncoded = "48656c6c6f";
+        byte[] helloBytesEncoded = "48656c6c6f".getBytes(StandardCharsets.UTF_8);
+
+        String retCase1 = Encoder.hexDecode(helloEncoded, StandardCharsets.UTF_8);
+        assertEquals(hello, retCase1);
+
+        String retCase2 = Encoder.hexDecode(helloBytesEncoded, StandardCharsets.UTF_8);
+        assertEquals(hello, retCase2);
+
+        byte[] retCase3 = Encoder.hexDecode(helloEncoded);
+        assertArrayEquals(helloBytes, retCase3);
+
+        byte[] retCase4 = Encoder.hexDecode(helloBytesEncoded);
+        assertArrayEquals(helloBytes, retCase4);
+    }
+
+    @Test
+    public void testIsBase58EncodedGood() {
+        String helloEncoded = "9Ajdvzr";
+        boolean retCase1 = Encoder.isBase58Encoded(helloEncoded);
+        assertTrue(retCase1);
+    }
+
+    @Test
+    public void testIsBase58EncodedBad() {
+        String helloEncoded = "9Ajdvzr=";
+        boolean retCase1 = Encoder.isBase58Encoded(helloEncoded);
+        assertFalse(retCase1);
+    }
+
+    @Test
+    public void testIsBase64EncodedGood() {
+        String helloEncoded = "SGVsbG8=";
+        boolean retCase1 = Encoder.isBase64Encoded(helloEncoded);
+        assertTrue(retCase1);
+    }
+
+    @Test
+    public void testIsBase64EncodedBad() {
+        String helloEncoded = "SGVsbG8=л";
+        boolean retCase1 = Encoder.isBase64Encoded(helloEncoded);
+        assertFalse(retCase1);
     }
 }

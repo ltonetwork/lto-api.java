@@ -4,19 +4,20 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
+import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
-import com.ltonetwork.client.utils.JsonObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Anchor extends Transaction {
     private final static long MINIMUM_FEE = 35_000_000;
-    private final static int TYPE = 15;
-    private final static int VERSION = 1;
+    private final static byte TYPE = 15;
+    private final static byte VERSION = 1;
     private final ArrayList<String> anchors;
 
-    public Anchor(String hash, String encoding) {
+    public Anchor(String hash, Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
         anchors = new ArrayList<>();
         addHash(hash, encoding);
@@ -24,12 +25,11 @@ public class Anchor extends Transaction {
 
     public Anchor(JsonObject json) {
         super(json);
-        JsonObject jsonAnchors = new JsonObject((String) json.get("anchors"), true);
+        JsonObject jsonAnchors = new JsonObject(json.get("anchors").toString(), true);
         ArrayList<String> anchors = new ArrayList<>();
-        Iterator<?> it = jsonAnchors.keys();
 
-        while (it.hasNext()) {
-            anchors.add(it.next().toString());
+        for (int i = 0; i < jsonAnchors.length(); i++) {
+            anchors.add(jsonAnchors.get(i));
         }
 
         this.anchors = anchors;
@@ -54,7 +54,7 @@ public class Anchor extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                Encoder.base58Decode(this.senderPublicKey),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 Ints.toByteArray(anchors.size()),
                 Bytes.toArray(anchorsBytes),
                 Longs.toByteArray(this.timestamp),
@@ -62,23 +62,29 @@ public class Anchor extends Transaction {
         );
     }
 
-    public void addHash(String hash, String encoding) {
-        anchors.add(Encoder.fromXStringToBase58String(hash, encoding));
+    public void addHash(String hash, Encoding encoding) {
+        anchors.add(Encoder.base58Encode(Encoder.decode(hash, encoding)));
     }
 
-    public String getHash(String encoding) {
+    public String getHash(Encoding encoding) {
         if (anchors.size() != 1)
             throw new BadMethodCallException("Method 'getHash' can't be used on a multi-anchor tx");
 
-        return Encoder.fromBase58StringToXString(this.anchors.get(0), encoding);
+        return Encoder.encode(
+                Encoder.base58Decode(this.anchors.get(0), StandardCharsets.UTF_8),
+                encoding
+        );
     }
 
-    public String[] getHashes(String encoding) {
-        if (encoding.equals("base58")) return this.anchors.toArray(new String[0]);
+    public String[] getHashes(Encoding encoding) {
+        if (encoding == Encoding.BASE58) return this.anchors.toArray(new String[0]);
 
         String[] hashes = new String[this.anchors.size()];
         for (int i = 0; i < this.anchors.size(); i++) {
-            hashes[i] = Encoder.fromBase58StringToXString(this.anchors.get(0), encoding);
+            hashes[i] = Encoder.encode(
+                    Encoder.base58Decode(this.anchors.get(i), StandardCharsets.UTF_8),
+                    encoding
+            );
         }
 
         return hashes;

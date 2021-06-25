@@ -4,26 +4,24 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
-import com.ltonetwork.client.utils.CryptoUtil;
+import com.ltonetwork.client.types.Address;
+import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
-import com.ltonetwork.client.utils.JsonObject;
+
+import java.nio.charset.StandardCharsets;
 
 public class Lease extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
-    private final static int TYPE = 8;
-    private final static int VERSION = 2;
+    private final static byte TYPE = 8;
+    private final static byte VERSION = 2;
     private final long amount;
-    private final String recipient;
+    private final Address recipient;
 
-    public Lease(long amount, String recipient) {
+    public Lease(long amount, Address recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
 
         if (amount <= 0) {
             throw new InvalidArgumentException("Invalid amount; should be greater than 0");
-        }
-
-        if (!CryptoUtil.isValidAddress(recipient, "base58")) {
-            throw new InvalidArgumentException("Invalid recipient address; is it base58 encoded?");
         }
 
         this.amount = amount;
@@ -32,8 +30,8 @@ public class Lease extends Transaction {
 
     public Lease(JsonObject json) {
         super(json);
-        this.amount = (long) json.get("amount");
-        this.recipient = (String) json.get("recipient");
+        this.amount = Long.parseLong(json.get("amount").toString());
+        this.recipient = new Address(json.get("recipient").toString());
     }
 
     public byte[] toBinary() {
@@ -48,11 +46,11 @@ public class Lease extends Transaction {
         return Bytes.concat(
                 Longs.toByteArray(this.type),
                 Longs.toByteArray(this.version),
-                Encoder.base58Decode(this.senderPublicKey),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),
-                Encoder.base58Decode(this.recipient)
+                Encoder.base58Decode(this.recipient.getAddress())
         );
     }
 }

@@ -1,10 +1,11 @@
-package com.ltonetwork.client.utils;
+package com.ltonetwork.client.types;
 
-import java.util.Iterator;
-
+import com.ltonetwork.client.utils.Encoder;
 import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.OrderedJSONObject;
+
+import java.util.Iterator;
 
 public class JsonObject {
     private static final int OBJECT = 1;
@@ -196,5 +197,12 @@ public class JsonObject {
             return object.keys();
         }
         return null;
+    }
+
+    public int length() {
+        if (type == ARRAY) {
+            return array.length();
+        }
+        return 0;
     }
 }

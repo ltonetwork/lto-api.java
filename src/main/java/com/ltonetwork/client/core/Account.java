@@ -1,17 +1,17 @@
 package com.ltonetwork.client.core;
 
+import com.ltonetwork.client.exceptions.InvalidArgumentException;
+import com.ltonetwork.client.types.*;
 import com.ltonetwork.client.utils.CryptoUtil;
-import com.ltonetwork.client.utils.Encoder;
 
 public class Account {
 
     private final Address address;
-    private byte[] chainId;
     private final KeyPair encrypt;
     private final KeyPair sign;
 
-    public Account(byte[] address, byte chainId, KeyPair encrypt, KeyPair sign) {
-        this.address = new Address(address, chainId);
+    public Account(Address address, KeyPair encrypt, KeyPair sign) {
+        this.address = address;
         this.encrypt = encrypt;
         this.sign = sign;
     }
@@ -20,12 +20,25 @@ public class Account {
         return this.address;
     }
 
-    public String getAddress(String encoding) {
-        return address != null ? encode(this.address.getAddress(), encoding) : null;
+    public String getAddress(Encoding encoding) {
+        String ret;
+
+        switch (encoding) {
+            case BASE58:
+                ret = this.address.getAddress();
+                break;
+            case BASE64:
+                ret = this.address.getAddressBase64();
+                break;
+            default:
+                throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");
+        }
+
+        return ret;
     }
 
     public String getAddress() {
-        return getAddress("base58");
+        return getAddress(Encoding.BASE58);
     }
 
     public byte getChainId() {
@@ -40,62 +53,44 @@ public class Account {
         return sign;
     }
 
-    public String getPublicSignKey(String encoding) {
-        return sign != null ? encode(sign.getPublickey(), encoding) : null;
+    public Key getPublicSignKey() {
+        return sign.getPublickey();
     }
 
-    public String getPublicSignKey() {
-        return getPublicSignKey("base58");
+    public Key getPublicEncryptKey() {
+        return encrypt.getPublickey();
     }
 
-    public String getPublicEncryptKey(String encoding) {
-        return encrypt != null ? encode(encrypt.getPublickey(), encoding) : null;
-    }
-
-    public String getPublicEncryptKey() {
-        return getPublicEncryptKey("base58");
-    }
-
-    public String sign(String message, String encoding) {
+    public Signature sign(String message) {
         if (sign == null || sign.getSecretkey() == null) {
             throw new RuntimeException("Unable to sign message; no secret sign key");
         }
-        byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey());
-        return encode(signature, encoding);
+        byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey().getValueBytes());
+        return new Signature(signature);
     }
 
-    public String sign(String message) {
+    public Signature sign(byte[] message) {
         if (sign == null || sign.getSecretkey() == null) {
             throw new RuntimeException("Unable to sign message; no secret sign key");
         }
-        byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey());
-        return encode(signature, "base58");
+        byte[] signature = CryptoUtil.crypto_sign_detached(message, sign.getSecretkey().getValueBytes());
+        return new Signature(signature);
     }
 
-    public byte[] signBytes(byte[] message) {
-        if (sign == null || sign.getSecretkey() == null) {
-            throw new RuntimeException("Unable to sign message; no secret sign key");
-        }
-        byte[] signature = CryptoUtil.crypto_sign_detached(message, sign.getSecretkey());
-        String encoded_signature = encode(signature, "base58");
-        if (encoded_signature == null) return null;
-        else return encoded_signature.getBytes();
-    }
-
-    public boolean verify(String signature, String message, String encoding) {
+    public boolean verify(Signature signature, String message) {
         if (sign == null || sign.getPublickey() == null) {
             throw new RuntimeException("Unable to verify message; no public sign key");
         }
 
-        byte[] rawSignature = decode(signature, encoding);
-
-        return rawSignature.length == CryptoUtil.crypto_sign_bytes() &&
-                sign.getPublickey().length == CryptoUtil.crypto_sign_publickeybytes() &&
-                CryptoUtil.crypto_sign_verify_detached(rawSignature, message.getBytes(), sign.getPublickey());
+        return signature.verify(sign.getPublickey(), message);
     }
 
-    public boolean verify(String signature, String message) {
-        return verify(signature, message, "base58");
+    public boolean verify(Signature signature, byte[] message) {
+        if (sign == null || sign.getPublickey() == null) {
+            throw new RuntimeException("Unable to verify message; no public sign key");
+        }
+
+        return signature.verify(sign.getPublickey(), message);
     }
 
     public byte[] encrypt(Account recipient, String message) {
@@ -108,7 +103,12 @@ public class Account {
 
         byte[] nonce = getNonce();
 
-        byte[] retEncrypt = CryptoUtil.crypto_box(nonce, message.getBytes(), recipient.encrypt.getPublickey(), encrypt.getSecretkey());
+        byte[] retEncrypt = CryptoUtil.crypto_box(
+                nonce,
+                message.getBytes(),
+                recipient.encrypt.getPublickey().getValueBytes(),
+                encrypt.getSecretkey().getValueBytes()
+        );
 
         byte[] ret = new byte[retEncrypt.length + nonce.length];
         System.arraycopy(retEncrypt, 0, ret, 0, retEncrypt.length);
@@ -131,57 +131,15 @@ public class Account {
         byte[] nonce = new byte[24];
         System.arraycopy(ciphertext, ciphertext.length - 24, nonce, 0, 24);
 
-        return CryptoUtil.crypto_box_open(nonce, encryptedMessage, encrypt.getPublickey(), sender.encrypt.getSecretkey());
+        return CryptoUtil.crypto_box_open(
+                nonce,
+                encryptedMessage,
+                encrypt.getPublickey().getValueBytes(),
+                sender.encrypt.getSecretkey().getValueBytes()
+        );
     }
 
     protected byte[] getNonce() {
         return CryptoUtil.random_bytes(CryptoUtil.crypto_box_noncebytes());
-    }
-
-    protected static String encode(String string, String encoding) {
-        if (encoding.equals("base58")) {
-            string = Encoder.base58Encode(string);
-        }
-
-        if (encoding.equals("base64")) {
-            string = Encoder.base64Encode(string);
-        }
-
-        return string;
-    }
-
-    protected static String encode(byte[] string, String encoding) {
-        if (encoding.equals("base58")) {
-            return Encoder.base58Encode(string);
-        }
-
-        if (encoding.equals("base64")) {
-            return Encoder.base64Encode(string);
-        }
-        return null;
-    }
-
-    protected static String encode(String string) {
-        return encode(string, "base58");
-    }
-
-    protected static String encode(byte[] string) {
-        return encode(string, "base58");
-    }
-
-    protected static byte[] decode(String string, String encoding) {
-        if (encoding.equals("base58")) {
-            return Encoder.base58Decode(string);
-        }
-
-        if (encoding.equals("base64")) {
-            return Encoder.base64Decode(string);
-        }
-
-        return null;
-    }
-
-    protected static byte[] decode(String string) {
-        return decode(string, "base58");
     }
 }

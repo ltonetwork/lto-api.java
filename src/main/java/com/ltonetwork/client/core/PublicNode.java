@@ -3,102 +3,126 @@ package com.ltonetwork.client.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ltonetwork.client.core.transacton.*;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
+import com.ltonetwork.client.exceptions.InvalidArgumentException;
+import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.HttpClientUtil;
-import com.ltonetwork.client.utils.JsonObject;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.util.Map;
-import java.util.Set;
 
 public class PublicNode {
-    private final String url;
+    private final URI uri;
     private final String apiKey;
 
-    public PublicNode(String url, String apiKey) {
-        this.url = url;
+    public PublicNode(URI uri, String apiKey) {
+        this.uri = uri;
         this.apiKey = apiKey;
     }
 
-    public String getUrl() {
-        return url;
+    public URI getUri() {
+        return uri;
     }
 
     public String getApiKey() {
         return apiKey;
     }
 
-    public Transaction getTransaction(int id) throws URISyntaxException {
-        HttpResponse<String> resp = HttpClientUtil.get(new URI(String.format("%s/transactions/info/%d", this.url, id)));
+    public Transaction getTransaction(String id) {
+        HttpResponse<String> resp = HttpClientUtil.get(URI.create(String.format("%s/transactions/info/%s", this.uri.toString(), id)));
         return getTransactionObject(new JsonObject(resp.body()));
     }
 
-    public Transaction getUnconfirmed() throws URISyntaxException {
-        HttpResponse<String> resp = HttpClientUtil.get(new URI(String.format("%s/transactions/unconfirmed", this.url)));
+    public Transaction getUnconfirmed() {
+        HttpResponse<String> resp = HttpClientUtil.get(URI.create(String.format("%s/transactions/unconfirmed", this.uri.toString())));
         return getTransactionObject(new JsonObject(resp.body()));
     }
 
-    public Transaction compile(String script) throws URISyntaxException {
-        HttpResponse<String> resp = HttpClientUtil.postScript(new URI(String.format("%s/utils/script/compile", this.url)), script);
+    public Transaction compile(String script) {
+        HttpResponse<String> resp = HttpClientUtil.postScript(URI.create(String.format("%s/utils/script/compile", this.uri)), script);
 
         return getTransactionObject(new JsonObject(resp.body()));
     }
 
-    public Transaction broadcast(Transaction transaction) throws URISyntaxException {
+    public Transaction broadcast(Transaction transaction) {
         if (!transaction.isSigned()) throw new BadMethodCallException("Transaction is not signed");
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> tx = objectMapper.convertValue(transaction, Map.class);
 
-        HttpResponse<String> resp = HttpClientUtil.post(new URI(String.format("%s/transactions/broadcast", this.url)), tx);
+        HttpResponse<String> resp = HttpClientUtil.post(URI.create(String.format("%s/transactions/broadcast", this.uri.toString())), tx);
 
         return getTransactionObject(new JsonObject(resp.body()));
     }
 
-    public JsonObject get(String endpoint) throws URISyntaxException {
-        HttpResponse<String> resp = HttpClientUtil.get(new URI(url + endpoint));
+    public JsonObject get(String endpoint) {
+        HttpResponse<String> resp = HttpClientUtil.get(URI.create(uri.toString() + endpoint));
         return new JsonObject(resp.body());
     }
 
-    public JsonObject get(String endpoint, Map<String, String> headers) throws URISyntaxException {
-        HttpResponse<String> resp = HttpClientUtil.get(new URI(url + endpoint), headers);
+    public JsonObject get(String endpoint, Map<String, String> headers) {
+        HttpResponse<String> resp = HttpClientUtil.get(URI.create(uri.toString() + endpoint), headers);
         return new JsonObject(resp.body());
     }
 
-    public JsonObject post(String endpoint, Map<String, Object> params) throws URISyntaxException {
-        HttpResponse<String> resp = HttpClientUtil.post(new URI(url + endpoint), params);
+    public JsonObject post(String endpoint, Map<String, Object> params) {
+        HttpResponse<String> resp = HttpClientUtil.post(URI.create(uri.toString() + endpoint), params);
         return new JsonObject(resp.body());
     }
 
-    public JsonObject post(String endpoint, Map<String, Object> params, Map<String, String> headers) throws URISyntaxException {
-        HttpResponse<String> resp = HttpClientUtil.post(new URI(url + endpoint), params, headers);
+    public JsonObject post(String endpoint, Map<String, Object> params, Map<String, String> headers) {
+        HttpResponse<String> resp = HttpClientUtil.post(URI.create(uri.toString() + endpoint), params, headers);
         return new JsonObject(resp.body());
     }
 
-    public JsonObject delete(String endpoint) throws URISyntaxException {
-        HttpResponse<String> resp = HttpClientUtil.delete(new URI(url + endpoint));
+    public JsonObject delete(String endpoint) {
+        HttpResponse<String> resp = HttpClientUtil.delete(URI.create(uri.toString() + endpoint));
         return new JsonObject(resp.body());
     }
 
-    public JsonObject delete(String endpoint, Map<String, String> headers) throws URISyntaxException {
-        HttpResponse<String> resp = HttpClientUtil.delete(new URI(url + endpoint), headers);
+    public JsonObject delete(String endpoint, Map<String, String> headers) {
+        HttpResponse<String> resp = HttpClientUtil.delete(URI.create(uri.toString() + endpoint), headers);
         return new JsonObject(resp.body());
     }
 
     private Transaction getTransactionObject(JsonObject json) {
-        return switch ((int) json.get("type")) {
-            case 4 -> new Transfer(json);
-            case 8 -> new Lease(json);
-            case 9 -> new CancelLease(json);
-            case 11 -> new MassTransfer(json);
-            case 13 -> new SetScript(json);
-            case 15 -> new Anchor(json);
-            case 16 -> new Association(json);
-            case 17 -> new RevokeAssociation(json);
-            case 18 -> new Sponsor(json);
-            case 19 -> new CancelSponsor(json);
-            default -> throw new BadMethodCallException("Unknown transaction type");
-        };
+        Transaction ret;
+
+        switch ((int) json.get("type")) {
+            case 4:
+                ret = new Transfer(json);
+                break;
+            case 8:
+                ret = new Lease(json);
+                break;
+            case 9:
+                ret = new CancelLease(json);
+                break;
+            case 11:
+                ret = new MassTransfer(json);
+                break;
+            case 13:
+                ret = new SetScript(json);
+                break;
+            case 15:
+                ret = new Anchor(json);
+                break;
+            case 16:
+                ret = new Association(json);
+                break;
+            case 17:
+                ret = new RevokeAssociation(json);
+                break;
+            case 18:
+                ret = new Sponsor(json);
+                break;
+            case 19:
+                ret = new CancelSponsor(json);
+                break;
+            default:
+                throw new InvalidArgumentException("Unknown transaction type");
+        }
+
+        return ret;
     }
 }

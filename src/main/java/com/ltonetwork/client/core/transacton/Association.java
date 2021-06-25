@@ -4,43 +4,40 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
-import com.ltonetwork.client.exceptions.InvalidArgumentException;
-import com.ltonetwork.client.utils.CryptoUtil;
+import com.ltonetwork.client.types.Address;
+import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
-import com.ltonetwork.client.utils.JsonObject;
+
+import java.nio.charset.StandardCharsets;
 
 public class Association extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
-    private final static int TYPE = 16;
-    private final static int VERSION = 1;
-    private final String party;
+    private final static byte TYPE = 16;
+    private final static byte VERSION = 1;
+    private final Address party;
     private final int associationType;
-    private final String hash;
+    private String hash;
 
-    public Association(String party, int type, String hash, String encoding) {
+    public Association(Address party, int type, String hash, Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
-
-        if (!CryptoUtil.isValidAddress(party, "base58")) {
-            throw new InvalidArgumentException("Invalid party address; is it base58 encoded?");
-        }
 
         this.party = party;
         this.associationType = type;
-        this.hash = Encoder.fromXStringToBase58String(hash, encoding);
+        this.hash = Encoder.base58Encode(Encoder.decode(hash, encoding));
     }
 
-    public Association(String party, int type) {
+    public Association(Address party, int type) {
         super(TYPE, VERSION, MINIMUM_FEE);
         this.party = party;
         this.associationType = type;
-        this.hash = "";
     }
 
     public Association(JsonObject json) {
         super(json);
-        this.party = (String) json.get("party");
-        this.associationType = (int) json.get("associationType");
-        this.hash = (String) json.get("hash");
+        this.party = new Address(json.get("party").toString());
+        this.associationType = Integer.parseInt(json.get("associationType").toString());
+        if (json.has("hash")) this.hash = json.get("hash").toString();
     }
 
     public byte[] toBinary() {
@@ -52,36 +49,41 @@ public class Association extends Transaction {
             throw new BadMethodCallException("Timestamp not set");
         }
 
-        byte[] hashByte;
+        byte[] ret = Bytes.concat(
+                Longs.toByteArray(this.type),
+                Longs.toByteArray(this.version),
+                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
+                new byte[this.getNetwork()],
+                Encoder.base58Decode(this.party.getAddress()),
+                Ints.toByteArray(associationType)
+        );
 
-        if (hash.equals("")) {
-            hashByte = Ints.toByteArray(0);
-        } else {
+        if (hash != null) {
             byte[] rawHash = Encoder.base58Decode(this.hash);
-            hashByte = Bytes.concat(
+            ret = Bytes.concat(
+                    ret,
                     Ints.toByteArray(1),
                     Ints.toByteArray(rawHash.length),
                     rawHash);
         }
 
         return Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                Encoder.base58Decode(this.senderPublicKey),
-                new byte[this.getNetwork()],
-                Encoder.base58Decode(this.party),
-                Ints.toByteArray(associationType),
-                hashByte,
+                ret,
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.fee)
         );
     }
 
-    public String getHash(String encoding) {
-        return Encoder.fromBase58StringToXString(this.hash, encoding);
+    public String getHash(Encoding encoding) {
+        if (hash == null)
+            throw new BadMethodCallException("Can't get hash; missing");
+        return Encoder.encode(
+                Encoder.base58Decode(hash, StandardCharsets.UTF_8),
+                encoding
+        );
     }
 
     public String getHash() {
-        return getHash("base58");
+        return getHash(Encoding.BASE58);
     }
 }
