@@ -1,6 +1,7 @@
 package com.ltonetwork.client.core.transacton;
 
 import com.ltonetwork.client.core.Account;
+import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.*;
 
 import java.time.Instant;
@@ -16,6 +17,7 @@ public abstract class Transaction {
     protected Address sender;
     protected Key senderPublicKey;
     protected ArrayList<Signature> proofs;
+    protected Account sponsor;
 
     public Transaction(byte type, byte version, long fee) {
         this.type = type;
@@ -51,6 +53,16 @@ public abstract class Transaction {
         }
 
         this.proofs.add(new Signature(this.toBinary(), account.getSign().getSecretkey()));
+    }
+
+    public void sponsor(Account account) {
+        if (isSigned()) {
+            signWith(account);
+            this.sponsor = account;
+        }
+        else {
+            throw new BadMethodCallException("Transaction should be signed by the sender before adding a sponsor");
+        }
     }
 
     abstract public byte[] toBinary();
