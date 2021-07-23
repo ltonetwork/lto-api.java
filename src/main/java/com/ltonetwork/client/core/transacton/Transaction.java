@@ -75,6 +75,14 @@ public abstract class Transaction {
         return this.sender.getChainId();
     }
 
+    public Account getSponsor() {
+        return this.sponsor;
+    }
+
+    public ArrayList<Signature> getProofs() {
+        return this.proofs;
+    }
+
     private ArrayList<Signature> fetchProofs(JsonObject jsonProofs) {
         ArrayList<Signature> proofs = new ArrayList<>();
 
