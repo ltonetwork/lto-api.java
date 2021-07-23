@@ -91,4 +91,25 @@ public class TransferTest {
         Transfer jsonTx = new Transfer(json);
         assertEquals(110, jsonTx.toBinary().length);
     }
+
+    @Test
+    public void testAddSponsor() {
+        Account sender = TestUtil.createAccount();
+        Account sponsor = TestUtil.createAccount();
+
+        tx.signWith(sender);
+        tx.sponsor(sponsor);
+        assertEquals(sponsor.getAddress(), tx.getSponsor().getAddress());
+        assertEquals(2, tx.getProofs().size());
+    }
+
+    @Test
+    public void testAddSponsorFail() {
+        expectedEx.expect(BadMethodCallException.class);
+        expectedEx.expectMessage("Transaction should be signed by the sender before adding a sponsor");
+
+        Account sponsor = TestUtil.createAccount();
+
+        tx.sponsor(sponsor);
+    }
 }
