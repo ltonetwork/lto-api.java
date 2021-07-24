@@ -25,8 +25,8 @@ Account acc = af.seed(seed);
 #### Create an account from sign and encrypt public keys
 
 ```java com.ltonetwork.client.core
-Key signKey = new Key("mySignKeyValue", com.ltonetwork.client.types.Encoding.BASE58);
-Key encryptKey = new Key("myEncryptKeyValue", com.ltonetwork.client.types.Encoding.BASE58);
+Key signKey = new Key("mySignKeyValue", Encoding.BASE58);
+Key encryptKey = new Key("myEncryptKeyValue", Encoding.BASE58);
 
 AccountFactory af = new AccountFactory("Testnet");
 Account acc = af.createPublic(signKey, (byte) 84, encryptKey);
@@ -36,12 +36,12 @@ Account acc = af.createPublic(signKey, (byte) 84, encryptKey);
 
 ```java com.ltonetwork.client.core
 KeyPair signKeyPair = new KeyPair (
-    new Key("mySignPublicKey", com.ltonetwork.client.types.Encoding.BASE58);
-    new Key("mySignPrivateKey", com.ltonetwork.client.types.Encoding.BASE58);
+    new Key("mySignPublicKey", Encoding.BASE58);
+    new Key("mySignPrivateKey", Encoding.BASE58);
 );
 KeyPair encryptKeyPair = new KeyPair (
-    Key encryptPublicKey = new Key("myEncryptPublicKey", com.ltonetwork.client.types.Encoding.BASE58);
-    Key encryptPrivateKey = new Key("myEncryptPrivateKey", com.ltonetwork.client.types.Encoding.BASE58);
+    Key encryptPublicKey = new Key("myEncryptPublicKey", Encoding.BASE58);
+    Key encryptPrivateKey = new Key("myEncryptPrivateKey", Encoding.BASE58);
 );
 
 AccountFactory af = new AccountFactory("Testnet");
@@ -91,3 +91,19 @@ byte[] decrypted = recipientAccount.decrypt(senderAccount, message)
 ```
 
 You can use `senderAccount.encrypt(senderAccount, message);` to decrypt a message from yourself.
+
+## Public layer
+
+```java com.ltonetwork.client.core
+use LTO\Transaction\Transfer;
+use LTO\PublicNode;
+
+PublicNode publicNode = new PublicNode(new URI("https://nodes.lto.network"), "myNodeApiKey");
+
+int amount = 1000; // Amount of LTO to transfer
+Address recipient = new Address("recipientAddress", (byte) 84);
+
+Transfer tx = new Transfer($amount, $recipient);
+tx.signWith(myAccount);
+publicNode.broadcast(tx);
+```
