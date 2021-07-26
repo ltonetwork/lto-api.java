@@ -15,7 +15,6 @@ import static org.junit.Assert.*;
 
 
 public class TransferTest {
-    byte chainId;
     Transfer tx;
 
     @Rule
@@ -23,8 +22,7 @@ public class TransferTest {
 
     @Before
     public void init() {
-        chainId = 84;
-        tx = new Transfer(1, new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx", chainId));
+        tx = new Transfer(1, new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"));
     }
 
     @Test

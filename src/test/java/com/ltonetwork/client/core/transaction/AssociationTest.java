@@ -24,8 +24,7 @@ public class AssociationTest {
 
     @Before
     public void init() {
-        chainId = 84;
-        tx = new Association(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx", chainId), 1, "hash", Encoding.BASE58);
+        tx = new Association(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), 1, "hash", Encoding.BASE58);
     }
 
     @Test
@@ -56,7 +55,7 @@ public class AssociationTest {
 
         Account account = TestUtil.createAccount();
 
-        Association txNoHash = new Association(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx", chainId), 1);
+        Association txNoHash = new Association(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), 1);
         txNoHash.signWith(account);
 
         assertEquals(190, txNoHash.toBinary().length);

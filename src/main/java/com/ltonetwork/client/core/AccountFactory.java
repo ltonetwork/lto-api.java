@@ -79,7 +79,7 @@ public class AccountFactory {
         byte chainId = 'T';
 
         return new Account(
-                new Address(signKeys.getPublickey().toBase58(), chainId),
+                new Address(signKeys.getPublickey().toBase58()),
                 createEncryptKeys(seed),
                 signKeys
         );

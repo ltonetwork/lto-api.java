@@ -23,8 +23,7 @@ public class LeaseTest {
 
     @Before
     public void init() {
-        chainId = 84;
-        tx = new Lease(1, new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx", chainId));
+        tx = new Lease(1, new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"));
     }
 
     @Test

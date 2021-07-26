@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 
 
 public class MassTransferTest {
-    byte chainId;
     MassTransfer tx;
 
     @Rule
@@ -24,7 +23,6 @@ public class MassTransferTest {
 
     @Before
     public void init() {
-        chainId = 84;
         tx = new MassTransfer();
     }
 
@@ -51,7 +49,7 @@ public class MassTransferTest {
         tx.signWith(account);
 
         int old = tx.toBinary().length;
-        tx.addTransfer(new Address("3MwGRJ1cbCQgP3mSGMR6pR1EJzXAD3e6Bvu", chainId), 1);
+        tx.addTransfer(new Address("3MwGRJ1cbCQgP3mSGMR6pR1EJzXAD3e6Bvu"), 1);
         assertTrue(tx.toBinary().length > old);
     }
 

@@ -23,8 +23,7 @@ public class CancelSponsorTest {
 
     @Before
     public void init() {
-        chainId = 84;
-        tx = new CancelSponsor(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx", chainId));
+        tx = new CancelSponsor(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"));
     }
 
     @Test

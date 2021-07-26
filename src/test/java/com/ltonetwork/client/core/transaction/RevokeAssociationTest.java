@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 
 public class RevokeAssociationTest {
-    byte chainId;
     RevokeAssociation tx;
 
     @Rule
@@ -24,8 +23,7 @@ public class RevokeAssociationTest {
 
     @Before
     public void init() {
-        chainId = 84;
-        tx = new RevokeAssociation(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx", chainId), 1, "hash", Encoding.BASE58);
+        tx = new RevokeAssociation(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), 1, "hash", Encoding.BASE58);
     }
 
     @Test
@@ -56,7 +54,7 @@ public class RevokeAssociationTest {
 
         Account account = TestUtil.createAccount();
 
-        RevokeAssociation txNoHash = new RevokeAssociation(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx", chainId), 1);
+        RevokeAssociation txNoHash = new RevokeAssociation(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), 1);
         txNoHash.signWith(account);
 
         assertEquals(190, txNoHash.toBinary().length);

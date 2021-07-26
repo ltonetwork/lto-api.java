@@ -34,7 +34,7 @@ public abstract class Transaction {
         this.timestamp = Long.parseLong(json.get("timestamp").toString());
         if (json.has("id")) this.id = new TransactionId(json.get("id").toString());
         if (json.has("chainId")) {
-            this.sender = new Address(json.get("sender").toString(), Byte.parseByte(json.get("chainId").toString()));
+            this.sender = new Address(json.get("sender").toString());
         } else {
             this.sender = new Address(json.get("sender").toString());
         }

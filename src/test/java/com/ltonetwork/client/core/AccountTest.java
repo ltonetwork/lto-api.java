@@ -31,9 +31,7 @@ public class AccountTest {
                 new PrivateKey(Encoder.base58Decode("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6"), Encoding.RAW)
         );
 
-        // Test network
-        byte b = 84;
-        Address address = new Address("3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy", b);
+        Address address = new Address("3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy");
 
         account = new Account(address, encrypt, sign);
     }

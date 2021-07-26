@@ -8,21 +8,17 @@ import java.nio.charset.StandardCharsets;
 
 public class Address {
     private final String address;
-    private byte chainId = 0;
+    private final byte chainId;
 
-    public Address(String address, byte chainId) {
+    public Address(String address) {
         if (!CryptoUtil.isValidAddress(address, Encoding.BASE58)) {
             throw new InvalidArgumentException("Address should be base58 encoded");
         }
         this.address = address;
-        this.chainId = chainId;
+        this.chainId = fetchChainIdFromAddress(address);
     }
 
-    public Address(String address, char chainId) {
-        this(address, (byte) chainId);
-    }
-
-    public Address(String address, byte chainId, Encoding encoding) {
+    public Address(String address, Encoding encoding) {
         if (encoding == Encoding.BASE58 && !CryptoUtil.isValidAddress(address, Encoding.BASE58)) {
             throw new InvalidArgumentException("Address is not properly base58 encoded");
         }
@@ -36,7 +32,7 @@ public class Address {
                     throw new InvalidArgumentException("Address is not properly base58 encoded");
                 }
                 this.address = address;
-                this.chainId = chainId;
+                this.chainId = fetchChainIdFromAddress(address);
                 break;
             }
             case BASE64: {
@@ -44,16 +40,12 @@ public class Address {
                     throw new InvalidArgumentException("Address is not properly base64 encoded");
                 }
                 this.address = Encoder.base58Encode(Encoder.base64Decode(address, StandardCharsets.UTF_8));
-                this.chainId = chainId;
+                this.chainId = fetchChainIdFromAddress(address);
                 break;
             }
             default:
                 throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");
         }
-    }
-
-    public Address(String address) {
-        this.address = address;
     }
 
     public String getAddress() {
@@ -66,5 +58,9 @@ public class Address {
 
     public byte getChainId() {
         return chainId;
+    }
+
+    private byte fetchChainIdFromAddress(String address) {
+        return Encoder.base58Decode(address)[1];
     }
 }

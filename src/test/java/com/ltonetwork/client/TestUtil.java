@@ -5,9 +5,9 @@ import com.ltonetwork.client.types.*;
 import com.ltonetwork.client.utils.Encoder;
 import org.junit.Test;
 
-public class TestUtil {
-    static byte chainId = 84;
+import java.nio.charset.StandardCharsets;
 
+public class TestUtil {
     public static Account createAccount() {
         KeyPair sign = new KeyPair(
                 new PublicKey(Encoder.base58Decode("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"), Encoding.RAW),
@@ -19,7 +19,7 @@ public class TestUtil {
                 new PrivateKey(Encoder.base58Decode("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6"), Encoding.RAW)
         );
 
-        Address address = new Address("3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy", chainId);
+        Address address = new Address("3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy");
 
         return new Account(address, encrypt, sign);
     }
