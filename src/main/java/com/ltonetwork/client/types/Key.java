@@ -19,6 +19,16 @@ public class Key {
         this.encoding = encoding;
     }
 
+    public Key(byte[] valueBytes) {
+        this.valueBytes = valueBytes;
+        this.encoding = Encoding.BASE58;
+    }
+
+    public Key(String valueBytes) {
+        this.valueBytes = valueBytes.getBytes(StandardCharsets.UTF_8);
+        this.encoding = Encoding.BASE58;
+    }
+
     public byte[] getValueBytes() {
         return valueBytes;
     }

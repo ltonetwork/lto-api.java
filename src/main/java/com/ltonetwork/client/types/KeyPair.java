@@ -1,10 +1,10 @@
 package com.ltonetwork.client.types;
 
 public class KeyPair {
-    private Key secretkey;
-    private Key publickey;
+    private PrivateKey secretkey;
+    private PublicKey publickey;
 
-    public KeyPair(Key publickey, Key secretkey) {
+    public KeyPair(PublicKey publickey, PrivateKey secretkey) {
         if (publickey != null) {
             this.publickey = publickey;
         }
@@ -15,17 +15,40 @@ public class KeyPair {
 
     public KeyPair(byte[] publickey, byte[] secretkey, Encoding encoding) {
         if (publickey != null) {
-            this.publickey = new Key(
+            this.publickey = new PublicKey(
                     publickey.clone(),
                     encoding
             );
         }
         if (secretkey != null) {
-            this.secretkey = new Key(
+            this.secretkey = new PrivateKey(
                     secretkey.clone(),
                     encoding
             );
         }
+    }
+
+    public KeyPair(byte[] publickey, byte[] secretkey) {
+        this(publickey, secretkey, Encoding.BASE58);
+    }
+
+    public KeyPair(String publickey, String secretkey, Encoding encoding) {
+        if (publickey != null) {
+            this.publickey = new PublicKey(
+                    publickey,
+                    encoding
+            );
+        }
+        if (secretkey != null) {
+            this.secretkey = new PrivateKey(
+                    secretkey,
+                    encoding
+            );
+        }
+    }
+
+    public KeyPair(String publickey, String secretkey) {
+        this(publickey, secretkey, Encoding.BASE58);
     }
 
     public KeyPair() {
@@ -33,33 +56,33 @@ public class KeyPair {
         this.secretkey = null;
     }
 
-    public void setSecretkey(Key secretkey) {
+    public void setSecretkey(PrivateKey secretkey) {
         this.secretkey = secretkey;
     }
 
     public void setSecretkey(byte[] secretkey, Encoding encoding) {
-        this.secretkey = new Key(
+        this.secretkey = new PrivateKey(
                 secretkey.clone(),
                 encoding
         );
     }
 
-    public Key getSecretkey() {
+    public PrivateKey getSecretkey() {
         return this.secretkey;
     }
 
-    public void setPublickey(Key publickey) {
+    public void setPublickey(PublicKey publickey) {
         this.publickey = publickey;
     }
 
     public void setPublickey(byte[] publickey, Encoding encoding) {
-        this.publickey = new Key(
+        this.publickey = new PublicKey(
                 publickey.clone(),
                 encoding
         );
     }
 
-    public Key getPublickey() {
+    public PublicKey getPublickey() {
         return this.publickey;
     }
 }

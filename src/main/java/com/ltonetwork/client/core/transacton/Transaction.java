@@ -15,7 +15,7 @@ public abstract class Transaction {
     protected long timestamp;
     protected TransactionId id;
     protected Address sender;
-    protected Key senderPublicKey;
+    protected PublicKey senderPublicKey;
     protected ArrayList<Signature> proofs;
     protected Account sponsor;
 
@@ -38,7 +38,7 @@ public abstract class Transaction {
         } else {
             this.sender = new Address(json.get("sender").toString());
         }
-        this.senderPublicKey = new Key(json.get("senderPublicKey").toString(), Encoding.BASE58);
+        this.senderPublicKey = new PublicKey(json.get("senderPublicKey").toString(), Encoding.BASE58);
         if (json.has("proofs")) this.proofs = fetchProofs(new JsonObject(json.get("proofs").toString(), true));
     }
 
@@ -55,14 +55,12 @@ public abstract class Transaction {
         this.proofs.add(new Signature(this.toBinary(), account.getSign().getSecretkey()));
     }
 
-    public void sponsor(Account account) {
-        if (isSigned()) {
-            signWith(account);
-            this.sponsor = account;
-        }
-        else {
+    public void sponsorWith(Account account) {
+        if (!isSigned())
             throw new BadMethodCallException("Transaction should be signed by the sender before adding a sponsor");
-        }
+
+        signWith(account);
+        this.sponsor = account;
     }
 
     abstract public byte[] toBinary();

@@ -53,11 +53,11 @@ public class Account {
         return sign;
     }
 
-    public Key getPublicSignKey() {
+    public PublicKey getPublicSignKey() {
         return sign.getPublickey();
     }
 
-    public Key getPublicEncryptKey() {
+    public PublicKey getPublicEncryptKey() {
         return encrypt.getPublickey();
     }
 

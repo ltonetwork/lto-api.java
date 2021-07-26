@@ -1,4 +1,4 @@
-LTO Network client for PHP
+LTO Network client for Java
 ===
 
 _Signing and addresses work for the public chain only._
@@ -15,41 +15,48 @@ Accounts
 
 #### Create an account from seed
 
-```java com.ltonetwork.client.core
+```java
+import com.ltonetwork.client.core.AccountFactory;
 String seed = "my seed phrase";
 
-AccountFactory af = new AccountFactory("Testnet");
+AccountFactory af = new AccountFactory('T');
 Account acc = af.seed(seed);
 ```
 
-#### Create an account from sign and encrypt public keys
+#### Create an account from sign public key
 
-```java com.ltonetwork.client.core
-Key signKey = new Key("mySignKeyValue", Encoding.BASE58);
-Key encryptKey = new Key("myEncryptKeyValue", Encoding.BASE58);
+```java
+import com.ltonetwork.client.types.Key;
+import com.ltonetwork.client.core.AccountFactory;
 
-AccountFactory af = new AccountFactory("Testnet");
-Account acc = af.createPublic(signKey, (byte) 84, encryptKey);
+Key signKey = new Key("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp", Encoding.BASE58);
+
+AccountFactory af = new AccountFactory('T');
+Account acc = af.createPublic(signKey);
 ```
 
 #### Create an account from full info
 
-```java com.ltonetwork.client.core
+```java
+import com.ltonetwork.client.types.Key;
+import com.ltonetwork.client.types.KeyPair;
+import com.ltonetwork.client.core.AccountFactory;
+
 KeyPair signKeyPair = new KeyPair (
-    new Key("mySignPublicKey", Encoding.BASE58);
-    new Key("mySignPrivateKey", Encoding.BASE58);
+    new Key("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp", Encoding.BASE58);
+    new Key("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y", Encoding.BASE58);
 );
 KeyPair encryptKeyPair = new KeyPair (
-    Key encryptPublicKey = new Key("myEncryptPublicKey", Encoding.BASE58);
-    Key encryptPrivateKey = new Key("myEncryptPrivateKey", Encoding.BASE58);
+    Key encryptPublicKey = new Key("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6", Encoding.BASE58);
+    Key encryptPrivateKey = new Key("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN", Encoding.BASE58);
 );
+Address address = new Address("3JmCa4jLVv7Yn2XkCnBUGsa7WNFVEMxAfWe", 'T');
 
-AccountFactory af = new AccountFactory("Testnet");
+AccountFactory af = new AccountFactory('T');
 Account acc = af.create(
     signKeyPair,
-    (byte) 84,
     encryptKeyPair,
-    "myAddress".getBytes());
+    address);
 ```
 
 Properties that are specified will be verified. Properties that are omitted will be generated where possible.
@@ -58,13 +65,13 @@ Properties that are specified will be verified. Properties that are omitted will
 
 #### Sign a message
 
-```java com.ltonetwork.client.core
+```java
 Signature sig = account.sign("my message"); // Base58 encoded signature
 ```
 
 #### Verify a signature
 
-```java com.ltonetwork.client.core
+```java
 String message = "my message";
 Signature sig = account.sign(message);
 boolean isValid = account.verify(sig, message) // True
@@ -74,7 +81,7 @@ boolean isValid = account.verify(sig, message) // True
 
 #### Encrypt a message for another account
 
-```java com.ltonetwork.client.core
+```java
 String message = "my message";
 
 byte[] encrypted = senderAccount.encrypt(recipientAccount, message)
@@ -84,7 +91,7 @@ You can use `senderAccount.encrypt(senderAccount, message);` to encrypt a messag
 
 #### Decrypt a message received from another account
 
-```java com.ltonetwork.client.core
+```java
 String message = "my message";
 
 byte[] decrypted = recipientAccount.decrypt(senderAccount, message)
@@ -94,14 +101,11 @@ You can use `senderAccount.encrypt(senderAccount, message);` to decrypt a messag
 
 ## Public layer
 
-```java com.ltonetwork.client.core
-use LTO\Transaction\Transfer;
-use LTO\PublicNode;
-
+```java
 PublicNode publicNode = new PublicNode(new URI("https://nodes.lto.network"), "myNodeApiKey");
 
 int amount = 1000; // Amount of LTO to transfer
-Address recipient = new Address("recipientAddress", (byte) 84);
+Address recipient = new Address("3JmCa4jLVv7Yn2XkCnBUGsa7WNFVEMxAfWe", 'T');
 
 Transfer tx = new Transfer($amount, $recipient);
 tx.signWith(myAccount);

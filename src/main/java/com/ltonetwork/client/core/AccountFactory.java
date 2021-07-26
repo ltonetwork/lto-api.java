@@ -1,10 +1,7 @@
 package com.ltonetwork.client.core;
 
 import com.ltonetwork.client.exceptions.InvalidAccountException;
-import com.ltonetwork.client.types.Address;
-import com.ltonetwork.client.types.Encoding;
-import com.ltonetwork.client.types.Key;
-import com.ltonetwork.client.types.KeyPair;
+import com.ltonetwork.client.types.*;
 import com.ltonetwork.client.utils.BinHex;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.HashUtil;
@@ -97,11 +94,11 @@ public class AccountFactory {
             int last = secretkey.length - 1;
             secretkey[last] = secretkey[last] % 2 == 1 ? ((byte) ((secretkey[last] | 0x80) & ~0x40)) : secretkey[last];
 
-            encrypt.setSecretkey(new Key(secretkey, Encoding.RAW));
+            encrypt.setSecretkey(new PrivateKey(secretkey, Encoding.RAW));
         }
 
         if (sign != null && sign.getPublickey() != null) {
-            encrypt.setPublickey(new Key(
+            encrypt.setPublickey(new PublicKey(
                     CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(sign.getPublickey().getValueBytes()),
                     Encoding.RAW)
             );
@@ -124,21 +121,35 @@ public class AccountFactory {
         }
 
         return new KeyPair(
-                new Key(publickey, Encoding.RAW),
-                new Key(secretkey, Encoding.RAW)
+                new PublicKey(publickey, Encoding.RAW),
+                new PrivateKey(secretkey, Encoding.RAW)
         );
     }
 
-    public Account create(KeyPair sign, byte chainId, KeyPair encrypt, byte[] address) {
-        KeyPair signKeys = sign != null ? calcKeys(sign, "sign") : null;
-        KeyPair encryptKeys = encrypt != null ? calcKeys(encrypt, "encrypt") : (sign != null ? convertSignToEncrypt(signKeys) : null);
-        byte[] accountAddress = calcAddress(address, signKeys, encryptKeys);
-        Address addr = new Address(new String(accountAddress), chainId);
-
-        return new Account(addr, encryptKeys, signKeys);
+    public KeyPair calcKeys(PrivateKey key, String type) {
+        KeyPair kp = new KeyPair(null, key);
+        return calcKeys(kp, type);
     }
 
-    public Account createPublic(Key signkey, byte chainId, Key encryptkey) {
+    public Account create(KeyPair sign, KeyPair encrypt, Address address) {
+        KeyPair signKeys = sign != null ? calcKeys(sign, "sign") : null;
+        KeyPair encryptKeys = encrypt != null ? calcKeys(encrypt, "encrypt") : (sign != null ? convertSignToEncrypt(signKeys) : null);
+
+        return new Account(address, encryptKeys, signKeys);
+    }
+
+    public Account create(KeyPair sign) {
+        KeyPair signKeys = sign != null ? calcKeys(sign, "sign") : null;
+        KeyPair encryptKeys = sign != null ? calcKeys(convertSignToEncrypt(sign), "encrypt") : null;
+
+        return create(signKeys, encryptKeys, null);
+    }
+
+    public Account create(PrivateKey signPrivateKey) {
+        return create(new KeyPair(null, signPrivateKey));
+    }
+
+    public Account createPublic(PublicKey signkey) {
         KeyPair sign = null;
         if (signkey != null) {
             sign = new KeyPair(
@@ -147,15 +158,9 @@ public class AccountFactory {
             );
         }
 
-        KeyPair encrypt = null;
-        if (encryptkey != null) {
-            encrypt = new KeyPair(
-                    encryptkey,
-                    null
-            );
-        }
+        KeyPair encrypt = convertSignToEncrypt(sign);
 
-        return create(sign, chainId, encrypt, null);
+        return create(sign, encrypt, null);
     }
 
     protected int getNonce() {
@@ -197,5 +202,10 @@ public class AccountFactory {
             }
         }
         return _address;
+    }
+
+    protected byte getNetworkByte(){
+        if(this.network.equals("T")) return (byte) 84;
+        else return (byte) 76;
     }
 }

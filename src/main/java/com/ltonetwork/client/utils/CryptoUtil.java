@@ -7,9 +7,7 @@ import com.goterl.lazysodium.interfaces.Box;
 import com.goterl.lazysodium.interfaces.GenericHash;
 import com.goterl.lazysodium.interfaces.Sign;
 import com.goterl.lazysodium.utils.LibraryLoader;
-import com.ltonetwork.client.types.Encoding;
-import com.ltonetwork.client.types.Key;
-import com.ltonetwork.client.types.KeyPair;
+import com.ltonetwork.client.types.*;
 
 import java.nio.charset.StandardCharsets;
 
@@ -86,8 +84,8 @@ public class CryptoUtil {
         sodium.cryptoSignSeedKeypair(publickey, secretkey, seed);
 
         return new KeyPair(
-                new Key(publickey, Encoding.RAW),
-                new Key(secretkey, Encoding.RAW)
+                new PublicKey(publickey, Encoding.RAW),
+                new PrivateKey(secretkey, Encoding.RAW)
         );
     }
 
@@ -96,8 +94,8 @@ public class CryptoUtil {
         byte[] publickey = new byte[Box.PUBLICKEYBYTES];
         sodium.cryptoBoxSeedKeypair(publickey, secretkey, seed);
         return new KeyPair(
-                new Key(publickey, Encoding.RAW),
-                new Key(secretkey, Encoding.RAW)
+                new PublicKey(publickey, Encoding.RAW),
+                new PrivateKey(secretkey, Encoding.RAW)
         );
     }
 

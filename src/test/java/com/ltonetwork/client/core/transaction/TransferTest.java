@@ -98,7 +98,7 @@ public class TransferTest {
         Account sponsor = TestUtil.createAccount();
 
         tx.signWith(sender);
-        tx.sponsor(sponsor);
+        tx.sponsorWith(sponsor);
         assertEquals(sponsor.getAddress(), tx.getSponsor().getAddress());
         assertEquals(2, tx.getProofs().size());
     }
@@ -110,6 +110,6 @@ public class TransferTest {
 
         Account sponsor = TestUtil.createAccount();
 
-        tx.sponsor(sponsor);
+        tx.sponsorWith(sponsor);
     }
 }

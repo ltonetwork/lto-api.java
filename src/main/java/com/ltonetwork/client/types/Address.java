@@ -18,6 +18,10 @@ public class Address {
         this.chainId = chainId;
     }
 
+    public Address(String address, char chainId) {
+        this(address, (byte) chainId);
+    }
+
     public Address(String address, byte chainId, Encoding encoding) {
         if (encoding == Encoding.BASE58 && !CryptoUtil.isValidAddress(address, Encoding.BASE58)) {
             throw new InvalidArgumentException("Address is not properly base58 encoded");
@@ -43,7 +47,8 @@ public class Address {
                 this.chainId = chainId;
                 break;
             }
-            default: throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");
+            default:
+                throw new InvalidArgumentException("Address is field supports only base58 and base64 encodings");
         }
     }
 
