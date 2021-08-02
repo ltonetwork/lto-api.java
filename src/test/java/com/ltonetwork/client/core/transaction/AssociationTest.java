@@ -45,7 +45,7 @@ public class AssociationTest {
 
     @Test
     public void testGetHash() {
-        assertEquals("EeNE3sD", tx.getHash());
+        assertEquals("3fkSoZ", tx.getHash());
     }
 
     @Test
