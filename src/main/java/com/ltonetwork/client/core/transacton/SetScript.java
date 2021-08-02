@@ -1,14 +1,11 @@
 package com.ltonetwork.client.core.transacton;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
-
-import java.nio.charset.StandardCharsets;
 
 public class SetScript extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;

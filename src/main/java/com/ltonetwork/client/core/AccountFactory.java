@@ -204,8 +204,8 @@ public class AccountFactory {
         return _address;
     }
 
-    protected byte getNetworkByte(){
-        if(this.network.equals("T")) return (byte) 84;
+    protected byte getNetworkByte() {
+        if (this.network.equals("T")) return (byte) 84;
         else return (byte) 76;
     }
 }
