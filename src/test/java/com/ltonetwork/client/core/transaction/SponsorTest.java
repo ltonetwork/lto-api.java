@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 
 
 public class SponsorTest {
-    byte chainId;
     Sponsor tx;
 
     @Rule
@@ -23,8 +22,7 @@ public class SponsorTest {
 
     @Before
     public void init() {
-        chainId = 84;
-        tx = new Sponsor(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx", chainId));
+        tx = new Sponsor(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"));
     }
 
     @Test

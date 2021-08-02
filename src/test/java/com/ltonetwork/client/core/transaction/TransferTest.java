@@ -15,7 +15,6 @@ import static org.junit.Assert.*;
 
 
 public class TransferTest {
-    byte chainId;
     Transfer tx;
 
     @Rule
@@ -23,8 +22,7 @@ public class TransferTest {
 
     @Before
     public void init() {
-        chainId = 84;
-        tx = new Transfer(1, new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx", chainId));
+        tx = new Transfer(1, new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"));
     }
 
     @Test
@@ -90,5 +88,26 @@ public class TransferTest {
 
         Transfer jsonTx = new Transfer(json);
         assertEquals(110, jsonTx.toBinary().length);
+    }
+
+    @Test
+    public void testAddSponsor() {
+        Account sender = TestUtil.createAccount();
+        Account sponsor = TestUtil.createAccount();
+
+        tx.signWith(sender);
+        tx.sponsorWith(sponsor);
+        assertEquals(sponsor.getAddress(), tx.getSponsor().getAddress());
+        assertEquals(2, tx.getProofs().size());
+    }
+
+    @Test
+    public void testAddSponsorFail() {
+        expectedEx.expect(BadMethodCallException.class);
+        expectedEx.expectMessage("Transaction should be signed by the sender before adding a sponsor");
+
+        Account sponsor = TestUtil.createAccount();
+
+        tx.sponsorWith(sponsor);
     }
 }

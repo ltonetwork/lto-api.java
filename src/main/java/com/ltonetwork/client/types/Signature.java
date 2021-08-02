@@ -33,7 +33,7 @@ public class Signature {
     /**
      * Sign message with a key and create signature.
      */
-    public Signature(byte[] message, Key secretkey) {
+    public Signature(byte[] message, PrivateKey secretkey) {
         this.value = CryptoUtil.crypto_sign_detached(message, secretkey.getValueBytes());
     }
 
@@ -53,7 +53,7 @@ public class Signature {
         return Encoder.hexEncode(value);
     }
 
-    public boolean verify(Key publickey, String message) {
+    public boolean verify(PublicKey publickey, String message) {
         return this.value.length == CryptoUtil.crypto_sign_bytes() &&
                 publickey.getValueBytes().length == CryptoUtil.crypto_sign_publickeybytes() &&
                 CryptoUtil.crypto_sign_verify_detached(

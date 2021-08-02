@@ -1,8 +1,6 @@
 package com.ltonetwork.client.utils.main;
 
-import com.ltonetwork.client.types.Encoding;
-import com.ltonetwork.client.types.Key;
-import com.ltonetwork.client.types.KeyPair;
+import com.ltonetwork.client.types.*;
 import com.ltonetwork.client.utils.CryptoUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,13 +17,13 @@ public class CryptoUtilTest {
     @Before
     public void init() {
         signKp = new KeyPair(
-                new Key(new byte[]{32, -45, 3, 80, 65, -47, -102, 82, 86, -126, -68, -39, 34, -101, -66, -80, -75, -90, 93, -93, 86, 18, 98, 101, 115, -39, 76, -122, -4, 118, 118, -12}, Encoding.RAW),
-                new Key(new byte[]{69, -111, -58, -98, -93, -51, 49, 82, 63, 54, -88, -32, -70, 63, 62, -13, 8, 73, 91, -104, -121, -34, 119, 58, -8, -50, 72, -46, 73, -117, -83, -95, 32, -45, 3, 80, 65, -47, -102, 82, 86, -126, -68, -39, 34, -101, -66, -80, -75, -90, 93, -93, 86, 18, 98, 101, 115, -39, 76, -122, -4, 118, 118, -12}, Encoding.RAW)
+                new PublicKey(new byte[]{32, -45, 3, 80, 65, -47, -102, 82, 86, -126, -68, -39, 34, -101, -66, -80, -75, -90, 93, -93, 86, 18, 98, 101, 115, -39, 76, -122, -4, 118, 118, -12}, Encoding.RAW),
+                new PrivateKey(new byte[]{69, -111, -58, -98, -93, -51, 49, 82, 63, 54, -88, -32, -70, 63, 62, -13, 8, 73, 91, -104, -121, -34, 119, 58, -8, -50, 72, -46, 73, -117, -83, -95, 32, -45, 3, 80, 65, -47, -102, 82, 86, -126, -68, -39, 34, -101, -66, -80, -75, -90, 93, -93, 86, 18, 98, 101, 115, -39, 76, -122, -4, 118, 118, -12}, Encoding.RAW)
         );
 
         boxKp = new KeyPair(
-                new Key(new byte[]{95, 63, 13, -4, 101, -122, -90, -9, 79, -94, -52, -23, -120, 37, 49, -79, 41, -103, 39, 36, 122, -120, 116, -75, 46, -66, -21, -57, -124, -97, 108, 22}, Encoding.RAW),
-                new Key(new byte[]{-109, 64, 73, -28, -58, 57, 122, -49, -6, -101, 0, 66, 121, 98, 94, -82, 62, -109, -62, 54, 112, 68, -42, 65, 28, 123, 106, 124, 98, 77, -101, -89}, Encoding.RAW)
+                new PublicKey(new byte[]{95, 63, 13, -4, 101, -122, -90, -9, 79, -94, -52, -23, -120, 37, 49, -79, 41, -103, 39, 36, 122, -120, 116, -75, 46, -66, -21, -57, -124, -97, 108, 22}, Encoding.RAW),
+                new PrivateKey(new byte[]{-109, 64, 73, -28, -58, 57, 122, -49, -6, -101, 0, 66, 121, 98, 94, -82, 62, -109, -62, 54, 112, 68, -42, 65, 28, 123, 106, 124, 98, 77, -101, -89}, Encoding.RAW)
         );
 
         msg = "my random msg".getBytes(StandardCharsets.UTF_8);

@@ -1,6 +1,7 @@
 package com.ltonetwork.client.core.transacton;
 
 import com.ltonetwork.client.core.Account;
+import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.*;
 
 import java.time.Instant;
@@ -14,8 +15,9 @@ public abstract class Transaction {
     protected long timestamp;
     protected TransactionId id;
     protected Address sender;
-    protected Key senderPublicKey;
+    protected PublicKey senderPublicKey;
     protected ArrayList<Signature> proofs;
+    protected Account sponsor;
 
     public Transaction(byte type, byte version, long fee) {
         this.type = type;
@@ -32,11 +34,11 @@ public abstract class Transaction {
         this.timestamp = Long.parseLong(json.get("timestamp").toString());
         if (json.has("id")) this.id = new TransactionId(json.get("id").toString());
         if (json.has("chainId")) {
-            this.sender = new Address(json.get("sender").toString(), Byte.parseByte(json.get("chainId").toString()));
+            this.sender = new Address(json.get("sender").toString());
         } else {
             this.sender = new Address(json.get("sender").toString());
         }
-        this.senderPublicKey = new Key(json.get("senderPublicKey").toString(), Encoding.BASE58);
+        this.senderPublicKey = new PublicKey(json.get("senderPublicKey").toString(), Encoding.BASE58);
         if (json.has("proofs")) this.proofs = fetchProofs(new JsonObject(json.get("proofs").toString(), true));
     }
 
@@ -53,6 +55,14 @@ public abstract class Transaction {
         this.proofs.add(new Signature(this.toBinary(), account.getSign().getSecretkey()));
     }
 
+    public void sponsorWith(Account account) {
+        if (!isSigned())
+            throw new BadMethodCallException("Transaction should be signed by the sender before adding a sponsor");
+
+        signWith(account);
+        this.sponsor = account;
+    }
+
     abstract public byte[] toBinary();
 
     public boolean isSigned() {
@@ -61,6 +71,14 @@ public abstract class Transaction {
 
     public byte getNetwork() {
         return this.sender.getChainId();
+    }
+
+    public Account getSponsor() {
+        return this.sponsor;
+    }
+
+    public ArrayList<Signature> getProofs() {
+        return this.proofs;
     }
 
     private ArrayList<Signature> fetchProofs(JsonObject jsonProofs) {

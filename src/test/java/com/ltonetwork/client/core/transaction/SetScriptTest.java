@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 
 public class SetScriptTest {
-    byte chainId;
     SetScript tx;
 
     @Rule
@@ -22,7 +21,6 @@ public class SetScriptTest {
 
     @Before
     public void init() {
-        chainId = 84;
         tx = new SetScript("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx");
     }
 

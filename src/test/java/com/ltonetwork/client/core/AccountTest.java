@@ -22,18 +22,16 @@ public class AccountTest {
     @Before
     public void init() {
         sign = new KeyPair(
-                new Key(Encoder.base58Decode("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"), Encoding.RAW),
-                new Key(Encoder.base58Decode("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp"), Encoding.RAW)
+                new PublicKey(Encoder.base58Decode("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"), Encoding.RAW),
+                new PrivateKey(Encoder.base58Decode("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp"), Encoding.RAW)
         );
 
         encrypt = new KeyPair(
-                new Key(Encoder.base58Decode("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN"), Encoding.RAW),
-                new Key(Encoder.base58Decode("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6"), Encoding.RAW)
+                new PublicKey(Encoder.base58Decode("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN"), Encoding.RAW),
+                new PrivateKey(Encoder.base58Decode("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6"), Encoding.RAW)
         );
 
-        // Test network
-        byte b = 84;
-        Address address = new Address("3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy", b);
+        Address address = new Address("3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy");
 
         account = new Account(address, encrypt, sign);
     }
@@ -123,13 +121,13 @@ public class AccountTest {
     @Test
     public void testEncryptDecrypt() {
         KeyPair sign2 = new KeyPair(
-                new Key(Encoder.base58Decode("BvEdG3ATxtmkbCVj9k2yvh3s6ooktBoSmyp8xwDqCQHp"), Encoding.RAW),
-                new Key(Encoder.base58Decode("pLX2GgWzkjiiPp2SsowyyHZKrF4thkq1oDLD7tqBpYDwfMvRsPANMutwRvTVZHrw8VzsKjiN8EfdGA9M84smoEz"), Encoding.RAW)
+                new PublicKey(Encoder.base58Decode("BvEdG3ATxtmkbCVj9k2yvh3s6ooktBoSmyp8xwDqCQHp"), Encoding.RAW),
+                new PrivateKey(Encoder.base58Decode("pLX2GgWzkjiiPp2SsowyyHZKrF4thkq1oDLD7tqBpYDwfMvRsPANMutwRvTVZHrw8VzsKjiN8EfdGA9M84smoEz"), Encoding.RAW)
         );
 
         KeyPair encrypt2 = new KeyPair(
-                new Key(Encoder.base58Decode("HBqhfdFASRQ5eBBpu2y6c6KKi1az6bMx8v1JxX4iW1Q8"), Encoding.RAW),
-                new Key(Encoder.base58Decode("3kMEhU5z3v8bmer1ERFUUhW58Dtuhyo9hE5vrhjqAWYT"), Encoding.RAW)
+                new PublicKey(Encoder.base58Decode("HBqhfdFASRQ5eBBpu2y6c6KKi1az6bMx8v1JxX4iW1Q8"), Encoding.RAW),
+                new PrivateKey(Encoder.base58Decode("3kMEhU5z3v8bmer1ERFUUhW58Dtuhyo9hE5vrhjqAWYT"), Encoding.RAW)
         );
 
         Address address2 = new Address("3PPbMwqLtwBGcJrTA5whqJfY95GqnNnFMDX");
