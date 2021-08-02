@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 
 
 public class LeaseTest {
-    byte chainId;
     Lease tx;
 
     @Rule
@@ -31,7 +30,7 @@ public class LeaseTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(110, tx.toBinary().length);
+        assertEquals(84, tx.toBinary().length);
     }
 
     @Test
@@ -60,6 +59,6 @@ public class LeaseTest {
                         "}", false);
 
         Lease jsonTx = new Lease(json);
-        assertEquals(110, jsonTx.toBinary().length);
+        assertEquals(84, jsonTx.toBinary().length);
     }
 }

@@ -3,6 +3,7 @@ package com.ltonetwork.client.core.transacton;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
@@ -53,11 +54,12 @@ public class SetScript extends Transaction {
         byte[] binaryScript = Encoder.base64Decode(this.script.replaceAll("^(base64:)?", ""));
 
         return Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                new byte[this.getNetwork()],
-                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
-                Ints.toByteArray(binaryScript.length),
+                new byte[]{this.type},
+                new byte[]{this.version},
+                new byte[]{this.getNetwork()},
+                this.senderPublicKey.toRaw(),
+                new byte[]{(byte) 1},
+                Shorts.toByteArray((short) binaryScript.length),
                 binaryScript,
                 Longs.toByteArray(this.fee),
                 Longs.toByteArray(this.timestamp)

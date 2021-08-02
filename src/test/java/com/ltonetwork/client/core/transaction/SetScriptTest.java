@@ -21,7 +21,7 @@ public class SetScriptTest {
 
     @Before
     public void init() {
-        tx = new SetScript("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx");
+        tx = new SetScript("script");
     }
 
     @Test
@@ -29,7 +29,7 @@ public class SetScriptTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(190, tx.toBinary().length);
+        assertEquals(58, tx.toBinary().length);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class SetScriptTest {
     @Test
     public void testCreateWithJson() {
         SetScript jsonTx = createFromJson();
-        assertEquals(84, jsonTx.toBinary().length);
+        assertEquals(58, jsonTx.toBinary().length);
     }
 
     @Test

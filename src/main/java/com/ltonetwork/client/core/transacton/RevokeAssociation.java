@@ -3,6 +3,7 @@ package com.ltonetwork.client.core.transacton;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
@@ -49,10 +50,10 @@ public class RevokeAssociation extends Transaction {
         }
 
         byte[] ret = Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
-                new byte[this.getNetwork()],
+                new byte[]{this.type},
+                new byte[]{this.version},
+                this.senderPublicKey.toRaw(),
+                new byte[]{this.getNetwork()},
                 Encoder.base58Decode(this.party.getAddress()),
                 Ints.toByteArray(associationType)
         );
@@ -61,9 +62,13 @@ public class RevokeAssociation extends Transaction {
             byte[] rawHash = Encoder.base58Decode(this.hash);
             ret = Bytes.concat(
                     ret,
-                    Ints.toByteArray(1),
-                    Ints.toByteArray(rawHash.length),
+                    new byte[]{(byte) 1},
+                    Shorts.toByteArray((short) rawHash.length),
                     rawHash);
+        } else {
+            ret = Bytes.concat(
+                    ret,
+                    new byte[]{(byte) 0});
         }
 
         return Bytes.concat(

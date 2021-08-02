@@ -30,7 +30,7 @@ public class SponsorTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(186, tx.toBinary().length);
+        assertEquals(77, tx.toBinary().length);
     }
 
     @Test
@@ -58,6 +58,6 @@ public class SponsorTest {
                         "}", false);
 
         Sponsor jsonTx = new Sponsor(json);
-        assertEquals(102, jsonTx.toBinary().length);
+        assertEquals(77, jsonTx.toBinary().length);
     }
 }

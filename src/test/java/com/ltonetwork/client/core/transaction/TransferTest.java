@@ -39,7 +39,7 @@ public class TransferTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(110, tx.toBinary().length);
+        assertEquals(84, tx.toBinary().length);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class TransferTest {
         tx.signWith(account);
         tx.setAttachment("test");
 
-        assertEquals(119, tx.toBinary().length);
+        assertEquals(91, tx.toBinary().length);
     }
 
     @Test
@@ -64,8 +64,7 @@ public class TransferTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        byte exp = 84;
-        assertEquals(exp, tx.getNetwork());
+        assertEquals((byte) 84, tx.getNetwork());
     }
 
     @Test
@@ -87,7 +86,7 @@ public class TransferTest {
                         "}", false);
 
         Transfer jsonTx = new Transfer(json);
-        assertEquals(110, jsonTx.toBinary().length);
+        assertEquals(84, jsonTx.toBinary().length);
     }
 
     @Test

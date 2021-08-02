@@ -3,6 +3,7 @@ package com.ltonetwork.client.core.transacton;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.Address;
@@ -56,9 +57,9 @@ public class Transfer extends Transaction {
         }
 
         byte[] binaryAttachment = Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
+                new byte[]{this.type},
+                new byte[]{this.version},
+                this.senderPublicKey.toRaw(),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),
@@ -67,7 +68,7 @@ public class Transfer extends Transaction {
         if (attachment != null) {
             binaryAttachment = Bytes.concat(
                     binaryAttachment,
-                    Ints.toByteArray(attachment.length()),
+                    Shorts.toByteArray((short) attachment.length()),
                     Encoder.base58Decode(this.attachment)
             );
         }
