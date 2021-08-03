@@ -7,8 +7,6 @@ import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
 
-import java.nio.charset.StandardCharsets;
-
 public class Sponsor extends Transaction {
     private final static long MINIMUM_FEE = 500_000_000;
     private final static byte TYPE = 18;
@@ -35,10 +33,10 @@ public class Sponsor extends Transaction {
         }
 
         return Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                new byte[this.getNetwork()],
-                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
+                new byte[]{this.type},
+                new byte[]{this.version},
+                new byte[]{this.getNetwork()},
+                this.senderPublicKey.toRaw(),
                 Encoder.base58Decode(this.recipient.getAddress()),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.fee)

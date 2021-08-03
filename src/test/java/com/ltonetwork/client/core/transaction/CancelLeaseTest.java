@@ -22,7 +22,7 @@ public class CancelLeaseTest {
 
     @Before
     public void init() {
-        tx = new CancelLease("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx");
+        tx = new CancelLease("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXh");
     }
 
     @Test
@@ -30,7 +30,7 @@ public class CancelLeaseTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(160, tx.toBinary().length);
+        assertEquals(83, tx.toBinary().length);
     }
 
     @Test
@@ -53,11 +53,11 @@ public class CancelLeaseTest {
                         "  \"timestamp\": 1538728794530,\n" +
                         "  \"proofs\": [\"65E82MLn6RdF7Y2VrdtFWkHd97teqLSwVdbGyEfy7x6aczkHRDZMvNUfdTAYgqDXzDDKKEkQqVhMVMg6EEEvE3C3\"],\n" +
                         "  \"version\": 2,\n" +
-                        "  \"leaseId\": \"3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx\",\n" +
+                        "  \"leaseId\": \"3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXh\",\n" +
                         "  \"height\": 22654\n" +
                         "}", false);
 
         CancelLease jsonTx = new CancelLease(json);
-        assertEquals(76, jsonTx.toBinary().length);
+        assertEquals(83, jsonTx.toBinary().length);
     }
 }

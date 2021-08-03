@@ -24,7 +24,7 @@ public class AssociationTest {
 
     @Before
     public void init() {
-        tx = new Association(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), 1, "hash", Encoding.BASE58);
+        tx = new Association(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), 1, "hash", Encoding.RAW);
     }
 
     @Test
@@ -32,7 +32,7 @@ public class AssociationTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(203, tx.toBinary().length);
+        assertEquals(88, tx.toBinary().length);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class AssociationTest {
 
     @Test
     public void testGetHash() {
-        assertEquals("EeNE3sD", tx.getHash());
+        assertEquals("3fkSoZ", tx.getHash());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class AssociationTest {
         Association txNoHash = new Association(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), 1);
         txNoHash.signWith(account);
 
-        assertEquals(190, txNoHash.toBinary().length);
+        assertEquals(82, txNoHash.toBinary().length);
 
         txNoHash.getHash();
     }
@@ -78,12 +78,12 @@ public class AssociationTest {
                         "  \"recipient\": \"3Mv7ajrPLKewkBNqfxwRZoRwW6fziehp7dQ\",\n" +
                         "  \"party\": \"3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy\",\n" +
                         "  \"associationType\": \"1\",\n" +
-                        "  \"hash\": \"hash\",\n" +
+                        "  \"hash\": \"3fkSoZ\",\n" + //base58 of "hash"
                         "  \"height\": 22654\n" +
                         "}", false);
 
         Association jsonTx = new Association(json);
-        assertEquals(117, jsonTx.toBinary().length);
+        assertEquals(88, jsonTx.toBinary().length);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class AssociationTest {
                         "}", false);
 
         Association jsonTx = new Association(json);
-        assertEquals(106, jsonTx.toBinary().length);
+        assertEquals(82, jsonTx.toBinary().length);
 
         jsonTx.getHash();
     }

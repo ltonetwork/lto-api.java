@@ -8,8 +8,6 @@ import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
 
-import java.nio.charset.StandardCharsets;
-
 public class Lease extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
     private final static byte TYPE = 8;
@@ -44,13 +42,13 @@ public class Lease extends Transaction {
         }
 
         return Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
-                Longs.toByteArray(this.timestamp),
+                new byte[]{this.type},
+                new byte[]{this.version},
+                this.senderPublicKey.toRaw(),
+                Encoder.base58Decode(this.recipient.getAddress()),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),
-                Encoder.base58Decode(this.recipient.getAddress())
+                Longs.toByteArray(this.timestamp)
         );
     }
 }

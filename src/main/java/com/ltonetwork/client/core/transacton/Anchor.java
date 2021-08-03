@@ -1,8 +1,8 @@
 package com.ltonetwork.client.core.transacton;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
@@ -46,17 +46,21 @@ public class Anchor extends Transaction {
 
         ArrayList<Byte> anchorsBytes = new ArrayList<>();
         for (String anchor : anchors) {
-            for (Byte anc : Encoder.base58Decode(anchor)) {
+            byte[] decodedAnchor = Encoder.base58Decode(anchor);
+            byte[] ancLen = Shorts.toByteArray((short) decodedAnchor.length);
+            anchorsBytes.add(ancLen[0]);
+            anchorsBytes.add(ancLen[1]);
+            for (Byte anc : decodedAnchor) {
                 anchorsBytes.add(anc);
             }
         }
 
         return Bytes.concat(
-                Longs.toByteArray(this.type),
-                Longs.toByteArray(this.version),
-                this.senderPublicKey.toBase58().getBytes(StandardCharsets.UTF_8),
-                Ints.toByteArray(anchors.size()),
-                Bytes.toArray(anchorsBytes),
+                new byte[]{this.type},
+                new byte[]{this.version},
+                this.senderPublicKey.toRaw(),
+                Shorts.toByteArray((short) anchors.size()),
+                Bytes.toArray(anchorsBytes), // includes each anchor's length and value
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.fee)
         );

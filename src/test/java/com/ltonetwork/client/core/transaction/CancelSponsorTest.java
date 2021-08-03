@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 
 
 public class CancelSponsorTest {
-    byte chainId;
     CancelSponsor tx;
 
     @Rule
@@ -31,7 +30,7 @@ public class CancelSponsorTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(186, tx.toBinary().length);
+        assertEquals(77, tx.toBinary().length);
     }
 
     @Test
@@ -59,6 +58,6 @@ public class CancelSponsorTest {
                         "}", false);
 
         CancelSponsor jsonTx = new CancelSponsor(json);
-        assertEquals(102, jsonTx.toBinary().length);
+        assertEquals(77, jsonTx.toBinary().length);
     }
 }

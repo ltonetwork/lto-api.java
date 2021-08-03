@@ -7,7 +7,10 @@ import com.goterl.lazysodium.interfaces.Box;
 import com.goterl.lazysodium.interfaces.GenericHash;
 import com.goterl.lazysodium.interfaces.Sign;
 import com.goterl.lazysodium.utils.LibraryLoader;
-import com.ltonetwork.client.types.*;
+import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.KeyPair;
+import com.ltonetwork.client.types.PrivateKey;
+import com.ltonetwork.client.types.PublicKey;
 
 import java.nio.charset.StandardCharsets;
 

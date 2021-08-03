@@ -24,7 +24,7 @@ public class AnchorTest {
     @Before
     public void init() {
         chainId = 84;
-        tx = new Anchor("8A8TXZioKiCpKBt7dYx8yAEwnWGhp", Encoding.BASE58);
+        tx = new Anchor("8A8TXZioKiCpKBt7dYx8yAEwnWGhp", Encoding.RAW);
     }
 
     @Test
@@ -32,7 +32,7 @@ public class AnchorTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(101, tx.toBinary().length);
+        assertEquals(83, tx.toBinary().length);
     }
 
     @Test
@@ -45,12 +45,12 @@ public class AnchorTest {
 
     @Test
     public void testGetHashes() {
-        assertEquals("8A8TXZioKiCpKBt7dYx8yAEwnWGhp", tx.getHashes(Encoding.BASE58)[0]);
+        assertEquals("8A8TXZioKiCpKBt7dYx8yAEwnWGhp", tx.getHashes(Encoding.RAW)[0]);
     }
 
     @Test
     public void testGetHash() {
-        assertEquals("8A8TXZioKiCpKBt7dYx8yAEwnWGhp", tx.getHash(Encoding.BASE58));
+        assertEquals("8A8TXZioKiCpKBt7dYx8yAEwnWGhp", tx.getHash(Encoding.RAW));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class AnchorTest {
         expectedEx.expectMessage("Method 'getHash' can't be used on a multi-anchor tx");
 
         tx.addHash("test", Encoding.RAW);
-        assertEquals("8A8TXZioKiCpKBt7dYx8yAEwnWGhk", tx.getHash(Encoding.BASE58));
+        assertEquals("8A8TXZioKiCpKBt7dYx8yAEwnWGhk", tx.getHash(Encoding.RAW));
     }
 
     @Test
@@ -80,11 +80,11 @@ public class AnchorTest {
                         "  \"timestamp\": 1538728794530,\n" +
                         "  \"proofs\": [\"65E82MLn6RdF7Y2VrdtFWkHd97teqLSwVdbGyEfy7x6aczkHRDZMvNUfdTAYgqDXzDDKKEkQqVhMVMg6EEEvE3C3\"],\n" +
                         "  \"version\": 2,\n" +
-                        "  \"anchors\": [\"3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx\"],\n" +
+                        "  \"anchors\": [\"3Z7yhiFYtYVXHkLXMKLkzkCqYxnRmdMRcutGYba7\"],\n" + // base58 encoding of "8A8TXZioKiCpKBt7dYx8yAEwnWGhp"
                         "  \"height\": 22654\n" +
                         "}", false);
 
         Anchor jsonTx = new Anchor(json);
-        assertEquals(106, jsonTx.toBinary().length);
+        assertEquals(83, jsonTx.toBinary().length);
     }
 }
