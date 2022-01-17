@@ -27,12 +27,12 @@ public class DataEntryTest {
 
     @Test
     public void testToBytesInteger() {
-        DataEntry<Integer> entry = new DataEntry<>(DataEntry.DataEntryType.INTEGER, "test", 1);
+        DataEntry<Long> entry = new DataEntry<>(DataEntry.DataEntryType.INTEGER, "test", (long) 1);
         // 0, 4 - key length
         // 116, 101, 115, 116 - key ("test")
-        // 0 - value type (int)
-        // 0, 0, 0, 1 - integer (1)
-        assertArrayEquals(new byte[]{0, 4, 116, 101, 115, 116, 0, 0, 0, 0, 1}, entry.toBytes());
+        // 0 - value type (long)
+        // 0, 0, 0, 0, 0, 0, 0, 1 - long (1)
+        assertArrayEquals(new byte[]{0, 4, 116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 1}, entry.toBytes());
     }
 
     @Test
