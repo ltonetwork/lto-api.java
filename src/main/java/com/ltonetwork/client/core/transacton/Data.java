@@ -33,13 +33,17 @@ public class Data extends Transaction {
             DataEntry.DataEntryType type = DataEntry.DataEntryType.valueOf(curr.get("type").toString().toUpperCase());
             switch(type){
                 case INTEGER:
-                    dataFromJson.add(new DataEntry<>(type, key, (Integer) curr.get("value")));
+                    dataFromJson.add(new DataEntry<>(type, key, Long.parseLong(curr.get("value").toString())));
+                    break;
                 case BOOLEAN:
-                    dataFromJson.add(new DataEntry<>(type, key, (boolean) curr.get("value")));
+                    dataFromJson.add(new DataEntry<>(type, key, Boolean.parseBoolean(curr.get("value").toString())));
+                    break;
                 case BINARY:
-                    dataFromJson.add(new DataEntry<>(type, key, (byte[]) curr.get("value")));
+                    dataFromJson.add(new DataEntry<>(type, key, parseBytes(curr.get("value").toString())));
+                    break;
                 case STRING:
                     dataFromJson.add(new DataEntry<>(type, key, curr.get("value").toString()));
+                    break;
             }
         }
 
@@ -77,5 +81,12 @@ public class Data extends Transaction {
         byte[] dataBytes = new byte[0];
         for (DataEntry<?> entry : data) dataBytes = Bytes.concat(dataBytes, entry.toBytes());
         if (dataBytes.length > 0)  this.fee += (dataBytes.length / (1024 * 256) + 1) * DATA_FEE;
+    }
+
+    private byte[] parseBytes(String bytesString) {
+        String[] byteValues = bytesString.substring(1, bytesString.length() - 1).split((","));
+        byte[] ret = new byte[byteValues.length];
+        for (int i=0; i<ret.length; i++) ret[i] = Byte.parseByte(byteValues[i].trim());
+        return ret;
     }
 }

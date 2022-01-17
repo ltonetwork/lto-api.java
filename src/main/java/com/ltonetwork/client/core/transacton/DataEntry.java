@@ -1,7 +1,7 @@
 package com.ltonetwork.client.core.transacton;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 
 import java.nio.charset.StandardCharsets;
@@ -18,6 +18,7 @@ public class DataEntry<T> {
     }
 
     public enum DataEntryType {
+        // N.B.: Integer meant as number, not as integer type, actual type is Long
         INTEGER,
         BOOLEAN,
         BINARY,
@@ -41,7 +42,7 @@ public class DataEntry<T> {
         byte[] valueBytes;
         switch(type){
             case INTEGER:
-                valueBytes = Ints.toByteArray((Integer) value);
+                valueBytes = Longs.toByteArray((Long) value);
                 return Bytes.concat(
                         Shorts.toByteArray((short) keyBytes.length),
                         keyBytes,
