@@ -2,6 +2,9 @@ package com.ltonetwork.client.core.transacton;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Shorts;
+
+import java.nio.charset.StandardCharsets;
 
 public class DataEntry<T> {
     private final DataEntryType type;
@@ -33,17 +36,40 @@ public class DataEntry<T> {
         return value;
     }
 
-    public byte[] toBinary() {
-        System.out.println(type);
+    public byte[] toBytes() {
+        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+        byte[] valueBytes;
         switch(type){
             case INTEGER:
-                return Bytes.concat(new byte[]{0}, Ints.toByteArray((Integer) value));
+                valueBytes = Ints.toByteArray((Integer) value);
+                return Bytes.concat(
+                        Shorts.toByteArray((short) keyBytes.length),
+                        keyBytes,
+                        new byte[]{0},
+                        valueBytes);
             case BOOLEAN:
-                return Bytes.concat(new byte[]{1}, (boolean) value ? new byte[]{1} : new byte[]{0});
+                valueBytes = (boolean) value ? new byte[]{1} : new byte[]{0};
+                return Bytes.concat(
+                        Shorts.toByteArray((short) keyBytes.length),
+                        keyBytes,
+                        new byte[]{1},
+                        valueBytes);
             case BINARY:
-                return Bytes.concat(new byte[]{2}, (byte[]) value);
+                valueBytes = (byte[]) value;
+                return Bytes.concat(
+                        Shorts.toByteArray((short) keyBytes.length),
+                        keyBytes,
+                        new byte[]{2},
+                        Shorts.toByteArray((short) valueBytes.length),
+                        valueBytes);
             case STRING:
-                return Bytes.concat(new byte[]{3}, value.toString().getBytes());
+                valueBytes = value.toString().getBytes();
+                return Bytes.concat(
+                        Shorts.toByteArray((short) keyBytes.length),
+                        keyBytes,
+                        new byte[]{3},
+                        Shorts.toByteArray((short) valueBytes.length),
+                        valueBytes);
             default: throw new IllegalArgumentException("Unknown DataEntry type");
         }
     }
