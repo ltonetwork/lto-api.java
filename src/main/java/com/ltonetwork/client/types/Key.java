@@ -6,27 +6,48 @@ import static com.ltonetwork.client.utils.Encoder.*;
 
 public class Key {
 
-    private byte[] valueBytes;
-    private Encoding encoding;
+    private final byte[] valueBytes;
+    private final Encoding encoding;
+    private final KeyType keyType;
 
-    public Key(byte[] valueBytes, Encoding encoding) {
+    public enum KeyType {
+        ED25519,
+        SECP256K1,
+        SECP256R1
+    }
+
+    public Key(byte[] valueBytes, Encoding encoding, KeyType keyType) {
         this.valueBytes = valueBytes;
         this.encoding = encoding;
+        this.keyType = keyType;
+    }
+
+    public Key(byte[] valueBytes, Encoding encoding) {
+        this(valueBytes,encoding, KeyType.ED25519);
     }
 
     public Key(String valueBytes, Encoding encoding) {
-        this.valueBytes = valueBytes.getBytes(StandardCharsets.UTF_8);
-        this.encoding = encoding;
+        this(valueBytes.getBytes(StandardCharsets.UTF_8), encoding, KeyType.ED25519);
+    }
+
+    public Key(String valueBytes, Encoding encoding, KeyType keyType) {
+        this(valueBytes.getBytes(StandardCharsets.UTF_8), encoding, keyType);
     }
 
     public Key(byte[] valueBytes) {
-        this.valueBytes = valueBytes;
-        this.encoding = Encoding.BASE58;
+        this(valueBytes, Encoding.BASE58, KeyType.ED25519);
+    }
+
+    public Key(byte[] valueBytes, KeyType keyType) {
+        this(valueBytes, Encoding.BASE58, keyType);
     }
 
     public Key(String valueBytes) {
-        this.valueBytes = valueBytes.getBytes(StandardCharsets.UTF_8);
-        this.encoding = Encoding.BASE58;
+        this(valueBytes.getBytes(StandardCharsets.UTF_8), Encoding.BASE58, KeyType.ED25519);
+    }
+
+    public Key(String valueBytes, KeyType keyType) {
+        this(valueBytes.getBytes(StandardCharsets.UTF_8), Encoding.BASE58, keyType);
     }
 
     public byte[] getValueBytes() {
@@ -35,6 +56,10 @@ public class Key {
 
     public Encoding getEncoding() {
         return encoding;
+    }
+
+    public KeyType getKeyType() {
+        return keyType;
     }
 
     public String toBase58() {
