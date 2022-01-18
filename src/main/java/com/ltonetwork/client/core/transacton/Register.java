@@ -4,10 +4,10 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
-import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.*;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Register extends Transaction {
     private final static long BASE_FEE = 100_000_000;
@@ -29,7 +29,7 @@ public class Register extends Transaction {
 
         for (int i = 0; i < jsonAccounts.length(); i++) {
             JsonObject curr = new JsonObject(jsonAccounts.get(i), false);
-            Key.KeyType keyType = Key.KeyType.valueOf(curr.get("keyType").toString());
+            Key.KeyType keyType = Key.KeyType.valueOf(curr.get("keyType").toString().toUpperCase(Locale.ROOT));
             String key = curr.get("publicKey").toString();
             accounts.add(new PublicKey(key, Encoding.BASE58, keyType));
             this.fee += VAR_FEE;
