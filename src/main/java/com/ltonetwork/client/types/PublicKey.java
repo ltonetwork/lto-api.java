@@ -47,4 +47,22 @@ public class PublicKey extends Key {
             default: throw new IllegalArgumentException("Unknown key type");
         }
     }
+
+    public short keyLengthByType(KeyType type) {
+        switch(type){
+            case ED25519: return (short) 32;
+            case SECP256K1:
+            case SECP256R1: return (short) 33;
+            default: throw new IllegalArgumentException("Unknown key type");
+        }
+    }
+
+    public short keyLengthByType(byte id) {
+        switch(id){
+            case 0: return keyLengthByType(KeyType.ED25519);
+            case 1: return keyLengthByType(KeyType.SECP256K1);
+            case 2: return keyLengthByType(KeyType.SECP256R1);
+            default: throw new IllegalArgumentException("Unknown key type");
+        }
+    }
 }
