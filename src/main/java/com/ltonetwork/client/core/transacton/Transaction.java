@@ -38,11 +38,7 @@ public abstract class Transaction {
         this.fee = Long.parseLong(json.get("fee").toString());
         this.timestamp = Long.parseLong(json.get("timestamp").toString());
         if (json.has("id")) this.id = new TransactionId(json.get("id").toString());
-        if (json.has("chainId")) {
-            this.sender = new Address(json.get("sender").toString());
-        } else {
-            this.sender = new Address(json.get("sender").toString());
-        }
+        this.sender = new Address(json.get("sender").toString());
         this.senderPublicKey = new PublicKey(json.get("senderPublicKey").toString(), Encoding.BASE58);
         if (json.has("proofs")) this.proofs = fetchProofs(new JsonObject(json.get("proofs").toString(), true));
     }

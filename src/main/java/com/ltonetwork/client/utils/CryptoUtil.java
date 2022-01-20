@@ -54,8 +54,7 @@ public class CryptoUtil {
         try {
             return sodium.cryptoBoxEasy(new String(message, StandardCharsets.UTF_8), nonce, kp).getBytes();
         } catch (SodiumException e) {
-            e.printStackTrace();
-            return null;
+            throw new IllegalArgumentException("Unable to create crypto box");
         }
     }
 

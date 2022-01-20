@@ -66,18 +66,18 @@ public class AccountFactory {
             publickey = new PublicKey(CryptoUtil.signToEncryptPublicKey(publickey.getRaw()));
         }
 
-        String publickeyHash = new String(
+        String publicKeyHash = new String(
                 Keccak256.hash(CryptoUtil.genericHash(publickey.getRaw(), 32)).getBytes(),
                 StandardCharsets.UTF_8
         ).substring(0, 40);
 
-        byte[] packed = PackUtil.packCaH40(ADDRESS_VERSION, network, publickeyHash);
-        String chksum = new String(
+        byte[] packed = PackUtil.packCaH40(ADDRESS_VERSION, network, publicKeyHash);
+        String checkSum = new String(
                 Keccak256.hash(CryptoUtil.genericHash(packed, packed.length)).getBytes(),
                 StandardCharsets.UTF_8
         ).substring(0, 8);
 
-        return PackUtil.packCaH40H8(ADDRESS_VERSION, network, publickeyHash, chksum);
+        return PackUtil.packCaH40H8(ADDRESS_VERSION, network, publicKeyHash, checkSum);
     }
 
     public byte[] createAddress(PublicKey publickey) {
@@ -87,7 +87,6 @@ public class AccountFactory {
     public Account seed(String seedText) {
         byte[] seed = createAccountSeed(seedText);
         KeyPair signKeys = createSignKeys(seed);
-        byte chainId = 'T';
 
         return new Account(
                 new Address(signKeys.getPublicKey().getBase58()),
@@ -114,17 +113,17 @@ public class AccountFactory {
             return new KeyPair(keys.getPublicKey(), null);
         }
 
-        byte[] secretkey = keys.getPrivateKey().getRaw();
+        byte[] privateKey = keys.getPrivateKey().getRaw();
 
-        byte[] publickey = type.equals("sign") ? CryptoUtil.signPublicFromPrivate(secretkey) : CryptoUtil.encryptPublicFromPrivate(secretkey);
+        byte[] publicKey = type.equals("sign") ? CryptoUtil.signPublicFromPrivate(privateKey) : CryptoUtil.encryptPublicFromPrivate(privateKey);
 
-        if (keys.getPublicKey() != null && !Arrays.equals(keys.getPublicKey().getRaw(), publickey)) {
+        if (keys.getPublicKey() != null && !Arrays.equals(keys.getPublicKey().getRaw(), publicKey)) {
             throw new InvalidAccountException("Public " + type + " key doesn't match private " + type + " key");
         }
 
         return new KeyPair(
-                new PublicKey(publickey),
-                new PrivateKey(secretkey)
+                new PublicKey(publicKey),
+                new PrivateKey(privateKey)
         );
     }
 
@@ -147,22 +146,9 @@ public class AccountFactory {
         return create(signKeys, encryptKeys, null);
     }
 
-    public Account create(PrivateKey signPrivateKey) {
-        return create(new KeyPair(null, signPrivateKey));
-    }
-
-    public Account createPublic(PublicKey signkey) {
-        KeyPair sign = null;
-        if (signkey != null) {
-            sign = new KeyPair(
-                    signkey,
-                    null
-            );
-        }
-
-        KeyPair encrypt = convertSignToEncrypt(sign);
-
-        return create(sign, encrypt, null);
+    public Account createPublic(PublicKey signPublicKey) {
+        if (signPublicKey == null || signPublicKey.getRaw().length == 0) throw new IllegalArgumentException("Provided signing key is empty");
+        return create(new KeyPair(signPublicKey, null));
     }
 
     protected int getNonce() {
