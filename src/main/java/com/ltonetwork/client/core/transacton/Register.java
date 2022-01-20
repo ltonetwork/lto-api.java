@@ -4,7 +4,10 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
-import com.ltonetwork.client.types.*;
+import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.JsonObject;
+import com.ltonetwork.client.types.Key;
+import com.ltonetwork.client.types.PublicKey;
 
 import java.util.ArrayList;
 import java.util.Locale;

@@ -1,6 +1,9 @@
 package com.ltonetwork.client.utils.main;
 
-import com.ltonetwork.client.types.*;
+import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.KeyPair;
+import com.ltonetwork.client.types.PrivateKey;
+import com.ltonetwork.client.types.PublicKey;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.seasalt.sign.Signature;
 import org.junit.Before;

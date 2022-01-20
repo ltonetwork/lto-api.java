@@ -10,8 +10,6 @@ import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
 
-import java.nio.charset.StandardCharsets;
-
 public class Association extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
     private final static byte TYPE = 16;

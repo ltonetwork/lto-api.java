@@ -1,7 +1,6 @@
 package com.ltonetwork.client.utils;
 
 import com.ltonetwork.client.types.JsonObject;
-import com.ltonetwork.seasalt.Binary;
 
 import java.io.IOException;
 import java.io.InputStream;

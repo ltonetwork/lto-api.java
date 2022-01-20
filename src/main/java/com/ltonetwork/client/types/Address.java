@@ -4,8 +4,6 @@ import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 
-import java.nio.charset.StandardCharsets;
-
 public class Address {
     private final String address;
     private final byte chainId;
