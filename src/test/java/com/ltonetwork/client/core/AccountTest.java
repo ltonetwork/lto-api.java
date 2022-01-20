@@ -1,13 +1,13 @@
 package com.ltonetwork.client.core;
 
 import com.ltonetwork.client.types.*;
-import com.ltonetwork.client.utils.Encoder;
+import com.ltonetwork.seasalt.Binary;
+import com.ltonetwork.seasalt.sign.Signature;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
 
@@ -22,13 +22,13 @@ public class AccountTest {
     @Before
     public void init() {
         sign = new KeyPair(
-                new PublicKey(Encoder.base58Decode("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"), Encoding.RAW),
-                new PrivateKey(Encoder.base58Decode("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp"), Encoding.RAW)
+                new PublicKey("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y", Encoding.BASE58),
+                new PrivateKey("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp", Encoding.BASE58)
         );
 
         encrypt = new KeyPair(
-                new PublicKey(Encoder.base58Decode("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN"), Encoding.RAW),
-                new PrivateKey(Encoder.base58Decode("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6"), Encoding.RAW)
+                new PublicKey("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN", Encoding.BASE58),
+                new PrivateKey("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6", Encoding.BASE58)
         );
 
         Address address = new Address("3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy");
@@ -58,12 +58,12 @@ public class AccountTest {
 
     @Test
     public void testGetPublicSignKey() {
-        assertEquals(encrypt.getPublickey(), account.getPublicEncryptKey());
+        assertEquals(encrypt.getPublicKey(), account.getPublicEncryptKey());
     }
 
     @Test
     public void testGetPublicEncryptKey() {
-        assertEquals(sign.getPublickey(), account.getPublicSignKey());
+        assertEquals(sign.getPublicKey(), account.getPublicSignKey());
     }
 
     @Test
@@ -72,7 +72,7 @@ public class AccountTest {
 
         assertEquals(
                 "2DDGtVHrX66Ae8C4shFho4AqgojCBTcE4phbCRTm3qXCKPZZ7reJBXiiwxweQAkJ3Tsz6Xd3r5qgnbA67gdL5fWE",
-                signature.base58()
+                signature.getBase58()
         );
     }
 
@@ -82,7 +82,7 @@ public class AccountTest {
 
         assertEquals(
                 "2SUPrUfQZBMXVAoY5p5Z1oYe8a8v4SN6gGk7FtPLHkTNmSN1Epj47KfLsmSv6MoExpF7GY8EBtroSV2yHDiG7HdS",
-                signature.base58()
+                signature.getBase58()
         );
     }
 
@@ -93,41 +93,43 @@ public class AccountTest {
 
         assertEquals(
                 "2SUPrUfQZBMXVAoY5p5Z1oYe8a8v4SN6gGk7FtPLHkTNmSN1Epj47KfLsmSv6MoExpF7GY8EBtroSV2yHDiG7HdS",
-                signature.base58()
+                signature.getBase58()
         );
     }
 
     @Test
-    public void testVerifyString() {
-        Signature signature = new Signature(Encoder.base58Decode("2DDGtVHrX66Ae8C4shFho4AqgojCBTcE4phbCRTm3qXCKPZZ7reJBXiiwxweQAkJ3Tsz6Xd3r5qgnbA67gdL5fWE"));
+    public void testVerify() {
+        String message = "hello";
+        Signature signature = account.sign(message);
 
-        assertTrue(account.verify(signature, "hello"));
-    }
-
-    @Test
-    public void testVerifyByte() {
-        Signature signature = new Signature(Encoder.base58Decode("2DDGtVHrX66Ae8C4shFho4AqgojCBTcE4phbCRTm3qXCKPZZ7reJBXiiwxweQAkJ3Tsz6Xd3r5qgnbA67gdL5fWE"));
-
-        assertTrue(account.verify(signature, "hello".getBytes(StandardCharsets.UTF_8)));
+        assertTrue(account.verify(signature, message));
     }
 
     @Test
     public void testVerifyFail() {
-        Signature signature = new Signature(Encoder.base58Decode("2DDGtVHrX66Ae8C4shFho4AqgojCBTcE4phbCRTm3qXCKPZZ7reJBXiiwxweQAkJ3Tsz6Xd3r5qgnbA67gdL5fWE"));
+        Signature signature = new Signature(Binary.fromBase58("2DDGtVHrX66Ae8C4shFho4AqgojCBTcE4phbCRTm3qXCKPZZ7reJBXiiwxweQAkJ3Tsz6Xd3r5qgnbA67gdL5fWE").getBytes());
 
         assertFalse(account.verify(signature, "fail"));
     }
 
     @Test
+    public void testSignAndVerify() {
+        String message = "hello";
+        Signature signature = account.sign(message);
+
+        assertTrue(account.verify(signature, message));
+    }
+
+    @Test
     public void testEncryptDecrypt() {
         KeyPair sign2 = new KeyPair(
-                new PublicKey(Encoder.base58Decode("BvEdG3ATxtmkbCVj9k2yvh3s6ooktBoSmyp8xwDqCQHp"), Encoding.RAW),
-                new PrivateKey(Encoder.base58Decode("pLX2GgWzkjiiPp2SsowyyHZKrF4thkq1oDLD7tqBpYDwfMvRsPANMutwRvTVZHrw8VzsKjiN8EfdGA9M84smoEz"), Encoding.RAW)
+                new PublicKey("BvEdG3ATxtmkbCVj9k2yvh3s6ooktBoSmyp8xwDqCQHp", Encoding.BASE58),
+                new PrivateKey("pLX2GgWzkjiiPp2SsowyyHZKrF4thkq1oDLD7tqBpYDwfMvRsPANMutwRvTVZHrw8VzsKjiN8EfdGA9M84smoEz", Encoding.BASE58)
         );
 
         KeyPair encrypt2 = new KeyPair(
-                new PublicKey(Encoder.base58Decode("HBqhfdFASRQ5eBBpu2y6c6KKi1az6bMx8v1JxX4iW1Q8"), Encoding.RAW),
-                new PrivateKey(Encoder.base58Decode("3kMEhU5z3v8bmer1ERFUUhW58Dtuhyo9hE5vrhjqAWYT"), Encoding.RAW)
+                new PublicKey("HBqhfdFASRQ5eBBpu2y6c6KKi1az6bMx8v1JxX4iW1Q8", Encoding.BASE58),
+                new PrivateKey("3kMEhU5z3v8bmer1ERFUUhW58Dtuhyo9hE5vrhjqAWYT", Encoding.BASE58)
         );
 
         Address address2 = new Address("3PPbMwqLtwBGcJrTA5whqJfY95GqnNnFMDX");
