@@ -3,6 +3,8 @@ package com.ltonetwork.client.core.transacton;
 import com.ltonetwork.client.core.Account;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.*;
+import com.ltonetwork.client.utils.CryptoUtil;
+import com.ltonetwork.seasalt.Binary;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public abstract class Transaction {
     protected TransactionId id;
     protected Address sender;
     protected PublicKey senderPublicKey;
-    protected ArrayList<Signature> proofs;
+    protected ArrayList<com.ltonetwork.seasalt.sign.Signature> proofs;
     protected Account sponsor;
 
     public Transaction(byte type, byte version, long fee) {
@@ -52,7 +54,7 @@ public abstract class Transaction {
             this.timestamp = Instant.now().toEpochMilli() * 1000;
         }
 
-        this.proofs.add(new Signature(this.toBinary(), account.getSign().getSecretkey()));
+        this.proofs.add(CryptoUtil.signDetached(this.toBinary(), account.getSign().getPrivateKey()));
     }
 
     public void sponsorWith(Account account) {
@@ -77,15 +79,15 @@ public abstract class Transaction {
         return this.sponsor;
     }
 
-    public ArrayList<Signature> getProofs() {
+    public ArrayList<com.ltonetwork.seasalt.sign.Signature> getProofs() {
         return this.proofs;
     }
 
-    private ArrayList<Signature> fetchProofs(JsonObject jsonProofs) {
-        ArrayList<Signature> proofs = new ArrayList<>();
+    private ArrayList<com.ltonetwork.seasalt.sign.Signature> fetchProofs(JsonObject jsonProofs) {
+        ArrayList<com.ltonetwork.seasalt.sign.Signature> proofs = new ArrayList<>();
 
         for (int i = 0; i < jsonProofs.length(); i++) {
-            proofs.add(new Signature(jsonProofs.get(i), Encoding.BASE58));
+            proofs.add(new com.ltonetwork.seasalt.sign.Signature(Binary.fromBase58(jsonProofs.get(i)).getBytes()));
         }
 
         return proofs;

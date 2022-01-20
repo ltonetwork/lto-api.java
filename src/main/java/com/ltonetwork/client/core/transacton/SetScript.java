@@ -54,7 +54,7 @@ public class SetScript extends Transaction {
                 new byte[]{this.type},
                 new byte[]{this.version},
                 new byte[]{this.getNetwork()},
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 new byte[]{(byte) 1},
                 Shorts.toByteArray((short) binaryScript.length),
                 binaryScript,

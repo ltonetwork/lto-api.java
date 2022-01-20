@@ -39,7 +39,7 @@ public class Address {
                 if (!CryptoUtil.isValidAddress(address, Encoding.BASE64)) {
                     throw new InvalidArgumentException("Address is not properly base64 encoded");
                 }
-                this.address = Encoder.base58Encode(Encoder.base64Decode(address, StandardCharsets.UTF_8));
+                this.address = Encoder.base58Encode(Encoder.base64Decode(address));
                 this.chainId = fetchChainIdFromAddress(address);
                 break;
             }
@@ -53,7 +53,7 @@ public class Address {
     }
 
     public String getAddressBase64() {
-        return Encoder.base64Encode(Encoder.base58Decode(address, StandardCharsets.UTF_8));
+        return Encoder.base64Encode(Encoder.base58Decode(address));
     }
 
     public byte getChainId() {

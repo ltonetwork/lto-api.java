@@ -56,7 +56,7 @@ public class Transfer extends Transaction {
         byte[] binaryAttachment = Bytes.concat(
                 new byte[]{this.type},
                 new byte[]{this.version},
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),

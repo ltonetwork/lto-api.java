@@ -73,7 +73,7 @@ public class MassTransfer extends Transaction {
         byte[] ret = Bytes.concat(
                 new byte[]{this.type},
                 new byte[]{this.version},
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 Shorts.toByteArray((short) transfers.size())
         );
 

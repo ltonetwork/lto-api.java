@@ -1,166 +1,96 @@
 package com.ltonetwork.client.utils;
 
 import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.seasalt.Binary;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import org.bitcoinj.core.Base58;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.regex.Pattern;
 
 public class Encoder {
 
-    public static String base58Encode(String input, Charset charset) {
-        return Base58.encode(input.getBytes(charset));
-    }
-
-    public static String base58Encode(String input) {
-        return base58Encode(input, StandardCharsets.UTF_8);
-    }
-
     public static String base58Encode(byte[] input) {
-        return Base58.encode(input);
+        return new Binary(input).getBase58();
     }
-
-    public static String base58Decode(String input, Charset charset) {
-        return new String(Base58.decode(input), charset);
-    }
-
-    public static String base58Decode(byte[] input, Charset charset) {
-        return new String(Base58.decode(new String(input, charset)));
-    }
-
-    public static byte[] base58Decode(byte[] input) {
-        return Base58.decode(new String(input));
+    public static String base58Encode(String input) {
+        return base58Encode(input.getBytes(StandardCharsets.UTF_8));
     }
 
     public static byte[] base58Decode(String input) {
-        return Base58.decode(input);
+        return Binary.fromBase58(input).getBytes();
     }
-
-    public static String base64Encode(String input) {
-        try {
-            return new String(Base64.getEncoder().encode(input.getBytes()));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static byte[] base58Decode(byte[] input) {
+        return base58Decode(new String(input, StandardCharsets.UTF_8));
     }
 
     public static String base64Encode(byte[] input) {
-        try {
-            return new String(Base64.getEncoder().encode(input));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return new Binary(input).getBase64();
+    }
+    public static String base64Encode(String input) {
+        return base64Encode(input.getBytes(StandardCharsets.UTF_8));
     }
 
     public static byte[] base64Decode(String input) {
-        return Base64.getDecoder().decode(input);
+        return Binary.fromBase64(input).getBytes();
     }
-
     public static byte[] base64Decode(byte[] input) {
-        return Base64.getDecoder().decode(input);
-    }
-
-    public static String base64Decode(String input, Charset charset) {
-        return new String(Base64.getDecoder().decode(input), charset);
-    }
-
-    public static String base64Decode(byte[] input, Charset charset) {
-        return new String(Base64.getDecoder().decode(input), charset);
-    }
-
-    public static String hexEncode(String input) {
-        return Hex.encodeHexString(input.getBytes());
+        return base64Decode(new String(input, StandardCharsets.UTF_8));
     }
 
     public static String hexEncode(byte[] input) {
-        return Hex.encodeHexString(input);
+        return new Binary(input).getHex();
     }
-
-    public static String hexDecode(String input, Charset charset) {
-        try {
-            return new String(Hex.decodeHex(input));
-        } catch (DecoderException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static String hexDecode(byte[] input, Charset charset) {
-        try {
-            return new String(Hex.decodeHex(new String(input)));
-        } catch (DecoderException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public static String hexEncode(String input) {
+        return hexEncode(input.getBytes(StandardCharsets.UTF_8));
     }
 
     public static byte[] hexDecode(String input) {
         try {
-            return Hex.decodeHex(input);
+            return Binary.fromHex(input).getBytes();
         } catch (DecoderException e) {
-            e.printStackTrace();
-            return null;
+            throw new IllegalArgumentException("Unable to decode hex string " + input);
         }
     }
-
     public static byte[] hexDecode(byte[] input) {
-        try {
-            return Hex.decodeHex(new String(input));
-        } catch (DecoderException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return hexDecode(new String(input, StandardCharsets.UTF_8));
     }
 
-    public static String decode(String input, Encoding encoding) {
-        String ret;
+    public static byte[] decode(String input, Encoding encoding) {
         switch (encoding) {
             case BASE58:
-                ret = base58Decode(input, StandardCharsets.UTF_8);
-                break;
+                return base58Decode(input);
             case BASE64:
-                ret = base64Decode(input, StandardCharsets.UTF_8);
-                break;
+                return base64Decode(input);
             case RAW:
-                ret = input;
-                break;
+                return input.getBytes(StandardCharsets.UTF_8);
             case HEX:
-                ret = hexDecode(input, StandardCharsets.UTF_8);
-                break;
+                return hexDecode(input);
             default:
-                ret = null;
+                throw new IllegalArgumentException("Unknown encoding");
         }
-
-        return ret;
+    }
+    public static byte[] decode(byte[] input, Encoding encoding) {
+        return decode(new String(input, StandardCharsets.UTF_8), encoding);
     }
 
+    public static String encode(byte[] input, Encoding encoding) {
+        switch (encoding) {
+            case BASE58:
+                return base58Encode(input);
+            case BASE64:
+                return base64Encode(input);
+            case RAW:
+                return new String(input, StandardCharsets.UTF_8);
+            case HEX:
+                return hexEncode(input);
+            default:
+                throw new IllegalArgumentException("Unknown encoding");
+        }
+    }
     public static String encode(String input, Encoding encoding) {
-        String ret;
-
-        switch (encoding) {
-            case BASE58:
-                ret = base58Encode(input);
-                break;
-            case BASE64:
-                ret = base64Encode(input);
-                break;
-            case RAW:
-                ret = input;
-                break;
-            case HEX:
-                ret = hexEncode(input);
-                break;
-            default:
-                ret = null;
-        }
-
-        return ret;
+        return encode(input.getBytes(StandardCharsets.UTF_8), encoding);
     }
 
     public static boolean isBase58Encoded(String input) {
@@ -169,6 +99,10 @@ public class Encoder {
 
     public static boolean isBase64Encoded(String input) {
         return Pattern.matches("^[A-Za-z0-9+/]+={0,2}$", input);
+    }
+
+    public static boolean isHexEncoded(String input) {
+        return Pattern.matches("^[a-f0-9]+$", input);
     }
 
     static byte[] packN(int value) {

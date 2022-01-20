@@ -44,7 +44,7 @@ public class Lease extends Transaction {
         return Bytes.concat(
                 new byte[]{this.type},
                 new byte[]{this.version},
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 Encoder.base58Decode(this.recipient.getAddress()),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),

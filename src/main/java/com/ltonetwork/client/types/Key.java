@@ -1,14 +1,12 @@
 package com.ltonetwork.client.types;
 
-import java.nio.charset.StandardCharsets;
+import com.ltonetwork.seasalt.Binary;
+import org.apache.commons.codec.DecoderException;
 
-import static com.ltonetwork.client.utils.Encoder.*;
+public abstract class Key {
 
-public class Key {
-
-    private final byte[] valueBytes;
-    private final Encoding encoding;
-    private final KeyType keyType;
+    private final Binary value;
+    private final KeyType type;
 
     public enum KeyType {
         ED25519,
@@ -16,141 +14,64 @@ public class Key {
         SECP256R1
     }
 
-    public Key(byte[] valueBytes, Encoding encoding, KeyType keyType) {
-        this.valueBytes = valueBytes;
-        this.encoding = encoding;
-        this.keyType = keyType;
-    }
-
-    public Key(byte[] valueBytes, Encoding encoding) {
-        this(valueBytes,encoding, KeyType.ED25519);
-    }
-
-    public Key(String valueBytes, Encoding encoding) {
-        this(valueBytes.getBytes(StandardCharsets.UTF_8), encoding, KeyType.ED25519);
-    }
-
-    public Key(String valueBytes, Encoding encoding, KeyType keyType) {
-        this(valueBytes.getBytes(StandardCharsets.UTF_8), encoding, keyType);
+    public Key(byte[] valueBytes, KeyType keyType) {
+        this.value = new Binary(valueBytes);
+        this.type = keyType;
     }
 
     public Key(byte[] valueBytes) {
-        this(valueBytes, Encoding.BASE58, KeyType.ED25519);
+        this(valueBytes, KeyType.ED25519);
     }
 
-    public Key(byte[] valueBytes, KeyType keyType) {
-        this(valueBytes, Encoding.BASE58, keyType);
+    public Key(String value, Encoding encoding, KeyType keyType) {
+        this.value = valueToBinary(value, encoding);
+        this.type = keyType;
     }
 
-    public Key(String valueBytes) {
-        this(valueBytes.getBytes(StandardCharsets.UTF_8), Encoding.BASE58, KeyType.ED25519);
+    public Key(String value, Encoding encoding) {
+        this(value, encoding, KeyType.ED25519);
     }
 
-    public Key(String valueBytes, KeyType keyType) {
-        this(valueBytes.getBytes(StandardCharsets.UTF_8), Encoding.BASE58, keyType);
+    public Key(Binary value, KeyType keyType) {
+        this.value = value;
+        this.type = keyType;
     }
 
-    public byte[] getValueBytes() {
-        return valueBytes;
+    public Key(Binary value) {
+        this(value, KeyType.ED25519);
     }
 
-    public Encoding getEncoding() {
-        return encoding;
+    public String getBase58() {
+        return value.getBase58();
     }
 
-    public KeyType getKeyType() {
-        return keyType;
+    public String getBase64() {
+        return value.getBase64();
     }
 
-    public String toBase58() {
-        String ret;
+    public String getHex() {
+        return value.getHex();
+    }
 
-        switch (this.encoding) {
-            case BASE58:
-                ret = new String(this.valueBytes);
-                break;
-            case BASE64:
-                ret = base58Encode(base64Decode(this.valueBytes));
-                break;
-            case RAW:
-                ret = base58Encode(this.valueBytes);
-                break;
-            case HEX:
-                ret = base58Encode(hexDecode(this.valueBytes));
-                break;
-            default:
-                ret = null;
+    public byte[] getRaw() {
+        return value.getBytes();
+    }
+
+    public KeyType getType() {
+        return type;
+    }
+
+    private Binary valueToBinary(String value, Encoding encoding) {
+        try {
+            switch (encoding) {
+                case RAW: return new Binary(value.getBytes());
+                case BASE58: return Binary.fromBase58(value);
+                case BASE64: return Binary.fromBase64(value);
+                case HEX: return Binary.fromHex(value);
+                default: throw new IllegalArgumentException("Unknown encoding");
+            }
+        } catch (DecoderException e) {
+            throw new IllegalArgumentException(e);
         }
-
-        return ret;
-    }
-
-    public String toBase64() {
-        String ret;
-
-        switch (this.encoding) {
-            case BASE58:
-                ret = base64Encode(base58Decode(this.valueBytes));
-                break;
-            case BASE64:
-                ret = new String(this.valueBytes);
-                break;
-            case RAW:
-                ret = base64Encode(this.valueBytes);
-                break;
-            case HEX:
-                ret = base64Encode(hexDecode(this.valueBytes));
-                break;
-            default:
-                ret = null;
-        }
-
-        return ret;
-    }
-
-    public byte[] toRaw() {
-        byte[] ret;
-
-        switch (this.encoding) {
-            case BASE58:
-                ret = base58Decode(this.valueBytes);
-                break;
-            case BASE64:
-                ret = base64Decode(this.valueBytes);
-                break;
-            case RAW:
-                ret = new String(this.valueBytes).getBytes(StandardCharsets.UTF_8);
-                break;
-            case HEX:
-                ret = hexDecode(this.valueBytes);
-                break;
-            default:
-                ret = null;
-        }
-
-        return ret;
-    }
-
-    public String toHex() {
-        String ret;
-
-        switch (this.encoding) {
-            case BASE58:
-                ret = hexEncode(base58Decode(this.valueBytes));
-                break;
-            case BASE64:
-                ret = hexEncode(base64Decode(this.valueBytes));
-                break;
-            case RAW:
-                ret = hexEncode(this.valueBytes);
-                break;
-            case HEX:
-                ret = new String(this.valueBytes);
-                break;
-            default:
-                ret = null;
-        }
-
-        return ret;
     }
 }

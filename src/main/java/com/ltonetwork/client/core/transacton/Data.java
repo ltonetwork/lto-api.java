@@ -67,7 +67,7 @@ public class Data extends Transaction {
                 new byte[]{this.version},
                 new byte[]{this.sender.getChainId()},
                 Longs.toByteArray(this.timestamp),
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 Longs.toByteArray(this.fee),
                 Shorts.toByteArray((short) data.length)
         );

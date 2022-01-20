@@ -58,7 +58,7 @@ public class Anchor extends Transaction {
         return Bytes.concat(
                 new byte[]{this.type},
                 new byte[]{this.version},
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 Shorts.toByteArray((short) anchors.size()),
                 Bytes.toArray(anchorsBytes), // includes each anchor's length and value
                 Longs.toByteArray(this.timestamp),
@@ -75,7 +75,7 @@ public class Anchor extends Transaction {
             throw new BadMethodCallException("Method 'getHash' can't be used on a multi-anchor tx");
 
         return Encoder.encode(
-                Encoder.base58Decode(this.anchors.get(0), StandardCharsets.UTF_8),
+                Encoder.base58Decode(this.anchors.get(0)),
                 encoding
         );
     }
@@ -86,7 +86,7 @@ public class Anchor extends Transaction {
         String[] hashes = new String[this.anchors.size()];
         for (int i = 0; i < this.anchors.size(); i++) {
             hashes[i] = Encoder.encode(
-                    Encoder.base58Decode(this.anchors.get(i), StandardCharsets.UTF_8),
+                    Encoder.base58Decode(this.anchors.get(i)),
                     encoding
             );
         }
