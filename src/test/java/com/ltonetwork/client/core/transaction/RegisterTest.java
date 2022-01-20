@@ -8,7 +8,6 @@ import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.types.Key;
 import com.ltonetwork.client.types.PublicKey;
-import com.ltonetwork.client.utils.BinHex;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import org.junit.Before;

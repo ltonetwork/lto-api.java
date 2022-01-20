@@ -2,11 +2,13 @@ package com.ltonetwork.client.core;
 
 import com.ltonetwork.client.exceptions.InvalidAccountException;
 import com.ltonetwork.client.types.*;
-import com.ltonetwork.client.utils.BinHex;
 import com.ltonetwork.client.utils.CryptoUtil;
-import com.ltonetwork.client.utils.HashUtil;
+import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.PackUtil;
+import com.ltonetwork.seasalt.hash.Keccak256;
+import com.ltonetwork.seasalt.hash.SHA256;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -51,9 +53,9 @@ public class AccountFactory {
     public byte[] createAccountSeed(String seedText) {
         byte[] seedBase = PackUtil.packLaStar(nonce, seedText);
 
-        byte[] secureSeed = BinHex.hex2bin(HashUtil.Keccak256(CryptoUtil.genericHash(seedBase, 32)));
+        byte[] secureSeed = Encoder.hexDecode(Keccak256.hash(CryptoUtil.genericHash(seedBase, 32)).getBytes());
 
-        return HashUtil.SHA256(secureSeed);
+        return SHA256.hash(secureSeed).getBytes();
     }
 
     public byte[] createAddress(PublicKey publickey, String type) {
@@ -61,10 +63,16 @@ public class AccountFactory {
             publickey = new PublicKey(CryptoUtil.signToEncryptPublicKey(publickey.getRaw()));
         }
 
-        String publickeyHash = HashUtil.Keccak256(CryptoUtil.genericHash(publickey.getRaw(), 32)).substring(0, 40);
+        String publickeyHash = new String(
+                Keccak256.hash(CryptoUtil.genericHash(publickey.getRaw(), 32)).getBytes(),
+                StandardCharsets.UTF_8
+        ).substring(0, 40);
 
         byte[] packed = PackUtil.packCaH40(ADDRESS_VERSION, network, publickeyHash);
-        String chksum = HashUtil.Keccak256(CryptoUtil.genericHash(packed, packed.length)).substring(0, 8);
+        String chksum = new String(
+                Keccak256.hash(CryptoUtil.genericHash(packed, packed.length)).getBytes(),
+                StandardCharsets.UTF_8
+        ).substring(0, 8);
 
         return PackUtil.packCaH40H8(ADDRESS_VERSION, network, publickeyHash, chksum);
     }

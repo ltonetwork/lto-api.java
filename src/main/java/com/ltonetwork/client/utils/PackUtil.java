@@ -1,6 +1,7 @@
 package com.ltonetwork.client.utils;
 
 import com.ltonetwork.client.types.JsonObject;
+import com.ltonetwork.seasalt.Binary;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,7 +82,7 @@ public class PackUtil {
         byte[] packed = new byte[1 + 8 + 20];
         packed[0] = (byte) version;
         System.arraycopy(nonce, 0, packed, 1, 8);
-        System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 8, 20);
+        System.arraycopy(Encoder.hexDecode(hash), 0, packed, 1 + 8, 20);
         return packed;
     }
 
@@ -89,7 +90,7 @@ public class PackUtil {
         byte[] packed = new byte[1 + 1 + 20];
         packed[0] = (byte) version;
         System.arraycopy(network.getBytes(), 0, packed, 1, 1);
-        System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 1, 20);
+        System.arraycopy(Encoder.hexDecode(hash), 0, packed, 1 + 1, 20);
         return packed;
     }
 
@@ -97,8 +98,8 @@ public class PackUtil {
         byte[] packed = new byte[1 + 1 + 20 + 4];
         packed[0] = (byte) version;
         System.arraycopy(network.getBytes(), 0, packed, 1, 1);
-        System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 1, 20);
-        System.arraycopy(BinHex.hex2bin(chksum), 0, packed, 1 + 1 + 20, 4);
+        System.arraycopy(Encoder.hexDecode(hash), 0, packed, 1 + 1, 20);
+        System.arraycopy(Encoder.hexDecode(chksum), 0, packed, 1 + 1 + 20, 4);
         return packed;
     }
 
@@ -106,8 +107,8 @@ public class PackUtil {
         byte[] packed = new byte[1 + 8 + 20 + 4];
         packed[0] = (byte) version;
         System.arraycopy(nonce, 0, packed, 1, 8);
-        System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 8, 20);
-        System.arraycopy(BinHex.hex2bin(chksum), 0, packed, 1 + 8 + 20, 4);
+        System.arraycopy(Encoder.hexDecode(hash), 0, packed, 1 + 8, 20);
+        System.arraycopy(Encoder.hexDecode(chksum), 0, packed, 1 + 8 + 20, 4);
         return packed;
     }
 
@@ -124,11 +125,11 @@ public class PackUtil {
 
         byte[] hash = new byte[20];
         System.arraycopy(packed, 1 + 8, hash, 0, 20);
-        unpacked.put("keyhash", BinHex.bin2hex(hash));
+        unpacked.put("keyhash", Encoder.hexEncode(hash));
 
         byte[] chksum = new byte[4];
         System.arraycopy(packed, 1 + 8 + 20, chksum, 0, 4);
-        unpacked.put("checksum", BinHex.bin2hex(chksum));
+        unpacked.put("checksum", Encoder.hexEncode(chksum));
 
         return unpacked;
 
