@@ -1,7 +1,7 @@
 package com.ltonetwork.client.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ltonetwork.client.core.transacton.*;
+import com.ltonetwork.client.core.transaction.*;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.JsonObject;

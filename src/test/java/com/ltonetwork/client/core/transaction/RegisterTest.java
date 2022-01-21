@@ -2,7 +2,6 @@ package com.ltonetwork.client.core.transaction;
 
 import com.ltonetwork.client.TestUtil;
 import com.ltonetwork.client.core.Account;
-import com.ltonetwork.client.core.transacton.Register;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.types.Key;

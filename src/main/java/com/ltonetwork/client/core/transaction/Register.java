@@ -1,4 +1,4 @@
-package com.ltonetwork.client.core.transacton;
+package com.ltonetwork.client.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;

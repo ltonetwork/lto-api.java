@@ -2,7 +2,6 @@ package com.ltonetwork.client.core.transaction;
 
 import com.ltonetwork.client.TestUtil;
 import com.ltonetwork.client.core.Account;
-import com.ltonetwork.client.core.transacton.Transfer;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.JsonObject;

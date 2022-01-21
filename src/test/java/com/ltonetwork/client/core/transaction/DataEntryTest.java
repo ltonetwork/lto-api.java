@@ -1,6 +1,5 @@
 package com.ltonetwork.client.core.transaction;
 
-import com.ltonetwork.client.core.transacton.DataEntry;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;

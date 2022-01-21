@@ -1,4 +1,4 @@
-package com.ltonetwork.client.core.transacton;
+package com.ltonetwork.client.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -10,29 +10,28 @@ import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
 
-public class Association extends Transaction {
+public class RevokeAssociation extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
-    private final static byte TYPE = 16;
+    private final static byte TYPE = 17;
     private final static byte VERSION = 1;
     private final Address party;
     private final int associationType;
     private String hash;
 
-    public Association(Address party, int type, String hash, Encoding encoding) {
+    public RevokeAssociation(Address party, int type, String hash, Encoding encoding) {
         super(TYPE, VERSION, MINIMUM_FEE);
-
         this.party = party;
         this.associationType = type;
         this.hash = Encoder.base58Encode(Encoder.decode(hash, encoding));
     }
 
-    public Association(Address party, int type) {
+    public RevokeAssociation(Address party, int type) {
         super(TYPE, VERSION, MINIMUM_FEE);
         this.party = party;
         this.associationType = type;
     }
 
-    public Association(JsonObject json) {
+    public RevokeAssociation(JsonObject json) {
         super(json);
         this.party = new Address(json.get("party").toString());
         this.associationType = Integer.parseInt(json.get("associationType").toString());
@@ -51,8 +50,8 @@ public class Association extends Transaction {
         byte[] ret = Bytes.concat(
                 new byte[]{this.type},
                 new byte[]{this.version},
-                new byte[]{this.getNetwork()},
                 this.senderPublicKey.getRaw(),
+                new byte[]{this.getNetwork()},
                 Encoder.base58Decode(this.party.getAddress()),
                 Ints.toByteArray(associationType)
         );
