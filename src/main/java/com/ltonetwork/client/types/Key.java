@@ -11,7 +11,8 @@ public abstract class Key {
     public enum KeyType {
         ED25519,
         SECP256K1,
-        SECP256R1
+        SECP256R1,
+        CURVE25519
     }
 
     public Key(byte[] valueBytes, KeyType keyType) {

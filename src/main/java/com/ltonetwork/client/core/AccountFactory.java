@@ -1,10 +1,7 @@
 package com.ltonetwork.client.core;
 
 import com.ltonetwork.client.exceptions.InvalidAccountException;
-import com.ltonetwork.client.types.Address;
-import com.ltonetwork.client.types.KeyPair;
-import com.ltonetwork.client.types.PrivateKey;
-import com.ltonetwork.client.types.PublicKey;
+import com.ltonetwork.client.types.*;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.PackUtil;
@@ -61,8 +58,9 @@ public class AccountFactory {
         return SHA256.hash(secureSeed).getBytes();
     }
 
-    public byte[] createAddress(PublicKey publickey, String type) {
-        if (type.equals("sign")) {
+    public byte[] createAddress(PublicKey publickey) {
+        // if signing key
+        if (publickey.getType() != Key.KeyType.CURVE25519) {
             publickey = new PublicKey(CryptoUtil.signToEncryptPublicKey(publickey.getRaw()));
         }
 
@@ -78,10 +76,6 @@ public class AccountFactory {
         ).substring(0, 8);
 
         return PackUtil.packCaH40H8(ADDRESS_VERSION, network, publicKeyHash, checkSum);
-    }
-
-    public byte[] createAddress(PublicKey publickey) {
-        return createAddress(publickey, "encrypt");
     }
 
     public Account seed(String seedText) {
@@ -108,17 +102,17 @@ public class AccountFactory {
         return new KeyPair(encryptPublicKey, encryptPrivateKey);
     }
 
-    public KeyPair calcKeys(KeyPair keys, String type) {
+    public KeyPair calcKeys(KeyPair keys) {
         if (keys.getPrivateKey() == null) {
             return new KeyPair(keys.getPublicKey(), null);
         }
 
         byte[] privateKey = keys.getPrivateKey().getRaw();
 
-        byte[] publicKey = type.equals("sign") ? CryptoUtil.signPublicFromPrivate(privateKey) : CryptoUtil.encryptPublicFromPrivate(privateKey);
+        byte[] publicKey = keys.getPublicKey().getType() != Key.KeyType.CURVE25519 ? CryptoUtil.signPublicFromPrivate(privateKey) : CryptoUtil.encryptPublicFromPrivate(privateKey);
 
         if (keys.getPublicKey() != null && !Arrays.equals(keys.getPublicKey().getRaw(), publicKey)) {
-            throw new InvalidAccountException("Public " + type + " key doesn't match private " + type + " key");
+            throw new InvalidAccountException("Public key doesn't match private key");
         }
 
         return new KeyPair(
@@ -127,27 +121,28 @@ public class AccountFactory {
         );
     }
 
-    public KeyPair calcKeys(PrivateKey key, String type) {
+    public KeyPair calcKeys(PrivateKey key) {
         KeyPair kp = new KeyPair(null, key);
-        return calcKeys(kp, type);
+        return calcKeys(kp);
     }
 
     public Account create(KeyPair sign, KeyPair encrypt, Address address) {
-        KeyPair signKeys = sign != null ? calcKeys(sign, "sign") : null;
-        KeyPair encryptKeys = encrypt != null ? calcKeys(encrypt, "encrypt") : (sign != null ? convertSignToEncrypt(signKeys) : null);
+        KeyPair signKeys = sign != null ? calcKeys(sign) : null;
+        KeyPair encryptKeys = encrypt != null ? calcKeys(encrypt) : (sign != null ? convertSignToEncrypt(signKeys) : null);
 
         return new Account(address, encryptKeys, signKeys);
     }
 
     public Account create(KeyPair sign) {
-        KeyPair signKeys = sign != null ? calcKeys(sign, "sign") : null;
-        KeyPair encryptKeys = sign != null ? calcKeys(convertSignToEncrypt(sign), "encrypt") : null;
+        KeyPair signKeys = sign != null ? calcKeys(sign) : null;
+        KeyPair encryptKeys = sign != null ? calcKeys(convertSignToEncrypt(sign)) : null;
 
         return create(signKeys, encryptKeys, null);
     }
 
     public Account createPublic(PublicKey signPublicKey) {
-        if (signPublicKey == null || signPublicKey.getRaw().length == 0) throw new IllegalArgumentException("Provided signing key is empty");
+        if (signPublicKey == null || signPublicKey.getRaw().length == 0)
+            throw new IllegalArgumentException("Provided signing key is empty");
         return create(new KeyPair(signPublicKey, null));
     }
 
@@ -166,8 +161,8 @@ public class AccountFactory {
     protected byte[] calcAddress(byte[] address, KeyPair sign, KeyPair encrypt) {
         byte[] _address = null;
 
-        byte[] addrSign = (sign != null && sign.getPublicKey() != null) ? createAddress(sign.getPublicKey(), "sign") : null;
-        byte[] addrEncrypt = (encrypt != null && encrypt.getPublicKey() != null) ? createAddress(encrypt.getPublicKey(), "encrypt") : null;
+        byte[] addrSign = (sign != null && sign.getPublicKey() != null) ? createAddress(sign.getPublicKey()) : null;
+        byte[] addrEncrypt = (encrypt != null && encrypt.getPublicKey() != null) ? createAddress(encrypt.getPublicKey()) : null;
 
         if (addrSign != null && addrEncrypt != null && !Arrays.equals(addrSign, addrEncrypt)) {
             throw new InvalidAccountException("Sign key doesn't match encrypt key");

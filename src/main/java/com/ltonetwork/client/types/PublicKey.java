@@ -31,19 +31,18 @@ public class PublicKey extends Key {
 
     public byte[] toBinary() {
         switch(this.getType()) {
-            case ED25519:
-                return Bytes.concat(new byte[]{0}, this.getRaw());
-            case SECP256K1:
-                return Bytes.concat(new byte[]{1}, this.getRaw());
-            case SECP256R1:
-                return Bytes.concat(new byte[]{2}, this.getRaw());
+            case ED25519: return Bytes.concat(new byte[]{0}, this.getRaw());
+            case SECP256K1: return Bytes.concat(new byte[]{1}, this.getRaw());
+            case SECP256R1: return Bytes.concat(new byte[]{2}, this.getRaw());
+            case CURVE25519: throw new IllegalArgumentException("Cannot convert encryption key of type CURVE25519 to binary");
             default: throw new IllegalArgumentException("Unknown key type");
         }
     }
 
     public short keyLengthByType(KeyType type) {
         switch(type){
-            case ED25519: return (short) 32;
+            case ED25519:
+            case CURVE25519: return (short) 32;
             case SECP256K1:
             case SECP256R1: return (short) 33;
             default: throw new IllegalArgumentException("Unknown key type");

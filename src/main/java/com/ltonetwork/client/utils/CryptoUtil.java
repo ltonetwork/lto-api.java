@@ -38,10 +38,9 @@ public class CryptoUtil {
 
     public static boolean isValidAddress(String address, Encoding encoding) {
         if (encoding.equals(Encoding.BASE58) && !Encoder.isBase58Encoded(address)) return false;
-        if (encoding.equals(Encoding.BASE64) && !Encoder.isBase64Encoded(address)) return false;
+        return !encoding.equals(Encoding.BASE64) || Encoder.isBase64Encoded(address);
 
 //        return Encoder.decode(address, encoding).length() == 23;
-        return true;
     }
 
     // encrypting
@@ -98,11 +97,17 @@ public class CryptoUtil {
 
     // signing
     public static KeyPair signKeypair(byte[] seed, Key.KeyType keyType) {
-        switch(keyType){
-            case ED25519: return new KeyPair(ed25519.keyPairFromSeed(seed));
-            case SECP256K1: return new KeyPair(secp256k1.keyPairFromSeed(seed));
-            case SECP256R1: return new KeyPair(secp256r1.keyPairFromSeed(seed));
-            default: throw new IllegalArgumentException("Unknown curve");
+        switch (keyType) {
+            case ED25519:
+                return new KeyPair(ed25519.keyPairFromSeed(seed));
+            case SECP256K1:
+                return new KeyPair(secp256k1.keyPairFromSeed(seed));
+            case SECP256R1:
+                return new KeyPair(secp256r1.keyPairFromSeed(seed));
+            case CURVE25519:
+                throw new IllegalArgumentException("Cannot create signing key pair for encryption CURVE25519 curve");
+            default:
+                throw new IllegalArgumentException("Unknown curve");
         }
     }
 
@@ -117,20 +122,32 @@ public class CryptoUtil {
     }
 
     public static Signature signDetached(byte[] message, PrivateKey privateKey) {
-        switch(privateKey.getType()){
-            case ED25519: return ed25519.signDetached(message, privateKey.getRaw());
-            case SECP256K1: return secp256k1.signDetached(message, privateKey.getRaw());
-            case SECP256R1: return secp256r1.signDetached(message, privateKey.getRaw());
-            default: throw new IllegalArgumentException("Unknown curve");
+        switch (privateKey.getType()) {
+            case ED25519:
+                return ed25519.signDetached(message, privateKey.getRaw());
+            case SECP256K1:
+                return secp256k1.signDetached(message, privateKey.getRaw());
+            case SECP256R1:
+                return secp256r1.signDetached(message, privateKey.getRaw());
+            case CURVE25519:
+                throw new IllegalArgumentException("Cannot sign message with encryption CURVE25519 key pair");
+            default:
+                throw new IllegalArgumentException("Unknown curve");
         }
     }
 
     public static boolean verify(Signature signature, byte[] message, PublicKey publicKey) {
-        switch(publicKey.getType()){
-            case ED25519: return ed25519.verify(message, signature.getBytes(), publicKey.getRaw());
-            case SECP256K1: return secp256k1.verify(message, signature.getBytes(), publicKey.getRaw());
-            case SECP256R1: return secp256r1.verify(message, signature.getBytes(), publicKey.getRaw());
-            default: throw new IllegalArgumentException("Unknown curve");
+        switch (publicKey.getType()) {
+            case ED25519:
+                return ed25519.verify(message, signature.getBytes(), publicKey.getRaw());
+            case SECP256K1:
+                return secp256k1.verify(message, signature.getBytes(), publicKey.getRaw());
+            case SECP256R1:
+                return secp256r1.verify(message, signature.getBytes(), publicKey.getRaw());
+            case CURVE25519:
+                throw new IllegalArgumentException("Cannot verify message with encryption CURVE25519 key pair");
+            default:
+                throw new IllegalArgumentException("Unknown curve");
         }
     }
 
