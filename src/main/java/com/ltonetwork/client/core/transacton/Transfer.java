@@ -15,8 +15,8 @@ public class Transfer extends Transaction {
     private final static byte TYPE = 4;
     private final static byte VERSION = 2;
     private final long amount;
-    private String attachment;
     private final Address recipient;
+    private String attachment;
 
     public Transfer(int amount, Address recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);
@@ -56,7 +56,7 @@ public class Transfer extends Transaction {
         byte[] binaryAttachment = Bytes.concat(
                 new byte[]{this.type},
                 new byte[]{this.version},
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.amount),
                 Longs.toByteArray(this.fee),

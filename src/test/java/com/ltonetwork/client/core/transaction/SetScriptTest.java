@@ -14,10 +14,9 @@ import static org.junit.Assert.assertEquals;
 
 
 public class SetScriptTest {
-    SetScript tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    SetScript tx;
 
     @Before
     public void init() {

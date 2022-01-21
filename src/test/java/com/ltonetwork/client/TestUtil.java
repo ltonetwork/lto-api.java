@@ -2,10 +2,6 @@ package com.ltonetwork.client;
 
 import com.ltonetwork.client.core.Account;
 import com.ltonetwork.client.types.*;
-import com.ltonetwork.client.utils.Encoder;
-import org.junit.Test;
-
-import java.nio.charset.StandardCharsets;
 
 public class TestUtil {
     public static Account createAccount() {

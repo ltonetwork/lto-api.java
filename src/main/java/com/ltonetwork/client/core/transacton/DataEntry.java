@@ -17,14 +17,6 @@ public class DataEntry<T> {
         this.value = value;
     }
 
-    public enum DataEntryType {
-        // N.B.: Integer meant as number, not as integer type, actual type is Long
-        INTEGER,
-        BOOLEAN,
-        BINARY,
-        STRING
-    }
-
     public DataEntryType getType() {
         return type;
     }
@@ -40,7 +32,7 @@ public class DataEntry<T> {
     public byte[] toBytes() {
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         byte[] valueBytes;
-        switch(type){
+        switch (type) {
             case INTEGER:
                 valueBytes = Longs.toByteArray((Long) value);
                 return Bytes.concat(
@@ -71,7 +63,16 @@ public class DataEntry<T> {
                         new byte[]{3},
                         Shorts.toByteArray((short) valueBytes.length),
                         valueBytes);
-            default: throw new IllegalArgumentException("Unknown DataEntry type");
+            default:
+                throw new IllegalArgumentException("Unknown DataEntry type");
         }
+    }
+
+    public enum DataEntryType {
+        // N.B.: Integer meant as number, not as integer type, actual type is Long
+        INTEGER,
+        BOOLEAN,
+        BINARY,
+        STRING
     }
 }

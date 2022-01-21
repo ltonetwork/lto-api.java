@@ -1,88 +1,52 @@
 package com.ltonetwork.client.types;
 
+import com.ltonetwork.seasalt.Binary;
+
 public class KeyPair {
-    private PrivateKey secretkey;
-    private PublicKey publickey;
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
 
-    public KeyPair(PublicKey publickey, PrivateKey secretkey) {
-        if (publickey != null) {
-            this.publickey = publickey;
-        }
-        if (secretkey != null) {
-            this.secretkey = secretkey;
-        }
+    public KeyPair(PublicKey publicKey, PrivateKey privateKey) {
+        this.publicKey = publicKey;
+        this.privateKey = privateKey;
     }
 
-    public KeyPair(byte[] publickey, byte[] secretkey, Encoding encoding) {
-        if (publickey != null) {
-            this.publickey = new PublicKey(
-                    publickey.clone(),
-                    encoding
-            );
-        }
-        if (secretkey != null) {
-            this.secretkey = new PrivateKey(
-                    secretkey.clone(),
-                    encoding
-            );
-        }
+    public KeyPair(Binary publicKey, Binary privateKey, Key.KeyType keyType) {
+        this.publicKey = new PublicKey(publicKey, keyType);
+        this.privateKey = new PrivateKey(privateKey, keyType);
     }
 
-    public KeyPair(byte[] publickey, byte[] secretkey) {
-        this(publickey, secretkey, Encoding.BASE58);
+    public KeyPair(Binary publicKey, Binary privateKey) {
+        this(publicKey, privateKey, Key.KeyType.ED25519);
     }
 
-    public KeyPair(String publickey, String secretkey, Encoding encoding) {
-        if (publickey != null) {
-            this.publickey = new PublicKey(
-                    publickey,
-                    encoding
-            );
-        }
-        if (secretkey != null) {
-            this.secretkey = new PrivateKey(
-                    secretkey,
-                    encoding
-            );
-        }
+    public KeyPair(byte[] publicKey, byte[] privateKey, Key.KeyType keyType) {
+        this.publicKey = new PublicKey(publicKey.clone(), keyType);
+        this.privateKey = new PrivateKey(privateKey.clone(), keyType);
     }
 
-    public KeyPair(String publickey, String secretkey) {
-        this(publickey, secretkey, Encoding.BASE58);
+    public KeyPair(byte[] publicKey, byte[] privateKey) {
+        this(publicKey, privateKey, Key.KeyType.ED25519);
     }
 
-    public KeyPair() {
-        this.publickey = null;
-        this.secretkey = null;
+    public KeyPair(String publicKey, String privateKey, Encoding encoding) {
+        this.publicKey = new PublicKey(publicKey, encoding);
+        this.privateKey = new PrivateKey(privateKey, encoding);
     }
 
-    public void setSecretkey(PrivateKey secretkey) {
-        this.secretkey = secretkey;
+    public KeyPair(String publicKey, String privateKey) {
+        this(publicKey, privateKey, Encoding.BASE58);
     }
 
-    public void setSecretkey(byte[] secretkey, Encoding encoding) {
-        this.secretkey = new PrivateKey(
-                secretkey.clone(),
-                encoding
-        );
+    public KeyPair(com.ltonetwork.seasalt.KeyPair keyPair) {
+        this(keyPair.getPublicKey(), keyPair.getPrivateKey());
     }
 
-    public PrivateKey getSecretkey() {
-        return this.secretkey;
+    public PrivateKey getPrivateKey() {
+        return this.privateKey;
     }
 
-    public void setPublickey(PublicKey publickey) {
-        this.publickey = publickey;
-    }
-
-    public void setPublickey(byte[] publickey, Encoding encoding) {
-        this.publickey = new PublicKey(
-                publickey.clone(),
-                encoding
-        );
-    }
-
-    public PublicKey getPublickey() {
-        return this.publickey;
+    public PublicKey getPublicKey() {
+        return this.publicKey;
     }
 }

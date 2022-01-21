@@ -4,7 +4,6 @@ import com.ltonetwork.client.TestUtil;
 import com.ltonetwork.client.core.Account;
 import com.ltonetwork.client.core.transacton.CancelLease;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
-import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.JsonObject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,10 +14,9 @@ import static org.junit.Assert.assertEquals;
 
 
 public class CancelLeaseTest {
-    CancelLease tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    CancelLease tx;
 
     @Before
     public void init() {

@@ -1,8 +1,14 @@
 package com.ltonetwork.client.core;
 
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
-import com.ltonetwork.client.types.*;
+import com.ltonetwork.client.types.Address;
+import com.ltonetwork.client.types.Encoding;
+import com.ltonetwork.client.types.KeyPair;
+import com.ltonetwork.client.types.PublicKey;
 import com.ltonetwork.client.utils.CryptoUtil;
+import com.ltonetwork.seasalt.sign.Signature;
+
+import java.nio.charset.StandardCharsets;
 
 public class Account {
 
@@ -54,60 +60,52 @@ public class Account {
     }
 
     public PublicKey getPublicSignKey() {
-        return sign.getPublickey();
+        return sign.getPublicKey();
     }
 
     public PublicKey getPublicEncryptKey() {
-        return encrypt.getPublickey();
-    }
-
-    public Signature sign(String message) {
-        if (sign == null || sign.getSecretkey() == null) {
-            throw new RuntimeException("Unable to sign message; no secret sign key");
-        }
-        byte[] signature = CryptoUtil.crypto_sign_detached(message.getBytes(), sign.getSecretkey().getValueBytes());
-        return new Signature(signature);
+        return encrypt.getPublicKey();
     }
 
     public Signature sign(byte[] message) {
-        if (sign == null || sign.getSecretkey() == null) {
+        if (sign == null || sign.getPrivateKey() == null) {
             throw new RuntimeException("Unable to sign message; no secret sign key");
         }
-        byte[] signature = CryptoUtil.crypto_sign_detached(message, sign.getSecretkey().getValueBytes());
-        return new Signature(signature);
+
+        return CryptoUtil.signDetached(message, sign.getPrivateKey());
     }
 
-    public boolean verify(Signature signature, String message) {
-        if (sign == null || sign.getPublickey() == null) {
-            throw new RuntimeException("Unable to verify message; no public sign key");
-        }
-
-        return signature.verify(sign.getPublickey(), message);
+    public Signature sign(String message) {
+        return sign(message.getBytes(StandardCharsets.UTF_8));
     }
 
     public boolean verify(Signature signature, byte[] message) {
-        if (sign == null || sign.getPublickey() == null) {
+        if (sign == null || sign.getPublicKey() == null) {
             throw new RuntimeException("Unable to verify message; no public sign key");
         }
 
-        return signature.verify(sign.getPublickey(), message);
+        return CryptoUtil.verify(signature, message, sign.getPublicKey());
+    }
+
+    public boolean verify(Signature signature, String message) {
+        return verify(signature, message.getBytes(StandardCharsets.UTF_8));
     }
 
     public byte[] encrypt(Account recipient, String message) {
-        if (encrypt == null || encrypt.getSecretkey() == null) {
+        if (encrypt == null || encrypt.getPrivateKey() == null) {
             throw new RuntimeException("Unable to encrypt message; no secret encryption key");
         }
-        if (recipient.encrypt == null || recipient.encrypt.getPublickey() == null) {
+        if (recipient.encrypt == null || recipient.encrypt.getPublicKey() == null) {
             throw new RuntimeException("Unable to encrypt message; no public encryption key for recipient");
         }
 
         byte[] nonce = getNonce();
 
-        byte[] retEncrypt = CryptoUtil.crypto_box(
+        byte[] retEncrypt = CryptoUtil.cryptoBox(
                 nonce,
                 message.getBytes(),
-                recipient.encrypt.getPublickey().getValueBytes(),
-                encrypt.getSecretkey().getValueBytes()
+                recipient.encrypt.getPublicKey().getRaw(),
+                encrypt.getPrivateKey().getRaw()
         );
 
         byte[] ret = new byte[retEncrypt.length + nonce.length];
@@ -118,10 +116,10 @@ public class Account {
     }
 
     public byte[] decrypt(Account sender, byte[] ciphertext) {
-        if (encrypt == null || encrypt.getSecretkey() == null) {
+        if (encrypt == null || encrypt.getPrivateKey() == null) {
             throw new RuntimeException("Unable to decrypt message; no secret encryption key");
         }
-        if (sender.encrypt == null || sender.encrypt.getPublickey() == null) {
+        if (sender.encrypt == null || sender.encrypt.getPublicKey() == null) {
             throw new RuntimeException("Unable to decrypt message; no public encryption key for recipient");
         }
 
@@ -131,15 +129,15 @@ public class Account {
         byte[] nonce = new byte[24];
         System.arraycopy(ciphertext, ciphertext.length - 24, nonce, 0, 24);
 
-        return CryptoUtil.crypto_box_open(
+        return CryptoUtil.cryptoBoxOpen(
                 nonce,
                 encryptedMessage,
-                encrypt.getPublickey().getValueBytes(),
-                sender.encrypt.getSecretkey().getValueBytes()
+                encrypt.getPublicKey().getRaw(),
+                sender.encrypt.getPrivateKey().getRaw()
         );
     }
 
     protected byte[] getNonce() {
-        return CryptoUtil.random_bytes(CryptoUtil.crypto_box_noncebytes());
+        return CryptoUtil.randomBytes(CryptoUtil.cryptoBoxNoncebytes());
     }
 }

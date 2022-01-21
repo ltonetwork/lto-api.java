@@ -11,9 +11,6 @@ public class PackUtil {
     /**
      * Packing string
      * SimilarphpinpackstayjavaImplementation in
-     *
-     * @param str
-     * @return
      */
     public static byte[] pack(String str) {
         int nibbleshift = 4;
@@ -44,11 +41,6 @@ public class PackUtil {
 
     /**
      * 16Binary character decompression classphpinunpack
-     *
-     * @param is
-     * @param len
-     * @return
-     * @throws IOException
      */
     public static String unpack(InputStream is, int len) throws IOException {
         byte[] bytes = new byte[len];
@@ -58,16 +50,14 @@ public class PackUtil {
 
     /***
      * 16Binary character decompression classphpinunpack
-     * @param bytes
-     * @return
      */
     public static String unpack(byte[] bytes) {
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder();
         if (bytes == null || bytes.length <= 0) {
             return null;
         }
-        for (int i = 0; i < bytes.length; i++) {
-            int v = bytes[i] & 0xFF;
+        for (byte aByte : bytes) {
+            int v = aByte & 0xFF;
             String hv = Integer.toHexString(v);
             if (hv.length() < 2) {
                 stringBuilder.append(0);
@@ -81,7 +71,7 @@ public class PackUtil {
         byte[] packed = new byte[1 + 8 + 20];
         packed[0] = (byte) version;
         System.arraycopy(nonce, 0, packed, 1, 8);
-        System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 8, 20);
+        System.arraycopy(Encoder.hexDecode(hash), 0, packed, 1 + 8, 20);
         return packed;
     }
 
@@ -89,7 +79,7 @@ public class PackUtil {
         byte[] packed = new byte[1 + 1 + 20];
         packed[0] = (byte) version;
         System.arraycopy(network.getBytes(), 0, packed, 1, 1);
-        System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 1, 20);
+        System.arraycopy(Encoder.hexDecode(hash), 0, packed, 1 + 1, 20);
         return packed;
     }
 
@@ -97,8 +87,8 @@ public class PackUtil {
         byte[] packed = new byte[1 + 1 + 20 + 4];
         packed[0] = (byte) version;
         System.arraycopy(network.getBytes(), 0, packed, 1, 1);
-        System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 1, 20);
-        System.arraycopy(BinHex.hex2bin(chksum), 0, packed, 1 + 1 + 20, 4);
+        System.arraycopy(Encoder.hexDecode(hash), 0, packed, 1 + 1, 20);
+        System.arraycopy(Encoder.hexDecode(chksum), 0, packed, 1 + 1 + 20, 4);
         return packed;
     }
 
@@ -106,8 +96,8 @@ public class PackUtil {
         byte[] packed = new byte[1 + 8 + 20 + 4];
         packed[0] = (byte) version;
         System.arraycopy(nonce, 0, packed, 1, 8);
-        System.arraycopy(BinHex.hex2bin(hash), 0, packed, 1 + 8, 20);
-        System.arraycopy(BinHex.hex2bin(chksum), 0, packed, 1 + 8 + 20, 4);
+        System.arraycopy(Encoder.hexDecode(hash), 0, packed, 1 + 8, 20);
+        System.arraycopy(Encoder.hexDecode(chksum), 0, packed, 1 + 8 + 20, 4);
         return packed;
     }
 
@@ -124,11 +114,11 @@ public class PackUtil {
 
         byte[] hash = new byte[20];
         System.arraycopy(packed, 1 + 8, hash, 0, 20);
-        unpacked.put("keyhash", BinHex.bin2hex(hash));
+        unpacked.put("keyhash", Encoder.hexEncode(hash));
 
         byte[] chksum = new byte[4];
         System.arraycopy(packed, 1 + 8 + 20, chksum, 0, 4);
-        unpacked.put("checksum", BinHex.bin2hex(chksum));
+        unpacked.put("checksum", Encoder.hexEncode(chksum));
 
         return unpacked;
 

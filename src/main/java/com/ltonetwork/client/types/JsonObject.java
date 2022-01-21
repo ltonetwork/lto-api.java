@@ -11,7 +11,7 @@ public class JsonObject {
     private static final int OBJECT = 1;
     private static final int ARRAY = 2;
 
-    private int type;
+    private final int type;
 
     private OrderedJSONObject object;
     private JSONArray array;

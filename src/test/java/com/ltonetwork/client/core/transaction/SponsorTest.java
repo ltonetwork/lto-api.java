@@ -15,10 +15,9 @@ import static org.junit.Assert.assertEquals;
 
 
 public class SponsorTest {
-    Sponsor tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    Sponsor tx;
 
     @Before
     public void init() {

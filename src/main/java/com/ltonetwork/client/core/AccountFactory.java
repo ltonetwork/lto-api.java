@@ -2,11 +2,13 @@ package com.ltonetwork.client.core;
 
 import com.ltonetwork.client.exceptions.InvalidAccountException;
 import com.ltonetwork.client.types.*;
-import com.ltonetwork.client.utils.BinHex;
 import com.ltonetwork.client.utils.CryptoUtil;
-import com.ltonetwork.client.utils.HashUtil;
+import com.ltonetwork.client.utils.Encoder;
 import com.ltonetwork.client.utils.PackUtil;
+import com.ltonetwork.seasalt.hash.Keccak256;
+import com.ltonetwork.seasalt.hash.SHA256;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -51,116 +53,97 @@ public class AccountFactory {
     public byte[] createAccountSeed(String seedText) {
         byte[] seedBase = PackUtil.packLaStar(nonce, seedText);
 
-        byte[] secureSeed = BinHex.hex2bin(HashUtil.Keccak256(CryptoUtil.crypto_generichash(seedBase, 32)));
+        byte[] secureSeed = Encoder.hexDecode(Keccak256.hash(CryptoUtil.genericHash(seedBase, 32)).getBytes());
 
-        return HashUtil.SHA256(secureSeed);
+        return SHA256.hash(secureSeed).getBytes();
     }
 
-    public byte[] createAddress(Key publickey, String type) {
-        if (type.equals("sign")) {
-            publickey = new Key(CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(publickey.getValueBytes()), Encoding.RAW);
+    public byte[] createAddress(PublicKey publickey) {
+        // if signing key
+        if (publickey.getType() != Key.KeyType.CURVE25519) {
+            publickey = new PublicKey(CryptoUtil.signToEncryptPublicKey(publickey.getRaw()));
         }
 
-        String publickeyHash = HashUtil.Keccak256(CryptoUtil.crypto_generichash(publickey.getValueBytes(), 32)).substring(0, 40);
+        String publicKeyHash = new String(
+                Keccak256.hash(CryptoUtil.genericHash(publickey.getRaw(), 32)).getBytes(),
+                StandardCharsets.UTF_8
+        ).substring(0, 40);
 
-        byte[] packed = PackUtil.packCaH40(ADDRESS_VERSION, network, publickeyHash);
-        String chksum = HashUtil.Keccak256(CryptoUtil.crypto_generichash(packed, packed.length)).substring(0, 8);
+        byte[] packed = PackUtil.packCaH40(ADDRESS_VERSION, network, publicKeyHash);
+        String checkSum = new String(
+                Keccak256.hash(CryptoUtil.genericHash(packed, packed.length)).getBytes(),
+                StandardCharsets.UTF_8
+        ).substring(0, 8);
 
-        return PackUtil.packCaH40H8(ADDRESS_VERSION, network, publickeyHash, chksum);
-    }
-
-    public byte[] createAddress(Key publickey) {
-        return createAddress(publickey, "encrypt");
+        return PackUtil.packCaH40H8(ADDRESS_VERSION, network, publicKeyHash, checkSum);
     }
 
     public Account seed(String seedText) {
         byte[] seed = createAccountSeed(seedText);
         KeyPair signKeys = createSignKeys(seed);
-        byte chainId = 'T';
 
         return new Account(
-                new Address(signKeys.getPublickey().toBase58()),
+                new Address(signKeys.getPublicKey().getBase58()),
                 createEncryptKeys(seed),
                 signKeys
         );
     }
 
     public KeyPair convertSignToEncrypt(KeyPair sign) {
-        KeyPair encrypt = new KeyPair();
+        byte[] privateKey = CryptoUtil.signToEncryptPrivateKey(sign.getPrivateKey().getRaw());
 
-        if (sign != null && sign.getSecretkey() != null) {
-            byte[] secretkey = CryptoUtil.crypto_sign_ed25519_sk_to_curve25519(sign.getSecretkey().getValueBytes());
+        int last = privateKey.length - 1;
+        privateKey[last] = privateKey[last] % 2 == 1 ? ((byte) ((privateKey[last] | 0x80) & ~0x40)) : privateKey[last];
 
-            int last = secretkey.length - 1;
-            secretkey[last] = secretkey[last] % 2 == 1 ? ((byte) ((secretkey[last] | 0x80) & ~0x40)) : secretkey[last];
+        PrivateKey encryptPrivateKey = new PrivateKey(privateKey);
 
-            encrypt.setSecretkey(new PrivateKey(secretkey, Encoding.RAW));
-        }
+        PublicKey encryptPublicKey = new PublicKey(CryptoUtil.signToEncryptPublicKey(sign.getPublicKey().getRaw()));
 
-        if (sign != null && sign.getPublickey() != null) {
-            encrypt.setPublickey(new PublicKey(
-                    CryptoUtil.crypto_sign_ed25519_pk_to_curve25519(sign.getPublickey().getValueBytes()),
-                    Encoding.RAW)
-            );
-        }
-
-        return encrypt;
+        return new KeyPair(encryptPublicKey, encryptPrivateKey);
     }
 
-    public KeyPair calcKeys(KeyPair keys, String type) {
-        if (keys.getSecretkey() == null) {
-            return new KeyPair(keys.getPublickey(), null);
+    public KeyPair calcKeys(KeyPair keys) {
+        if (keys.getPrivateKey() == null) {
+            return new KeyPair(keys.getPublicKey(), null);
         }
 
-        byte[] secretkey = keys.getSecretkey().getValueBytes();
+        byte[] privateKey = keys.getPrivateKey().getRaw();
 
-        byte[] publickey = type.equals("sign") ? CryptoUtil.crypto_sign_publickey_from_secretkey(secretkey) : CryptoUtil.crypto_box_publickey_from_secretkey(secretkey);
+        byte[] publicKey = keys.getPublicKey().getType() != Key.KeyType.CURVE25519 ? CryptoUtil.signPublicFromPrivate(privateKey) : CryptoUtil.encryptPublicFromPrivate(privateKey);
 
-        if (keys.getPublickey() != null && !Arrays.equals(keys.getPublickey().getValueBytes(), publickey)) {
-            throw new InvalidAccountException("Public " + type + " key doesn't match private " + type + " key");
+        if (keys.getPublicKey() != null && !Arrays.equals(keys.getPublicKey().getRaw(), publicKey)) {
+            throw new InvalidAccountException("Public key doesn't match private key");
         }
 
         return new KeyPair(
-                new PublicKey(publickey, Encoding.RAW),
-                new PrivateKey(secretkey, Encoding.RAW)
+                new PublicKey(publicKey),
+                new PrivateKey(privateKey)
         );
     }
 
-    public KeyPair calcKeys(PrivateKey key, String type) {
+    public KeyPair calcKeys(PrivateKey key) {
         KeyPair kp = new KeyPair(null, key);
-        return calcKeys(kp, type);
+        return calcKeys(kp);
     }
 
     public Account create(KeyPair sign, KeyPair encrypt, Address address) {
-        KeyPair signKeys = sign != null ? calcKeys(sign, "sign") : null;
-        KeyPair encryptKeys = encrypt != null ? calcKeys(encrypt, "encrypt") : (sign != null ? convertSignToEncrypt(signKeys) : null);
+        KeyPair signKeys = sign != null ? calcKeys(sign) : null;
+        KeyPair encryptKeys = encrypt != null ? calcKeys(encrypt) : (sign != null ? convertSignToEncrypt(signKeys) : null);
 
         return new Account(address, encryptKeys, signKeys);
     }
 
     public Account create(KeyPair sign) {
-        KeyPair signKeys = sign != null ? calcKeys(sign, "sign") : null;
-        KeyPair encryptKeys = sign != null ? calcKeys(convertSignToEncrypt(sign), "encrypt") : null;
+        KeyPair signKeys = sign != null ? calcKeys(sign) : null;
+        KeyPair encryptKeys = sign != null ? calcKeys(convertSignToEncrypt(sign)) : null;
 
         return create(signKeys, encryptKeys, null);
     }
 
-    public Account create(PrivateKey signPrivateKey) {
-        return create(new KeyPair(null, signPrivateKey));
-    }
-
-    public Account createPublic(PublicKey signkey) {
-        KeyPair sign = null;
-        if (signkey != null) {
-            sign = new KeyPair(
-                    signkey,
-                    null
-            );
-        }
-
-        KeyPair encrypt = convertSignToEncrypt(sign);
-
-        return create(sign, encrypt, null);
+    public Account createPublic(PublicKey signPublicKey) {
+        if (signPublicKey == null || signPublicKey.getRaw().length == 0)
+            throw new IllegalArgumentException("Provided signing key is empty");
+        return create(new KeyPair(signPublicKey, null));
     }
 
     protected int getNonce() {
@@ -168,18 +151,18 @@ public class AccountFactory {
     }
 
     protected KeyPair createSignKeys(byte[] seed) {
-        return CryptoUtil.crypto_sign_seed_keypair(seed);
+        return CryptoUtil.signKeypair(seed);
     }
 
     protected KeyPair createEncryptKeys(byte[] seed) {
-        return CryptoUtil.crypto_box_seed_keypair(seed);
+        return CryptoUtil.cryptoBoxSeedKeypair(seed);
     }
 
     protected byte[] calcAddress(byte[] address, KeyPair sign, KeyPair encrypt) {
         byte[] _address = null;
 
-        byte[] addrSign = (sign != null && sign.getPublickey() != null) ? createAddress(sign.getPublickey(), "sign") : null;
-        byte[] addrEncrypt = (encrypt != null && encrypt.getPublickey() != null) ? createAddress(encrypt.getPublickey(), "encrypt") : null;
+        byte[] addrSign = (sign != null && sign.getPublicKey() != null) ? createAddress(sign.getPublicKey()) : null;
+        byte[] addrEncrypt = (encrypt != null && encrypt.getPublicKey() != null) ? createAddress(encrypt.getPublicKey()) : null;
 
         if (addrSign != null && addrEncrypt != null && !Arrays.equals(addrSign, addrEncrypt)) {
             throw new InvalidAccountException("Sign key doesn't match encrypt key");

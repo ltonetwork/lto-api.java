@@ -15,10 +15,9 @@ import static org.junit.Assert.*;
 
 
 public class TransferTest {
-    Transfer tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    Transfer tx;
 
     @Before
     public void init() {
@@ -48,7 +47,7 @@ public class TransferTest {
         tx.signWith(account);
         tx.setAttachment("test");
 
-        assertEquals(91, tx.toBinary().length);
+        assertEquals(89, tx.toBinary().length);
     }
 
     @Test

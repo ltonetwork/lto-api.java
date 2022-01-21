@@ -35,7 +35,7 @@ public class CancelLease extends Transaction {
         return Bytes.concat(
                 new byte[]{this.type},
                 new byte[]{this.version},
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 new byte[]{this.getNetwork()},
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.fee),

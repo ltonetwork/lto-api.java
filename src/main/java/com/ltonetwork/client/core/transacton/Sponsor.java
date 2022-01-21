@@ -36,7 +36,7 @@ public class Sponsor extends Transaction {
                 new byte[]{this.type},
                 new byte[]{this.version},
                 new byte[]{this.getNetwork()},
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 Encoder.base58Decode(this.recipient.getAddress()),
                 Longs.toByteArray(this.timestamp),
                 Longs.toByteArray(this.fee)

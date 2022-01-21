@@ -31,7 +31,7 @@ public class Data extends Transaction {
             JsonObject curr = new JsonObject(jsonData.get(i), false);
             String key = curr.get("key").toString();
             DataEntry.DataEntryType type = DataEntry.DataEntryType.valueOf(curr.get("type").toString().toUpperCase());
-            switch(type){
+            switch (type) {
                 case INTEGER:
                     dataFromJson.add(new DataEntry<>(type, key, Long.parseLong(curr.get("value").toString())));
                     break;
@@ -48,7 +48,7 @@ public class Data extends Transaction {
         }
 
         this.data = new DataEntry[dataFromJson.size()];
-        for (int i=0; i<data.length; i++) this.data[i] = dataFromJson.get(i);
+        for (int i = 0; i < data.length; i++) this.data[i] = dataFromJson.get(i);
 
         updateFeeBasedOnEntries(data);
     }
@@ -67,7 +67,7 @@ public class Data extends Transaction {
                 new byte[]{this.version},
                 new byte[]{this.sender.getChainId()},
                 Longs.toByteArray(this.timestamp),
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 Longs.toByteArray(this.fee),
                 Shorts.toByteArray((short) data.length)
         );
@@ -80,13 +80,13 @@ public class Data extends Transaction {
     private void updateFeeBasedOnEntries(DataEntry<?>[] data) {
         byte[] dataBytes = new byte[0];
         for (DataEntry<?> entry : data) dataBytes = Bytes.concat(dataBytes, entry.toBytes());
-        if (dataBytes.length > 0)  this.fee += (dataBytes.length / (1024 * 256) + 1) * DATA_FEE;
+        if (dataBytes.length > 0) this.fee += (dataBytes.length / (1024 * 256) + 1) * DATA_FEE;
     }
 
     private byte[] parseBytes(String bytesString) {
         String[] byteValues = bytesString.substring(1, bytesString.length() - 1).split((","));
         byte[] ret = new byte[byteValues.length];
-        for (int i=0; i<ret.length; i++) ret[i] = Byte.parseByte(byteValues[i].trim());
+        for (int i = 0; i < ret.length; i++) ret[i] = Byte.parseByte(byteValues[i].trim());
         return ret;
     }
 }

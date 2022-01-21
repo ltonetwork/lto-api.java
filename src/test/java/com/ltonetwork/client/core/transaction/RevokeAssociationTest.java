@@ -1,6 +1,5 @@
 package com.ltonetwork.client.core.transaction;
 
-import com.google.common.hash.Hasher;
 import com.ltonetwork.client.TestUtil;
 import com.ltonetwork.client.core.Account;
 import com.ltonetwork.client.core.transacton.RevokeAssociation;
@@ -8,22 +7,18 @@ import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
-import com.ltonetwork.client.utils.Encoder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.assertEquals;
 
 
 public class RevokeAssociationTest {
-    RevokeAssociation tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    RevokeAssociation tx;
 
     @Before
     public void init() {

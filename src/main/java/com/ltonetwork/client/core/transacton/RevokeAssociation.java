@@ -10,8 +10,6 @@ import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
 
-import java.nio.charset.StandardCharsets;
-
 public class RevokeAssociation extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
     private final static byte TYPE = 17;
@@ -52,7 +50,7 @@ public class RevokeAssociation extends Transaction {
         byte[] ret = Bytes.concat(
                 new byte[]{this.type},
                 new byte[]{this.version},
-                this.senderPublicKey.toRaw(),
+                this.senderPublicKey.getRaw(),
                 new byte[]{this.getNetwork()},
                 Encoder.base58Decode(this.party.getAddress()),
                 Ints.toByteArray(associationType)
@@ -82,7 +80,7 @@ public class RevokeAssociation extends Transaction {
         if (hash == null)
             throw new BadMethodCallException("Can't get hash; missing");
         return Encoder.encode(
-                Encoder.base58Decode(hash, StandardCharsets.UTF_8),
+                Encoder.base58Decode(hash),
                 encoding
         );
     }
