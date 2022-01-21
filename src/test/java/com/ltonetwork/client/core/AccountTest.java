@@ -11,12 +11,11 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.*;
 
 public class AccountTest {
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
     Account account;
     KeyPair sign;
     KeyPair encrypt;
-
-    @Rule
-    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Before
     public void init() {
@@ -140,15 +139,4 @@ public class AccountTest {
 
         assertEquals("hello", new String(hello));
     }
-
-//    @Test
-//    public void testDecryptFail() {
-//        SodiumException thrown = assertThrows(
-//                SodiumException.class,
-//                () -> account.decrypt(account, new byte[64]),
-//                "opalqqqqqqqq"
-//        );
-//
-//        assertTrue(thrown.getMessage().contains("Could not decrypt your message."));
-//    }
 }

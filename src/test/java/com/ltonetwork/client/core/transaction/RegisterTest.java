@@ -16,12 +16,11 @@ import static org.junit.Assert.assertEquals;
 
 
 public class RegisterTest {
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
     Register tx;
     // type + version + chainId + timestamp + publicKey + fee + accountsEntriesLength
     int DEFAULT_BINARY_LENGTH = 1 + 1 + 1 + 8 + 32 + 8 + 2;
-
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
 
     @Before
     public void init() {

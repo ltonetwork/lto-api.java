@@ -11,9 +11,6 @@ public class PackUtil {
     /**
      * Packing string
      * SimilarphpinpackstayjavaImplementation in
-     *
-     * @param str
-     * @return
      */
     public static byte[] pack(String str) {
         int nibbleshift = 4;
@@ -44,11 +41,6 @@ public class PackUtil {
 
     /**
      * 16Binary character decompression classphpinunpack
-     *
-     * @param is
-     * @param len
-     * @return
-     * @throws IOException
      */
     public static String unpack(InputStream is, int len) throws IOException {
         byte[] bytes = new byte[len];
@@ -58,16 +50,14 @@ public class PackUtil {
 
     /***
      * 16Binary character decompression classphpinunpack
-     * @param bytes
-     * @return
      */
     public static String unpack(byte[] bytes) {
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder();
         if (bytes == null || bytes.length <= 0) {
             return null;
         }
-        for (int i = 0; i < bytes.length; i++) {
-            int v = bytes[i] & 0xFF;
+        for (byte aByte : bytes) {
+            int v = aByte & 0xFF;
             String hv = Integer.toHexString(v);
             if (hv.length() < 2) {
                 stringBuilder.append(0);

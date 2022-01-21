@@ -14,6 +14,7 @@ public class Encoder {
     public static String base58Encode(byte[] input) {
         return new Binary(input).getBase58();
     }
+
     public static String base58Encode(String input) {
         return base58Encode(input.getBytes(StandardCharsets.UTF_8));
     }
@@ -21,6 +22,7 @@ public class Encoder {
     public static byte[] base58Decode(String input) {
         return Binary.fromBase58(input).getBytes();
     }
+
     public static byte[] base58Decode(byte[] input) {
         return base58Decode(new String(input, StandardCharsets.UTF_8));
     }
@@ -28,6 +30,7 @@ public class Encoder {
     public static String base64Encode(byte[] input) {
         return new Binary(input).getBase64();
     }
+
     public static String base64Encode(String input) {
         return base64Encode(input.getBytes(StandardCharsets.UTF_8));
     }
@@ -35,6 +38,7 @@ public class Encoder {
     public static byte[] base64Decode(String input) {
         return Binary.fromBase64(input).getBytes();
     }
+
     public static byte[] base64Decode(byte[] input) {
         return base64Decode(new String(input, StandardCharsets.UTF_8));
     }
@@ -42,6 +46,7 @@ public class Encoder {
     public static String hexEncode(byte[] input) {
         return new Binary(input).getHex();
     }
+
     public static String hexEncode(String input) {
         return hexEncode(input.getBytes(StandardCharsets.UTF_8));
     }
@@ -53,6 +58,7 @@ public class Encoder {
             throw new IllegalArgumentException("Unable to decode hex string " + input);
         }
     }
+
     public static byte[] hexDecode(byte[] input) {
         return hexDecode(new String(input, StandardCharsets.UTF_8));
     }
@@ -71,6 +77,7 @@ public class Encoder {
                 throw new IllegalArgumentException("Unknown encoding");
         }
     }
+
     public static byte[] decode(byte[] input, Encoding encoding) {
         return decode(new String(input, StandardCharsets.UTF_8), encoding);
     }
@@ -89,6 +96,7 @@ public class Encoder {
                 throw new IllegalArgumentException("Unknown encoding");
         }
     }
+
     public static String encode(String input, Encoding encoding) {
         return encode(input.getBytes(StandardCharsets.UTF_8), encoding);
     }
@@ -107,8 +115,7 @@ public class Encoder {
 
     static byte[] packN(int value) {
         byte[] bytes = ByteBuffer.allocate(4).putInt(value).array();
-        bytes = toPositiveByteArray(bytes);
-        return bytes;
+        return toPositiveByteArray(bytes);
     }
 
     static int unpackN(byte[] value) {

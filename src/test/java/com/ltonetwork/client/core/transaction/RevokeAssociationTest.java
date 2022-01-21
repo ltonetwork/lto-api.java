@@ -16,10 +16,9 @@ import static org.junit.Assert.assertEquals;
 
 
 public class RevokeAssociationTest {
-    RevokeAssociation tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    RevokeAssociation tx;
 
     @Before
     public void init() {

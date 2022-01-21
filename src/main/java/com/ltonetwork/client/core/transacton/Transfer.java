@@ -15,8 +15,8 @@ public class Transfer extends Transaction {
     private final static byte TYPE = 4;
     private final static byte VERSION = 2;
     private final long amount;
-    private String attachment;
     private final Address recipient;
+    private String attachment;
 
     public Transfer(int amount, Address recipient) {
         super(TYPE, VERSION, MINIMUM_FEE);

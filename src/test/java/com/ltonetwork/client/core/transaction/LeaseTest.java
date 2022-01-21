@@ -15,10 +15,9 @@ import static org.junit.Assert.assertEquals;
 
 
 public class LeaseTest {
-    Lease tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    Lease tx;
 
     @Before
     public void init() {

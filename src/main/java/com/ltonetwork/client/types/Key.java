@@ -8,13 +8,6 @@ public abstract class Key {
     private final Binary value;
     private final KeyType type;
 
-    public enum KeyType {
-        ED25519,
-        SECP256K1,
-        SECP256R1,
-        CURVE25519
-    }
-
     public Key(byte[] valueBytes, KeyType keyType) {
         this.value = new Binary(valueBytes);
         this.type = keyType;
@@ -65,14 +58,26 @@ public abstract class Key {
     private Binary valueToBinary(String value, Encoding encoding) {
         try {
             switch (encoding) {
-                case RAW: return new Binary(value.getBytes());
-                case BASE58: return Binary.fromBase58(value);
-                case BASE64: return Binary.fromBase64(value);
-                case HEX: return Binary.fromHex(value);
-                default: throw new IllegalArgumentException("Unknown encoding");
+                case RAW:
+                    return new Binary(value.getBytes());
+                case BASE58:
+                    return Binary.fromBase58(value);
+                case BASE64:
+                    return Binary.fromBase64(value);
+                case HEX:
+                    return Binary.fromHex(value);
+                default:
+                    throw new IllegalArgumentException("Unknown encoding");
             }
         } catch (DecoderException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    public enum KeyType {
+        ED25519,
+        SECP256K1,
+        SECP256R1,
+        CURVE25519
     }
 }

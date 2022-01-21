@@ -15,10 +15,9 @@ import static org.junit.Assert.*;
 
 
 public class TransferTest {
-    Transfer tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    Transfer tx;
 
     @Before
     public void init() {

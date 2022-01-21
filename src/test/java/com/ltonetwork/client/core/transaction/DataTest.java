@@ -14,12 +14,11 @@ import static org.junit.Assert.assertEquals;
 
 
 public class DataTest {
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
     Data tx;
     // type + version + chainId + timestamp + publicKey + fee + dataLength
     int DEFAULT_BINARY_LENGTH = 1 + 1 + 1 + 8 + 32 + 8 + 2;
-
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
 
     @Before
     public void init() {

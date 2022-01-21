@@ -15,10 +15,9 @@ import static org.junit.Assert.assertEquals;
 
 
 public class CancelSponsorTest {
-    CancelSponsor tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    CancelSponsor tx;
 
     @Before
     public void init() {

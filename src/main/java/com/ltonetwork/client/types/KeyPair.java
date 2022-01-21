@@ -3,8 +3,8 @@ package com.ltonetwork.client.types;
 import com.ltonetwork.seasalt.Binary;
 
 public class KeyPair {
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
 
     public KeyPair(PublicKey publicKey, PrivateKey privateKey) {
         this.publicKey = publicKey;

@@ -16,10 +16,9 @@ import static org.junit.Assert.assertTrue;
 
 
 public class MassTransferTest {
-    MassTransfer tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    MassTransfer tx;
 
     @Before
     public void init() {

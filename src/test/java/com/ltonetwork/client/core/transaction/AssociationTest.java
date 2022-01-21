@@ -16,11 +16,9 @@ import static org.junit.Assert.assertEquals;
 
 
 public class AssociationTest {
-    byte chainId;
-    Association tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    Association tx;
 
     @Before
     public void init() {

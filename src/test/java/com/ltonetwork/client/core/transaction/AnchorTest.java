@@ -15,11 +15,10 @@ import static org.junit.Assert.assertEquals;
 
 
 public class AnchorTest {
-    byte chainId;
-    Anchor tx;
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
+    byte chainId;
+    Anchor tx;
 
     @Before
     public void init() {

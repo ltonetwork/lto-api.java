@@ -74,6 +74,7 @@ public class Account {
 
         return CryptoUtil.signDetached(message, sign.getPrivateKey());
     }
+
     public Signature sign(String message) {
         return sign(message.getBytes(StandardCharsets.UTF_8));
     }
@@ -85,6 +86,7 @@ public class Account {
 
         return CryptoUtil.verify(signature, message, sign.getPublicKey());
     }
+
     public boolean verify(Signature signature, String message) {
         return verify(signature, message.getBytes(StandardCharsets.UTF_8));
     }
