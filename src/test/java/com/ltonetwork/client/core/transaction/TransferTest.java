@@ -47,7 +47,7 @@ public class TransferTest {
         tx.signWith(account);
         tx.setAttachment("test");
 
-        assertEquals(91, tx.toBinary().length);
+        assertEquals(89, tx.toBinary().length);
     }
 
     @Test
