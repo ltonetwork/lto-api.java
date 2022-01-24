@@ -10,7 +10,6 @@ import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class Association extends Transaction {
     public Association(Address party, int type, String hash, Encoding encoding, long expires, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
-        checkVersion(version, SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
         if(version == (byte) 1 && expires != 0)
             throw new IllegalArgumentException("Association expiration is not supported on v1");
 
@@ -51,7 +50,7 @@ public class Association extends Transaction {
     public Association(Address party, int type, long expires, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
-        checkVersion(version, SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
         if(version == (byte) 1 && expires != 0)
             throw new IllegalArgumentException("Association expiration is not supported on v1");
 
@@ -78,7 +77,7 @@ public class Association extends Transaction {
         byte versionFromJson = Byte.parseByte(json.get("version").toString());
         long expiresFromJson = json.has("expires") ? Long.parseLong(json.get("expires").toString()) : 0;
 
-        checkVersion(version, SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
         if(versionFromJson == (byte) 1 && expiresFromJson != 0)
             throw new IllegalArgumentException("Association expiration is not supported on v1");
 
@@ -89,8 +88,7 @@ public class Association extends Transaction {
     }
 
     public byte[] toBinary() {
-        if (this.senderPublicKey == null) throw new BadMethodCallException("Sender public key not set");
-        if (this.timestamp == 0) throw new BadMethodCallException("Timestamp not set");
+        checkToBinary();
 
         switch(version) {
             case (byte) 1: return toBinaryV1();

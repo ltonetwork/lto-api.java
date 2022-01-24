@@ -20,7 +20,7 @@ public class Data extends Transaction {
     public Data(DataEntry<?>[] data) {
         super(TYPE, (byte) 3, BASE_FEE);
 
-        checkVersion(version, SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
 
         this.data = data;
         updateFeeBasedOnEntries(data);
@@ -29,7 +29,7 @@ public class Data extends Transaction {
     public Data(JsonObject json) {
         super(json);
 
-        checkVersion(version, SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
 
         JsonObject jsonData = new JsonObject(json.get("data").toString(), true);
         ArrayList<DataEntry<?>> dataFromJson = new ArrayList<>();
@@ -61,8 +61,7 @@ public class Data extends Transaction {
     }
 
     public byte[] toBinary() {
-        if (this.senderPublicKey == null) throw new BadMethodCallException("Sender public key not set");
-        if (this.timestamp == 0) throw new BadMethodCallException("Timestamp not set");
+        checkToBinary();
 
         switch(version) {
             case (byte) 3: return toBinaryV3();

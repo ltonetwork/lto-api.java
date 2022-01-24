@@ -21,7 +21,7 @@ public class Lease extends Transaction {
     public Lease(long amount, Address recipient, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
-        checkVersion(version, SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
         if (amount <= 0) throw new InvalidArgumentException("Invalid amount; should be greater than 0");
 
         this.amount = amount;
@@ -35,15 +35,14 @@ public class Lease extends Transaction {
     public Lease(JsonObject json) {
         super(json);
 
-        checkVersion(version, SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
 
         this.amount = Long.parseLong(json.get("amount").toString());
         this.recipient = new Address(json.get("recipient").toString());
     }
 
     public byte[] toBinary() {
-        if (this.senderPublicKey == null) throw new BadMethodCallException("Sender public key not set");
-        if (this.timestamp == 0) throw new BadMethodCallException("Timestamp not set");
+        checkToBinary();
 
         switch(version) {
             case (byte) 2: return toBinaryV2();

@@ -21,7 +21,7 @@ public class Anchor extends Transaction {
     public Anchor(String hash, Encoding encoding, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
-        checkVersion(version, SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
 
         anchors = new ArrayList<>();
         addHash(hash, encoding);
@@ -34,7 +34,7 @@ public class Anchor extends Transaction {
     public Anchor(JsonObject json) {
         super(json);
 
-        checkVersion(version, SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
 
         JsonObject jsonAnchors = new JsonObject(json.get("anchors").toString(), true);
         ArrayList<String> anchors = new ArrayList<>();
@@ -45,8 +45,7 @@ public class Anchor extends Transaction {
         this.anchors = anchors;
     }
     public byte[] toBinary() {
-        if (this.senderPublicKey == null) throw new BadMethodCallException("Sender public key not set");
-        if (this.timestamp == 0) throw new BadMethodCallException("Timestamp not set");
+        checkToBinary();
 
         switch(version) {
             case (byte) 1: return toBinaryV1();

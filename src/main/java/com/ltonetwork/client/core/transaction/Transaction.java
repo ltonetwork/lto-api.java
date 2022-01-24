@@ -83,7 +83,12 @@ public abstract class Transaction {
         return this.proofs;
     }
 
-    protected void checkVersion(byte version, List<Byte> supportedVersions) {
+    protected void checkToBinary() {
+        if (this.senderPublicKey == null) throw new BadMethodCallException("Sender public key not set");
+        if (this.timestamp == 0) throw new BadMethodCallException("Timestamp not set");
+    }
+
+    protected void checkVersion(List<Byte> supportedVersions) {
         if(!supportedVersions.contains(version))
             throw new IllegalArgumentException("Unknown version " + version + ", supported versions are: " + supportedVersions);
     }
