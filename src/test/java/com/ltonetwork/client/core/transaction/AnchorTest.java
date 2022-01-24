@@ -16,21 +16,28 @@ import static org.junit.Assert.assertEquals;
 public class AnchorTest {
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
-    byte chainId;
     Anchor tx;
 
     @Before
     public void init() {
-        chainId = 84;
         tx = new Anchor("8A8TXZioKiCpKBt7dYx8yAEwnWGhp", Encoding.RAW);
     }
 
     @Test
-    public void testToBinary() {
+    public void testToBinaryV3() {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(83, tx.toBinary().length);
+        assertEquals(85, tx.toBinary().length);
+    }
+
+    @Test
+    public void testToBinaryV1() {
+        Anchor txV1 = new Anchor("8A8TXZioKiCpKBt7dYx8yAEwnWGhp", Encoding.RAW, (byte) 1);
+        Account account = TestUtil.createAccount();
+        txV1.signWith(account);
+
+        assertEquals(83, txV1.toBinary().length);
     }
 
     @Test
@@ -77,12 +84,12 @@ public class AnchorTest {
                         "  \"fee\": 100000,\n" +
                         "  \"timestamp\": 1538728794530,\n" +
                         "  \"proofs\": [\"65E82MLn6RdF7Y2VrdtFWkHd97teqLSwVdbGyEfy7x6aczkHRDZMvNUfdTAYgqDXzDDKKEkQqVhMVMg6EEEvE3C3\"],\n" +
-                        "  \"version\": 2,\n" +
+                        "  \"version\": 3,\n" +
                         "  \"anchors\": [\"3Z7yhiFYtYVXHkLXMKLkzkCqYxnRmdMRcutGYba7\"],\n" + // base58 encoding of "8A8TXZioKiCpKBt7dYx8yAEwnWGhp"
                         "  \"height\": 22654\n" +
                         "}", false);
 
         Anchor jsonTx = new Anchor(json);
-        assertEquals(83, jsonTx.toBinary().length);
+        assertEquals(85, jsonTx.toBinary().length);
     }
 }
