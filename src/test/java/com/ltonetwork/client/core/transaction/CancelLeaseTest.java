@@ -23,11 +23,20 @@ public class CancelLeaseTest {
     }
 
     @Test
-    public void testToBinary() {
+    public void testToBinaryV3() {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(83, tx.toBinary().length);
+        assertEquals(84, tx.toBinary().length);
+    }
+
+    @Test
+    public void testToBinaryV2() {
+        Account account = TestUtil.createAccount();
+        CancelLease txV2 = new CancelLease("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXh", (byte) 2);
+        txV2.signWith(account);
+
+        assertEquals(83, txV2.toBinary().length);
     }
 
     @Test

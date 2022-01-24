@@ -17,44 +17,55 @@ public class CancelLease extends Transaction {
 
     public CancelLease(String leaseId, byte version) {
         super(TYPE, version, MINIMUM_FEE);
+
+        checkVersion(SUPPORTED_VERSIONS);
+
         this.leaseId = leaseId;
     }
 
     public CancelLease(String leaseId) {
-        super(TYPE, (byte) 3, MINIMUM_FEE);
-
-        if(!SUPPORTED_VERSIONS.contains(version))
-            throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
-
-        this.leaseId = leaseId;
+        this(leaseId, (byte) 3);
     }
 
     public CancelLease(JsonObject json) {
         super(json);
 
-        if(!SUPPORTED_VERSIONS.contains(version))
-            throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
+        checkVersion(SUPPORTED_VERSIONS);
 
         this.leaseId = json.get("leaseId").toString();
     }
 
     public byte[] toBinary() {
-        if (this.senderPublicKey == null) {
-            throw new BadMethodCallException("Sender public key not set");
-        }
+        checkToBinary();
 
-        if (this.timestamp == 0) {
-            throw new BadMethodCallException("Timestamp not set");
+        switch(version) {
+            case (byte) 2: return toBinaryV2();
+            case (byte) 3: return toBinaryV3();
+            default: throw new IllegalArgumentException("Unknown version " + version);
         }
+    }
 
+    private byte[] toBinaryV2() {
         return Bytes.concat(
-                new byte[]{this.type},
-                new byte[]{this.version},
-                this.senderPublicKey.getRaw(),
-                new byte[]{this.getNetwork()},
-                Longs.toByteArray(this.timestamp),
-                Longs.toByteArray(this.fee),
-                leaseId.getBytes(StandardCharsets.UTF_8)
+                new byte[]{this.type},                      // 1b
+                new byte[]{this.version},                   // 1b
+                new byte[]{this.getNetwork()},              // 1b
+                this.senderPublicKey.getRaw(),              // 32b
+                Longs.toByteArray(this.fee),                // 8b
+                Longs.toByteArray(this.timestamp),          // 8b
+                leaseId.getBytes(StandardCharsets.UTF_8)    // 32b
+        );
+    }
+
+    private byte[] toBinaryV3() {
+        return Bytes.concat(
+                new byte[]{this.type},                      // 1b
+                new byte[]{this.version},                   // 1b
+                new byte[]{this.getNetwork()},              // 1b
+                Longs.toByteArray(this.timestamp),          // 8b
+                this.senderPublicKey.toBinary(),            // 33b/34b
+                Longs.toByteArray(this.fee),                // 8b
+                leaseId.getBytes(StandardCharsets.UTF_8)    // 32b
         );
     }
 }
