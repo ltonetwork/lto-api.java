@@ -24,11 +24,20 @@ public class LeaseTest {
     }
 
     @Test
-    public void testToBinary() {
+    public void testToBinaryV3() {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(84, tx.toBinary().length);
+        assertEquals(86, tx.toBinary().length);
+    }
+
+    @Test
+    public void testToBinaryV2() {
+        Lease txV2 = new Lease(1, new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), (byte) 2);
+        Account account = TestUtil.createAccount();
+        txV2.signWith(account);
+
+        assertEquals(85, txV2.toBinary().length);
     }
 
     @Test
@@ -57,6 +66,6 @@ public class LeaseTest {
                         "}", false);
 
         Lease jsonTx = new Lease(json);
-        assertEquals(84, jsonTx.toBinary().length);
+        assertEquals(85, jsonTx.toBinary().length);
     }
 }
