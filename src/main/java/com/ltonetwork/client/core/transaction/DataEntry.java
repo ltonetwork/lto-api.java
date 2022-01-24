@@ -29,7 +29,7 @@ public class DataEntry<T> {
         return value;
     }
 
-    public byte[] toBytes() {
+    public byte[] toBinary() {
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         byte[] valueBytes;
         switch (type) {
