@@ -26,8 +26,7 @@ public class Association extends Transaction {
     public Association(Address party, int type, String hash, Encoding encoding, long expires, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
-        if(!SUPPORTED_VERSIONS.contains(version))
-            throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
+        checkVersion(version, SUPPORTED_VERSIONS);
         if(version == (byte) 1 && expires != 0)
             throw new IllegalArgumentException("Association expiration is not supported on v1");
 
@@ -52,8 +51,7 @@ public class Association extends Transaction {
     public Association(Address party, int type, long expires, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
-        if(!SUPPORTED_VERSIONS.contains(version))
-            throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
+        checkVersion(version, SUPPORTED_VERSIONS);
         if(version == (byte) 1 && expires != 0)
             throw new IllegalArgumentException("Association expiration is not supported on v1");
 
@@ -80,8 +78,7 @@ public class Association extends Transaction {
         byte versionFromJson = Byte.parseByte(json.get("version").toString());
         long expiresFromJson = json.has("expires") ? Long.parseLong(json.get("expires").toString()) : 0;
 
-        if(!SUPPORTED_VERSIONS.contains(versionFromJson))
-            throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
+        checkVersion(version, SUPPORTED_VERSIONS);
         if(versionFromJson == (byte) 1 && expiresFromJson != 0)
             throw new IllegalArgumentException("Association expiration is not supported on v1");
 

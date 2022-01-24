@@ -11,6 +11,7 @@ import com.ltonetwork.seasalt.Binary;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Transaction {
     protected int height;
@@ -80,6 +81,11 @@ public abstract class Transaction {
 
     public ArrayList<com.ltonetwork.seasalt.sign.Signature> getProofs() {
         return this.proofs;
+    }
+
+    protected void checkVersion(byte version, List<Byte> supportedVersions) {
+        if(!supportedVersions.contains(version))
+            throw new IllegalArgumentException("Unknown version " + version + ", supported versions are: " + supportedVersions);
     }
 
     private ArrayList<com.ltonetwork.seasalt.sign.Signature> fetchProofs(JsonObject jsonProofs) {

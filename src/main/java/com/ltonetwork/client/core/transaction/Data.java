@@ -19,6 +19,9 @@ public class Data extends Transaction {
 
     public Data(DataEntry<?>[] data) {
         super(TYPE, (byte) 3, BASE_FEE);
+
+        checkVersion(version, SUPPORTED_VERSIONS);
+
         this.data = data;
         updateFeeBasedOnEntries(data);
     }
@@ -26,8 +29,7 @@ public class Data extends Transaction {
     public Data(JsonObject json) {
         super(json);
 
-        if(!SUPPORTED_VERSIONS.contains(Byte.parseByte(json.get("version").toString())))
-            throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
+        checkVersion(version, SUPPORTED_VERSIONS);
 
         JsonObject jsonData = new JsonObject(json.get("data").toString(), true);
         ArrayList<DataEntry<?>> dataFromJson = new ArrayList<>();

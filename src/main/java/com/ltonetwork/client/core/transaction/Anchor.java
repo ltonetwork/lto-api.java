@@ -21,8 +21,7 @@ public class Anchor extends Transaction {
     public Anchor(String hash, Encoding encoding, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
-        if(!SUPPORTED_VERSIONS.contains(version))
-            throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
+        checkVersion(version, SUPPORTED_VERSIONS);
 
         anchors = new ArrayList<>();
         addHash(hash, encoding);
@@ -35,8 +34,7 @@ public class Anchor extends Transaction {
     public Anchor(JsonObject json) {
         super(json);
 
-        if(!SUPPORTED_VERSIONS.contains(Byte.parseByte(json.get("version").toString())))
-            throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
+        checkVersion(version, SUPPORTED_VERSIONS);
 
         JsonObject jsonAnchors = new JsonObject(json.get("anchors").toString(), true);
         ArrayList<String> anchors = new ArrayList<>();

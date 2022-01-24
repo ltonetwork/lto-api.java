@@ -21,6 +21,7 @@ public class Lease extends Transaction {
     public Lease(long amount, Address recipient, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
+        checkVersion(version, SUPPORTED_VERSIONS);
         if (amount <= 0) throw new InvalidArgumentException("Invalid amount; should be greater than 0");
 
         this.amount = amount;
@@ -34,8 +35,7 @@ public class Lease extends Transaction {
     public Lease(JsonObject json) {
         super(json);
 
-        if(!SUPPORTED_VERSIONS.contains(version))
-            throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
+        checkVersion(version, SUPPORTED_VERSIONS);
 
         this.amount = Long.parseLong(json.get("amount").toString());
         this.recipient = new Address(json.get("recipient").toString());
