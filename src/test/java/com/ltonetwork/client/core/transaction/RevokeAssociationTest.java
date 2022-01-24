@@ -25,10 +25,19 @@ public class RevokeAssociationTest {
     }
 
     @Test
-    public void testToBinary() {
+    public void testToBinaryV3() {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
-        assertEquals(88, tx.toBinary().length);
+        assertEquals(89, tx.toBinary().length);
+    }
+
+    @Test
+    public void testToBinaryV1() {
+        RevokeAssociation txV1 = new RevokeAssociation(new Address("3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1"), 1, "hash", Encoding.RAW, (byte) 1);
+        Account account = TestUtil.createAccount();
+        txV1.signWith(account);
+
+        assertEquals(88, txV1.toBinary().length);
     }
 
     @Test
@@ -54,13 +63,13 @@ public class RevokeAssociationTest {
         RevokeAssociation txNoHash = new RevokeAssociation(new Address("3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1"), 1);
         txNoHash.signWith(account);
 
-        assertEquals(82, txNoHash.toBinary().length);
+        assertEquals(83, txNoHash.toBinary().length);
 
         txNoHash.getHash();
     }
 
     @Test
-    public void testCreateWithJson() {
+    public void testCreateWithJsonV1() {
         JsonObject json = new JsonObject(
                 "{\n" +
                         "  \"type\": 17,\n" +
@@ -80,6 +89,29 @@ public class RevokeAssociationTest {
 
         RevokeAssociation jsonTx = new RevokeAssociation(json);
         assertEquals(88, jsonTx.toBinary().length);
+    }
+
+    @Test
+    public void testCreateWithJsonV3() {
+        JsonObject json = new JsonObject(
+                "{\n" +
+                        "  \"type\": 17,\n" +
+                        "  \"id\": \"oYv8LBTsLRyAq1w7n9UXudAf5Luu9CuRXkYSnxLX2oa\",\n" +
+                        "  \"sender\": \"3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx\",\n" +
+                        "  \"senderPublicKey\": \"8wFR3b8WnbFaxQEdRnogTqC5doYUrotm3P7upvxPaWUo\",\n" +
+                        "  \"fee\": 100000,\n" +
+                        "  \"timestamp\": 1538728794530,\n" +
+                        "  \"signature\": \"5Ae37E2XfWXYPSgLp1TTM69noSWnDJrRGgk2Pb6aSptDdzU2yteitoYfzk91x5oRuT3BNhu1zFyJ9iND4RbFUbBk\",\n" +
+                        "  \"version\": 3,\n" +
+                        "  \"recipient\": \"3Mv7ajrPLKewkBNqfxwRZoRwW6fziehp7dQ\",\n" +
+                        "  \"party\": \"3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx\",\n" +
+                        "  \"associationType\": \"1\",\n" +
+                        "  \"hash\": \"3fkSoZ\",\n" + //base58 of "hash"
+                        "  \"height\": 22654\n" +
+                        "}", false);
+
+        RevokeAssociation jsonTx = new RevokeAssociation(json);
+        assertEquals(89, jsonTx.toBinary().length);
     }
 
     @Test
