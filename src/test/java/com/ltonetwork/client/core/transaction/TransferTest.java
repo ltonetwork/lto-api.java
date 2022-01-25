@@ -37,16 +37,36 @@ public class TransferTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(84, tx.toBinary().length);
+        assertEquals(88, tx.toBinary().length);
     }
 
     @Test
-    public void testToBinary() {
+    public void testToBinaryV1() {
+        Account account = TestUtil.createAccount();
+        Transfer txV1 = new Transfer(1, new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), (byte) 1);
+        txV1.signWith(account);
+        txV1.setAttachment("test");
+
+        assertEquals(88, txV1.toBinary().length);
+    }
+
+    @Test
+    public void testToBinaryV2() {
+        Account account = TestUtil.createAccount();
+        Transfer txV2 = new Transfer(1, new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), (byte) 2);
+        txV2.signWith(account);
+        txV2.setAttachment("test");
+
+        assertEquals(89, txV2.toBinary().length);
+    }
+
+    @Test
+    public void testToBinaryV3() {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
         tx.setAttachment("test");
 
-        assertEquals(89, tx.toBinary().length);
+        assertEquals(91, tx.toBinary().length);
     }
 
     @Test
@@ -84,7 +104,7 @@ public class TransferTest {
                         "}", false);
 
         Transfer jsonTx = new Transfer(json);
-        assertEquals(84, jsonTx.toBinary().length);
+        assertEquals(85, jsonTx.toBinary().length);
     }
 
     @Test

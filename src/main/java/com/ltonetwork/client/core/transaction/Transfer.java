@@ -10,29 +10,42 @@ import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Transfer extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
     private final static byte TYPE = 4;
-    private final static byte VERSION = 2;
+    private final static List<Byte> SUPPORTED_VERSIONS = Arrays.asList((byte) 1, (byte) 2, (byte) 3);
     private final long amount;
     private final Address recipient;
     private String attachment;
 
-    public Transfer(int amount, Address recipient) {
-        super(TYPE, VERSION, MINIMUM_FEE);
+    public Transfer(int amount, Address recipient, byte version) {
+        super(TYPE, version, MINIMUM_FEE);
 
-        if (amount <= 0) {
-            throw new InvalidArgumentException("Invalid amount; should be greater than 0");
-        }
+        checkVersion(SUPPORTED_VERSIONS);
+        if (amount <= 0) throw new InvalidArgumentException("Invalid amount; should be greater than 0");
 
         this.amount = amount;
         this.recipient = recipient;
+        this.attachment = "";
+    }
+
+    public Transfer(int amount, Address recipient) {
+        this(amount, recipient, (byte) 3);
     }
 
     public Transfer(JsonObject json) {
         super(json);
-        this.amount = Long.parseLong(json.get("amount").toString());
+        long am = Long.parseLong(json.get("amount").toString());
+
+        checkVersion(SUPPORTED_VERSIONS);
+        if (am <= 0) throw new InvalidArgumentException("Invalid amount; should be greater than 0");
+
+        this.amount = am;
         this.recipient = new Address(json.get("recipient").toString());
+        this.attachment = (json.has("attachment")) ? json.get("attachment").toString() : "";
     }
 
     public void setAttachment(String message, Encoding encoding) {
@@ -45,31 +58,56 @@ public class Transfer extends Transaction {
     }
 
     public byte[] toBinary() {
-        if (this.senderPublicKey == null) {
-            throw new BadMethodCallException("Sender public key not set");
+        checkToBinary();
+
+        switch(version) {
+            case (byte) 1: return toBinaryV1();
+            case (byte) 2: return toBinaryV2();
+            case (byte) 3: return toBinaryV3();
+            default: throw new IllegalArgumentException("Unknown version " + version);
         }
+    }
 
-        if (this.timestamp == 0) {
-            throw new BadMethodCallException("Timestamp not set");
-        }
+    public byte[] toBinaryV1() {
+        return Bytes.concat(
+                new byte[]{this.type},                              // 1b
+                this.senderPublicKey.getRaw(),                      // 32b
+                Longs.toByteArray(this.timestamp),                  // 8b
+                Longs.toByteArray(this.amount),                     // 8b
+                Longs.toByteArray(this.fee),                        // 8b
+                Encoder.base58Decode(this.recipient.getAddress()),  // 26b
+                Shorts.toByteArray((short) attachment.length()),    // 2b
+                Encoder.base58Decode(this.attachment)               // mb
+        );
+    }
 
-        byte[] binaryAttachment = Bytes.concat(
-                new byte[]{this.type},
-                new byte[]{this.version},
-                this.senderPublicKey.getRaw(),
-                Longs.toByteArray(this.timestamp),
-                Longs.toByteArray(this.amount),
-                Longs.toByteArray(this.fee),
-                Encoder.base58Decode(this.recipient.getAddress()));
+    public byte[] toBinaryV2() {
+        return Bytes.concat(
+                new byte[]{this.type},                              // 1b
+                new byte[]{this.version},                           // 1b
+                this.senderPublicKey.getRaw(),                      // 32b
+                Longs.toByteArray(this.timestamp),                  // 8b
+                Longs.toByteArray(this.amount),                     // 8b
+                Longs.toByteArray(this.fee),                        // 8b
+                Encoder.base58Decode(this.recipient.getAddress()),  // 26b
+                Shorts.toByteArray((short) attachment.length()),    // 2b
+                Encoder.base58Decode(this.attachment)               // mb
+        );
+    }
 
-        if (attachment != null) {
-            binaryAttachment = Bytes.concat(
-                    binaryAttachment,
-                    Shorts.toByteArray((short) attachment.length()),
-                    Encoder.base58Decode(this.attachment)
-            );
-        }
 
-        return binaryAttachment;
+    public byte[] toBinaryV3() {
+        return Bytes.concat(
+                new byte[]{this.type},                              // 1b
+                new byte[]{this.version},                           // 1b
+                new byte[]{this.getNetwork()},                      // 1b
+                Longs.toByteArray(this.timestamp),                  // 8b
+                this.senderPublicKey.toBinary(),                    // 33b/34b
+                Longs.toByteArray(this.fee),                        // 8b
+                Encoder.base58Decode(this.recipient.getAddress()),  // 26b
+                Longs.toByteArray(this.amount),                     // 8b
+                Shorts.toByteArray((short) attachment.length()),    // 2b
+                Encoder.base58Decode(this.attachment)               // mb
+        );
     }
 }
