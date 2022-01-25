@@ -44,13 +44,17 @@ public class Anchor extends Transaction {
 
         this.anchors = anchors;
     }
+
     public byte[] toBinary() {
         checkToBinary();
 
-        switch(version) {
-            case (byte) 1: return toBinaryV1();
-            case (byte) 3: return toBinaryV3();
-            default: throw new IllegalArgumentException("Unknown version " + version);
+        switch (version) {
+            case (byte) 1:
+                return toBinaryV1();
+            case (byte) 3:
+                return toBinaryV3();
+            default:
+                throw new IllegalArgumentException("Unknown version " + version);
         }
     }
 
@@ -97,7 +101,7 @@ public class Anchor extends Transaction {
         return anchorsBytes;
     }
 
-    private byte[] toBinaryV1(){
+    private byte[] toBinaryV1() {
         return Bytes.concat(
                 new byte[]{this.type},                      // 1b
                 new byte[]{this.version},                   // 1b
@@ -109,13 +113,13 @@ public class Anchor extends Transaction {
         );
     }
 
-    private byte[] toBinaryV3(){
+    private byte[] toBinaryV3() {
         return Bytes.concat(
                 new byte[]{this.type},                      // 1b
                 new byte[]{this.version},                   // 1b
                 new byte[]{this.getNetwork()},              // 1b
                 Longs.toByteArray(this.timestamp),          // 8b
-                this.senderPublicKey.toBinary(),            // 33b/34b
+                this.senderPublicKey.toBinary(),            // 33b|34b
                 Longs.toByteArray(this.fee),                // 8b
                 Shorts.toByteArray((short) anchors.size()), // 2b
                 Bytes.toArray(anchorsBytes())               // (2b + mb)*nb

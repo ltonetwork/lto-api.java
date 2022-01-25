@@ -3,7 +3,6 @@ package com.ltonetwork.client.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
-import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
@@ -60,15 +59,19 @@ public class Transfer extends Transaction {
     public byte[] toBinary() {
         checkToBinary();
 
-        switch(version) {
-            case (byte) 1: return toBinaryV1();
-            case (byte) 2: return toBinaryV2();
-            case (byte) 3: return toBinaryV3();
-            default: throw new IllegalArgumentException("Unknown version " + version);
+        switch (version) {
+            case (byte) 1:
+                return toBinaryV1();
+            case (byte) 2:
+                return toBinaryV2();
+            case (byte) 3:
+                return toBinaryV3();
+            default:
+                throw new IllegalArgumentException("Unknown version " + version);
         }
     }
 
-    public byte[] toBinaryV1() {
+    private byte[] toBinaryV1() {
         return Bytes.concat(
                 new byte[]{this.type},                              // 1b
                 this.senderPublicKey.getRaw(),                      // 32b
@@ -81,7 +84,7 @@ public class Transfer extends Transaction {
         );
     }
 
-    public byte[] toBinaryV2() {
+    private byte[] toBinaryV2() {
         return Bytes.concat(
                 new byte[]{this.type},                              // 1b
                 new byte[]{this.version},                           // 1b
@@ -96,13 +99,13 @@ public class Transfer extends Transaction {
     }
 
 
-    public byte[] toBinaryV3() {
+    private byte[] toBinaryV3() {
         return Bytes.concat(
                 new byte[]{this.type},                              // 1b
                 new byte[]{this.version},                           // 1b
                 new byte[]{this.getNetwork()},                      // 1b
                 Longs.toByteArray(this.timestamp),                  // 8b
-                this.senderPublicKey.toBinary(),                    // 33b/34b
+                this.senderPublicKey.toBinary(),                    // 33b|34b
                 Longs.toByteArray(this.fee),                        // 8b
                 Encoder.base58Decode(this.recipient.getAddress()),  // 26b
                 Longs.toByteArray(this.amount),                     // 8b

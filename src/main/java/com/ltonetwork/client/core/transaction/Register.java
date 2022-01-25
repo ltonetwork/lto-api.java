@@ -3,7 +3,6 @@ package com.ltonetwork.client.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
-import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.types.Key;
@@ -58,9 +57,11 @@ public class Register extends Transaction {
     public byte[] toBinary() {
         checkToBinary();
 
-        switch(version) {
-            case (byte) 3: return toBinaryV3();
-            default: throw new IllegalArgumentException("Unknown version " + version);
+        switch (version) {
+            case (byte) 3:
+                return toBinaryV3();
+            default:
+                throw new IllegalArgumentException("Unknown version " + version);
         }
     }
 
@@ -70,10 +71,10 @@ public class Register extends Transaction {
                 new byte[]{this.version},                       // 1b
                 new byte[]{this.getNetwork()},                  // 1b
                 Longs.toByteArray(this.timestamp),              // 8b
-                this.senderPublicKey.toBinary(),                // 33b/34b
+                this.senderPublicKey.toBinary(),                // 33b|34b
                 Longs.toByteArray(this.fee),                    // 8b
                 Shorts.toByteArray((short) accounts.size()),    // 2b
-                keysToBinary()                                  // (1 + 32b|33b)*n
+                keysToBinary()                                  // (33b|34b)*n
         );
     }
 

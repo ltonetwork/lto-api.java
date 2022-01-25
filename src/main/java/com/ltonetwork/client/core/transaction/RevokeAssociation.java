@@ -24,7 +24,7 @@ public class RevokeAssociation extends Transaction {
     public RevokeAssociation(Address party, int type, String hash, Encoding encoding, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
-        if(!SUPPORTED_VERSIONS.contains(version))
+        if (!SUPPORTED_VERSIONS.contains(version))
             throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
 
         this.party = party;
@@ -39,7 +39,7 @@ public class RevokeAssociation extends Transaction {
     public RevokeAssociation(Address party, int type, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
-        if(!SUPPORTED_VERSIONS.contains(version))
+        if (!SUPPORTED_VERSIONS.contains(version))
             throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
 
         this.party = party;
@@ -55,7 +55,7 @@ public class RevokeAssociation extends Transaction {
 
         byte versionFromJson = Byte.parseByte(json.get("version").toString());
 
-        if(!SUPPORTED_VERSIONS.contains(versionFromJson))
+        if (!SUPPORTED_VERSIONS.contains(versionFromJson))
             throw new IllegalArgumentException("Unknown version, supported versions are: " + SUPPORTED_VERSIONS);
 
         this.party = new Address(json.get("party").toString());
@@ -67,10 +67,13 @@ public class RevokeAssociation extends Transaction {
         if (this.senderPublicKey == null) throw new BadMethodCallException("Sender public key not set");
         if (this.timestamp == 0) throw new BadMethodCallException("Timestamp not set");
 
-        switch(version) {
-            case (byte) 1: return toBinaryV1();
-            case (byte) 3: return toBinaryV3();
-            default: throw new IllegalArgumentException("Unknown version " + version);
+        switch (version) {
+            case (byte) 1:
+                return toBinaryV1();
+            case (byte) 3:
+                return toBinaryV3();
+            default:
+                throw new IllegalArgumentException("Unknown version " + version);
         }
     }
 
@@ -107,7 +110,7 @@ public class RevokeAssociation extends Transaction {
                 new byte[]{this.version},                       // 1b
                 new byte[]{this.getNetwork()},                  // 1b
                 Longs.toByteArray(this.timestamp),              // 8b
-                this.senderPublicKey.toBinary(),                // 33b/34b
+                this.senderPublicKey.toBinary(),                // 33b|34b
                 Longs.toByteArray(this.fee),                    // 8b
                 Encoder.base58Decode(this.party.getAddress()),  // 26b
                 Ints.toByteArray(associationType),              // 4b
@@ -115,7 +118,7 @@ public class RevokeAssociation extends Transaction {
         );
     }
 
-    private byte[] hashToBinary(){
+    private byte[] hashToBinary() {
         if (hash != null) {
             byte[] rawHash = Encoder.base58Decode(this.hash);
             return Bytes.concat(

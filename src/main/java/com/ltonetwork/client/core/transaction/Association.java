@@ -19,14 +19,14 @@ public class Association extends Transaction {
     private final static List<Byte> SUPPORTED_VERSIONS = Arrays.asList((byte) 1, (byte) 3);
     private final Address party;
     private final int associationType;
-    private String hash;
     private final long expires;
+    private String hash;
 
     public Association(Address party, int type, String hash, Encoding encoding, long expires, byte version) {
         super(TYPE, version, MINIMUM_FEE);
 
         checkVersion(SUPPORTED_VERSIONS);
-        if(version == (byte) 1 && expires != 0)
+        if (version == (byte) 1 && expires != 0)
             throw new IllegalArgumentException("Association expiration is not supported on v1");
 
         this.party = party;
@@ -51,7 +51,7 @@ public class Association extends Transaction {
         super(TYPE, version, MINIMUM_FEE);
 
         checkVersion(SUPPORTED_VERSIONS);
-        if(version == (byte) 1 && expires != 0)
+        if (version == (byte) 1 && expires != 0)
             throw new IllegalArgumentException("Association expiration is not supported on v1");
 
         this.party = party;
@@ -78,7 +78,7 @@ public class Association extends Transaction {
         long expiresFromJson = json.has("expires") ? Long.parseLong(json.get("expires").toString()) : 0;
 
         checkVersion(SUPPORTED_VERSIONS);
-        if(versionFromJson == (byte) 1 && expiresFromJson != 0)
+        if (versionFromJson == (byte) 1 && expiresFromJson != 0)
             throw new IllegalArgumentException("Association expiration is not supported on v1");
 
         this.party = new Address(json.get("party").toString());
@@ -90,10 +90,13 @@ public class Association extends Transaction {
     public byte[] toBinary() {
         checkToBinary();
 
-        switch(version) {
-            case (byte) 1: return toBinaryV1();
-            case (byte) 3: return toBinaryV3();
-            default: throw new IllegalArgumentException("Unknown version " + version);
+        switch (version) {
+            case (byte) 1:
+                return toBinaryV1();
+            case (byte) 3:
+                return toBinaryV3();
+            default:
+                throw new IllegalArgumentException("Unknown version " + version);
         }
     }
 
@@ -114,7 +117,7 @@ public class Association extends Transaction {
         return this.expires;
     }
 
-    private byte[] toBinaryV1(){
+    private byte[] toBinaryV1() {
         return Bytes.concat(
                 new byte[]{this.type},                          // 1b
                 new byte[]{this.version},                       // 1b
@@ -128,13 +131,13 @@ public class Association extends Transaction {
         );
     }
 
-    private byte[] toBinaryV3(){
+    private byte[] toBinaryV3() {
         return Bytes.concat(
                 new byte[]{this.type},                          // 1b
                 new byte[]{this.version},                       // 1b
                 new byte[]{this.getNetwork()},                  // 1b
                 Longs.toByteArray(this.timestamp),              // 8b
-                this.senderPublicKey.toBinary(),                // 33b/34b
+                this.senderPublicKey.toBinary(),                // 33b|34b
                 Longs.toByteArray(this.fee),                    // 8b
                 Encoder.base58Decode(this.party.getAddress()),  // 26b
                 Ints.toByteArray(associationType),              // 4b
@@ -143,7 +146,7 @@ public class Association extends Transaction {
         );
     }
 
-    private byte[] hashToBinary(){
+    private byte[] hashToBinary() {
         if (hash != null) {
             byte[] rawHash = Encoder.base58Decode(this.hash);
             return Bytes.concat(

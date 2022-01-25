@@ -2,7 +2,6 @@ package com.ltonetwork.client.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.JsonObject;
@@ -44,10 +43,13 @@ public class Lease extends Transaction {
     public byte[] toBinary() {
         checkToBinary();
 
-        switch(version) {
-            case (byte) 2: return toBinaryV2();
-            case (byte) 3: return toBinaryV3();
-            default: throw new IllegalArgumentException("Unknown version " + version);
+        switch (version) {
+            case (byte) 2:
+                return toBinaryV2();
+            case (byte) 3:
+                return toBinaryV3();
+            default:
+                throw new IllegalArgumentException("Unknown version " + version);
         }
     }
 
@@ -70,7 +72,7 @@ public class Lease extends Transaction {
                 new byte[]{this.version},                           // 1b
                 new byte[]{this.getNetwork()},                      // 1b
                 Longs.toByteArray(this.timestamp),                  // 8b
-                this.senderPublicKey.toBinary(),                    // 33b/34b
+                this.senderPublicKey.toBinary(),                    // 33b|34b
                 Longs.toByteArray(this.fee),                        // 8b
                 Encoder.base58Decode(this.recipient.getAddress()),  // 26b
                 Longs.toByteArray(this.amount)                      // 8b

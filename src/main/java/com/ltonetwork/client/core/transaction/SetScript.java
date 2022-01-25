@@ -57,10 +57,13 @@ public class SetScript extends Transaction {
     public byte[] toBinary() {
         checkToBinary();
 
-        switch(version) {
-            case (byte) 1: return toBinaryV1();
-            case (byte) 3: return toBinaryV3();
-            default: throw new IllegalArgumentException("Unknown version " + version);
+        switch (version) {
+            case (byte) 1:
+                return toBinaryV1();
+            case (byte) 3:
+                return toBinaryV3();
+            default:
+                throw new IllegalArgumentException("Unknown version " + version);
         }
     }
 
@@ -88,7 +91,7 @@ public class SetScript extends Transaction {
                 new byte[]{this.version},                           // 1b
                 new byte[]{this.getNetwork()},                      // 1b
                 Longs.toByteArray(this.timestamp),                  // 8b
-                this.senderPublicKey.toBinary(),                    // 33b/34b
+                this.senderPublicKey.toBinary(),                    // 33b|34b
                 Longs.toByteArray(this.fee),                        // 8b
                 Shorts.toByteArray((short) binaryScript.length),    // 2b
                 binaryScript                                        // nb

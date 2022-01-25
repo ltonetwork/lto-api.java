@@ -3,7 +3,6 @@ package com.ltonetwork.client.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
-import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
 import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
@@ -76,10 +75,13 @@ public class MassTransfer extends Transaction {
     public byte[] toBinary() {
         checkToBinary();
 
-        switch(version) {
-            case (byte) 1: return toBinaryV1();
-            case (byte) 3: return toBinaryV3();
-            default: throw new IllegalArgumentException("Unknown version " + version);
+        switch (version) {
+            case (byte) 1:
+                return toBinaryV1();
+            case (byte) 3:
+                return toBinaryV3();
+            default:
+                throw new IllegalArgumentException("Unknown version " + version);
         }
     }
 
@@ -93,7 +95,7 @@ public class MassTransfer extends Transaction {
                 transfersToBinary(),                                // (26b + 8b)*n
                 Longs.toByteArray(this.timestamp),                  // 8b
                 Longs.toByteArray(this.fee),                        // 8b
-                Shorts.toByteArray((short) attachment.length()),    // 2
+                Shorts.toByteArray((short) attachment.length()),    // 2b
                 Encoder.base58Decode(this.attachment)               // mb
         );
     }
@@ -104,11 +106,11 @@ public class MassTransfer extends Transaction {
                 new byte[]{this.version},                           // 1b
                 new byte[]{this.getNetwork()},                      // 1b
                 Longs.toByteArray(this.timestamp),                  // 8b
-                this.senderPublicKey.toBinary(),                    // 33b/34b
+                this.senderPublicKey.toBinary(),                    // 33b|34b
                 Longs.toByteArray(this.fee),                        // 8b
                 Shorts.toByteArray((short) transfers.size()),       // 2b
                 transfersToBinary(),                                // (26b + 8b)*n
-                Shorts.toByteArray((short) attachment.length()),    // 2
+                Shorts.toByteArray((short) attachment.length()),    // 2b
                 Encoder.base58Decode(this.attachment)               // mb
         );
     }

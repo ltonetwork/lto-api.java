@@ -10,10 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class MassTransferTest {
@@ -117,7 +114,7 @@ public class MassTransferTest {
                         "}", false);
 
         MassTransfer jsonTx = new MassTransfer(json);
-        assertEquals(92, jsonTx.toBinary().length);
+        assertEquals(94, jsonTx.toBinary().length);
     }
 
     @Test
