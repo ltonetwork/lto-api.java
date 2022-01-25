@@ -11,22 +11,34 @@ import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MassTransfer extends Transaction {
     private final static long BASE_FEE = 100_000_000;
     private final static long ITEM_FEE = 10_000_000;
     private final static byte TYPE = 11;
-    private final static byte VERSION = 1;
+    private final static List<Byte> SUPPORTED_VERSIONS = Arrays.asList((byte) 1, (byte) 3);
     private final ArrayList<TransferShort> transfers;
     private String attachment;
 
-    public MassTransfer() {
-        super(TYPE, VERSION, BASE_FEE);
+    public MassTransfer(byte version) {
+        super(TYPE, version, BASE_FEE);
+
+        checkVersion(SUPPORTED_VERSIONS);
+
         transfers = new ArrayList<>();
+        attachment = "";
+    }
+
+    public MassTransfer() {
+        this((byte) 3);
     }
 
     public MassTransfer(JsonObject json) {
         super(json);
+
+        checkVersion(SUPPORTED_VERSIONS);
 
         JsonObject jsonTransfers = new JsonObject(json.get("transfers").toString(), true);
         ArrayList<TransferShort> transfers = new ArrayList<>();
@@ -40,7 +52,7 @@ public class MassTransfer extends Transaction {
         }
 
         this.transfers = transfers;
-        if (json.has("attachment")) this.attachment = json.get("attachment").toString();
+        this.attachment = (json.has("attachment")) ? json.get("attachment").toString() : "";
     }
 
     public void setAttachment(String message, Encoding encoding) {
@@ -62,21 +74,46 @@ public class MassTransfer extends Transaction {
     }
 
     public byte[] toBinary() {
-        if (this.senderPublicKey == null) {
-            throw new BadMethodCallException("Sender public key not set");
-        }
+        checkToBinary();
 
-        if (this.timestamp == 0) {
-            throw new BadMethodCallException("Timestamp not set");
+        switch(version) {
+            case (byte) 1: return toBinaryV1();
+            case (byte) 3: return toBinaryV3();
+            default: throw new IllegalArgumentException("Unknown version " + version);
         }
+    }
 
-        byte[] ret = Bytes.concat(
-                new byte[]{this.type},
-                new byte[]{this.version},
-                this.senderPublicKey.getRaw(),
-                Shorts.toByteArray((short) transfers.size())
+    private byte[] toBinaryV1() {
+        System.out.println();
+        return Bytes.concat(
+                new byte[]{this.type},                              // 1b
+                new byte[]{this.version},                           // 1b
+                this.senderPublicKey.getRaw(),                      // 32b
+                Shorts.toByteArray((short) transfers.size()),       // 2b
+                transfersToBinary(),                                // (26b + 8b)*n
+                Longs.toByteArray(this.timestamp),                  // 8b
+                Longs.toByteArray(this.fee),                        // 8b
+                Shorts.toByteArray((short) attachment.length()),    // 2
+                Encoder.base58Decode(this.attachment)               // mb
         );
+    }
 
+    private byte[] toBinaryV3() {
+        return Bytes.concat(
+                new byte[]{this.type},                              // 1b
+                new byte[]{this.version},                           // 1b
+                new byte[]{this.getNetwork()},                      // 1b
+                Longs.toByteArray(this.timestamp),                  // 8b
+                this.senderPublicKey.toBinary(),                    // 33b/34b
+                Longs.toByteArray(this.fee),                        // 8b
+                Shorts.toByteArray((short) transfers.size()),       // 2b
+                transfersToBinary(),                                // (26b + 8b)*n
+                Shorts.toByteArray((short) attachment.length()),    // 2
+                Encoder.base58Decode(this.attachment)               // mb
+        );
+    }
+
+    private byte[] transfersToBinary() {
         ArrayList<Byte> transfersBytes = new ArrayList<>();
 
         for (TransferShort transfer : transfers) {
@@ -88,21 +125,6 @@ public class MassTransfer extends Transaction {
             }
         }
 
-        ret = Bytes.concat(
-                ret,
-                Bytes.toArray(transfersBytes),
-                Longs.toByteArray(this.fee),
-                Longs.toByteArray(this.timestamp)
-        );
-
-        if (attachment != null) {
-            ret = Bytes.concat(
-                    ret,
-                    Shorts.toByteArray((short) attachment.length()),
-                    Encoder.base58Decode(this.attachment)
-            );
-        }
-
-        return ret;
+        return Bytes.toArray(transfersBytes);
     }
 }

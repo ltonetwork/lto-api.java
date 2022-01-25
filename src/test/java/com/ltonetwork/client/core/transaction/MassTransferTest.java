@@ -10,6 +10,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -29,16 +31,26 @@ public class MassTransferTest {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(52, tx.toBinary().length);
+        assertEquals(56, tx.toBinary().length);
     }
 
     @Test
-    public void testToBinary() {
+    public void testToBinaryV1() {
+        Account account = TestUtil.createAccount();
+        MassTransfer txV1 = new MassTransfer((byte) 1);
+        txV1.signWith(account);
+        txV1.setAttachment("test");
+
+        assertEquals(58, txV1.toBinary().length);
+    }
+
+    @Test
+    public void testToBinaryV3() {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
         tx.setAttachment("test");
 
-        assertEquals(58, tx.toBinary().length);
+        assertEquals(60, tx.toBinary().length);
     }
 
     @Test
@@ -47,8 +59,9 @@ public class MassTransferTest {
         tx.signWith(account);
 
         int old = tx.toBinary().length;
+        assertEquals(56, old);
         tx.addTransfer(new Address("3MwGRJ1cbCQgP3mSGMR6pR1EJzXAD3e6Bvu"), 1);
-        assertTrue(tx.toBinary().length > old);
+        assertEquals(old + 26 + 8, tx.toBinary().length);
     }
 
     @Test
@@ -84,6 +97,30 @@ public class MassTransferTest {
     }
 
     @Test
+    public void testCreateWithJsonV3() {
+        JsonObject json = new JsonObject(
+                "{\n" +
+                        "  \"type\": 11,\n" +
+                        "  \"id\": \"oYv8LBTsLRyAq1w7n9UXudAf5Luu9CuRXkYSnxLX2oa\",\n" +
+                        "  \"sender\": \"3N51gbw5W3xvSkcAXtLnXc3SQh2m9e6TBcy\",\n" +
+                        "  \"senderPublicKey\": \"8wFR3b8WnbFaxQEdRnogTqC5doYUrotm3P7upvxPaWUo\",\n" +
+                        "  \"fee\": 100000,\n" +
+                        "  \"timestamp\": 1538728794530,\n" +
+                        "  \"proofs\": [\"65E82MLn6RdF7Y2VrdtFWkHd97teqLSwVdbGyEfy7x6aczkHRDZMvNUfdTAYgqDXzDDKKEkQqVhMVMg6EEEvE3C3\"],\n" +
+                        "  \"version\": 3,\n" +
+                        "  \"transfers\": [{\n" +
+                        "      \"recipient\": \"3MwGRJ1cbCQgP3mSGMR6pR1EJzXAD3e6Bvu\",\n" +
+                        "      \"amount\": 100000000\n" +
+                        "    }],\n" +
+                        "  \"attachment\": \"3yZe7d\",\n" + // base58 encoded "test"
+                        "  \"height\": 22654\n" +
+                        "}", false);
+
+        MassTransfer jsonTx = new MassTransfer(json);
+        assertEquals(92, jsonTx.toBinary().length);
+    }
+
+    @Test
     public void testCreateWithJsonNoTransferNoAttachment() {
         JsonObject json = new JsonObject(
                 "{\n" +
@@ -100,7 +137,7 @@ public class MassTransferTest {
                         "}", false);
 
         MassTransfer jsonTx = new MassTransfer(json);
-        assertEquals(52, jsonTx.toBinary().length);
+        assertEquals(54, jsonTx.toBinary().length);
     }
 
     @Test
@@ -144,6 +181,6 @@ public class MassTransferTest {
                         "}", false);
 
         MassTransfer jsonTx = new MassTransfer(json);
-        assertEquals(86, jsonTx.toBinary().length);
+        assertEquals(88, jsonTx.toBinary().length);
     }
 }
