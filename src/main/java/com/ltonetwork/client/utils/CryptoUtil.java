@@ -77,6 +77,13 @@ public class CryptoUtil {
         );
     }
 
+    public static KeyPair signToEncryptKeyPair(KeyPair signKeyPair) {
+        return new KeyPair(
+                new PublicKey(signToEncryptPublicKey(signKeyPair.getPublicKey().getRaw()), Key.KeyType.CURVE25519),
+                new PrivateKey(signToEncryptPrivateKey(signKeyPair.getPrivateKey().getRaw()), Key.KeyType.CURVE25519)
+        );
+    }
+
     public static byte[] signToEncryptPublicKey(byte[] publicKey) {
         byte[] key = new byte[Sign.CURVE25519_PUBLICKEYBYTES];
         sodium.convertPublicKeyEd25519ToCurve25519(key, publicKey);
