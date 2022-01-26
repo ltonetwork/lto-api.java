@@ -21,8 +21,8 @@ public class KeyPair {
     }
 
     public KeyPair(byte[] publicKey, byte[] privateKey, Key.KeyType keyType) {
-        this.publicKey = new PublicKey(publicKey.clone(), keyType);
-        this.privateKey = new PrivateKey(privateKey.clone(), keyType);
+        this.publicKey = publicKey == null ? null : new PublicKey(publicKey.clone(), keyType);
+        this.privateKey = privateKey == null ? null : new PrivateKey(privateKey.clone(), keyType);
     }
 
     public KeyPair(byte[] publicKey, byte[] privateKey) {

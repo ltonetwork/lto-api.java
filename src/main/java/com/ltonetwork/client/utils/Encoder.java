@@ -113,19 +113,6 @@ public class Encoder {
         return Pattern.matches("^[a-f0-9]+$", input);
     }
 
-    static byte[] packN(int value) {
-        byte[] bytes = ByteBuffer.allocate(4).putInt(value).array();
-        return toPositiveByteArray(bytes);
-    }
-
-    static int unpackN(byte[] value) {
-        ByteBuffer buf = ByteBuffer.allocate(4);
-        buf.order(ByteOrder.BIG_ENDIAN);
-        buf.put(value);
-        buf.flip();
-        return buf.getInt();
-    }
-
     // converts a byte[] like [0,0,19,-2] to [0,0,19,254]
     public static byte[] toPositiveByteArray(byte[] bytes) {
         for (int i = 0; i < bytes.length; i++) {
