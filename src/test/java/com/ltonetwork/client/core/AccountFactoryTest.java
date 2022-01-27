@@ -1,11 +1,9 @@
 package com.ltonetwork.client.core;
 
-import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidAccountException;
-import com.ltonetwork.client.types.*;
+import com.ltonetwork.client.types.Key;
+import com.ltonetwork.client.types.KeyPair;
 import com.ltonetwork.client.utils.CryptoUtil;
-import com.ltonetwork.seasalt.Binary;
-import com.ltonetwork.seasalt.sign.Signature;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,7 +11,7 @@ import org.junit.rules.ExpectedException;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class AccountFactoryTest {
     @Rule

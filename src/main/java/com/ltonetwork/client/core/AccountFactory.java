@@ -19,14 +19,16 @@ public class AccountFactory {
     protected int nonce;
 
     public AccountFactory(byte network, int nonce) {
-        if (network != 'T' && network != 'L') throw new IllegalArgumentException("Expected network Testnet or LTO (mainnet)");
+        if (network != 'T' && network != 'L')
+            throw new IllegalArgumentException("Expected network Testnet or LTO (mainnet)");
         this.network = network;
         this.nonce = nonce;
     }
 
     public AccountFactory(String network, int nonce) {
         byte networkByte = network.toUpperCase().substring(0, 1).getBytes(StandardCharsets.UTF_8)[0];
-        if (networkByte != 'T' && networkByte != 'L') throw new IllegalArgumentException("Expected network Testnet or LTO (mainnet)");
+        if (networkByte != 'T' && networkByte != 'L')
+            throw new IllegalArgumentException("Expected network Testnet or LTO (mainnet)");
         this.network = networkByte;
         this.nonce = nonce;
     }
@@ -39,12 +41,20 @@ public class AccountFactory {
         this(network, new Random().nextInt(0xFFFF + 1));
     }
 
+    public static byte mainnetByte() {
+        return 'L';
+    }
+
+    public static byte testnetByte() {
+        return 'T';
+    }
+
     public KeyPair calcKeys(KeyPair keys) {
         if (keys.getPrivateKey() == null) {
             return new KeyPair(keys.getPublicKey(), null);
         }
 
-        PublicKey calcPublicKey = CryptoUtil.publicFromPrivate(keys.getPrivateKey());;
+        PublicKey calcPublicKey = CryptoUtil.publicFromPrivate(keys.getPrivateKey());
 
         if (keys.getPublicKey() != null && !keys.getPublicKey().getBase58().equals(calcPublicKey.getBase58())) {
             throw new InvalidAccountException("Public key doesn't match private key");
@@ -162,13 +172,5 @@ public class AccountFactory {
 
     public int getNonce() {
         return nonce;
-    }
-
-    public static byte mainnetByte() {
-        return 'L';
-    }
-
-    public static byte testnetByte() {
-        return 'T';
     }
 }
