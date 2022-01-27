@@ -4,8 +4,6 @@ import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.seasalt.Binary;
 import org.apache.commons.codec.DecoderException;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
