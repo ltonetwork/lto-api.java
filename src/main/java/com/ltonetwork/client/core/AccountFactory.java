@@ -1,11 +1,11 @@
 package com.ltonetwork.client.core;
 
+import com.google.common.primitives.Bytes;
 import com.ltonetwork.client.exceptions.InvalidAccountException;
 import com.ltonetwork.client.types.*;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.client.utils.Encoder;
-import com.ltonetwork.client.utils.PackUtil;
-import com.ltonetwork.seasalt.hash.Keccak256;
+import com.ltonetwork.seasalt.hash.Blake2b256;
 import com.ltonetwork.seasalt.hash.SHA256;
 
 import java.nio.charset.StandardCharsets;
@@ -15,20 +15,25 @@ import java.util.Random;
 public class AccountFactory {
     public static final char ADDRESS_VERSION = 0x1;
 
-    protected String network;
+    protected byte network;
     protected int nonce;
 
-    public AccountFactory(int network, int nonce) {
-        this.network = Character.toString((char) network).substring(0, 1);
+    public AccountFactory(byte network, int nonce) {
+        if (network != 'T' && network != 'L')
+            throw new IllegalArgumentException("Expected network Testnet or LTO (mainnet)");
+        this.network = network;
         this.nonce = nonce;
     }
 
     public AccountFactory(String network, int nonce) {
-        this.network = network.substring(0, 1);
+        byte networkByte = network.toUpperCase().substring(0, 1).getBytes(StandardCharsets.UTF_8)[0];
+        if (networkByte != 'T' && networkByte != 'L')
+            throw new IllegalArgumentException("Expected network Testnet or LTO (mainnet)");
+        this.network = networkByte;
         this.nonce = nonce;
     }
 
-    public AccountFactory(int network) {
+    public AccountFactory(byte network) {
         this(network, new Random().nextInt(0xFFFF + 1));
     }
 
@@ -36,70 +41,12 @@ public class AccountFactory {
         this(network, new Random().nextInt(0xFFFF + 1));
     }
 
-    public AccountFactory(Object network) {
-        this(network, new Random().nextInt(0xFFFF + 1));
+    public static byte mainnetByte() {
+        return 'L';
     }
 
-    public AccountFactory(Object network, int nonce) {
-        if (network instanceof String) {
-            this.network = network.toString().substring(0, 1);
-        }
-        if (network instanceof Number) {
-            this.network = Character.toString((char) ((Number) network).intValue());
-        }
-        this.nonce = nonce;
-    }
-
-    public byte[] createAccountSeed(String seedText) {
-        byte[] seedBase = PackUtil.packLaStar(nonce, seedText);
-
-        byte[] secureSeed = Encoder.hexDecode(Keccak256.hash(CryptoUtil.genericHash(seedBase, 32)).getBytes());
-
-        return SHA256.hash(secureSeed).getBytes();
-    }
-
-    public byte[] createAddress(PublicKey publickey) {
-        // if signing key
-        if (publickey.getType() != Key.KeyType.CURVE25519) {
-            publickey = new PublicKey(CryptoUtil.signToEncryptPublicKey(publickey.getRaw()));
-        }
-
-        String publicKeyHash = new String(
-                Keccak256.hash(CryptoUtil.genericHash(publickey.getRaw(), 32)).getBytes(),
-                StandardCharsets.UTF_8
-        ).substring(0, 40);
-
-        byte[] packed = PackUtil.packCaH40(ADDRESS_VERSION, network, publicKeyHash);
-        String checkSum = new String(
-                Keccak256.hash(CryptoUtil.genericHash(packed, packed.length)).getBytes(),
-                StandardCharsets.UTF_8
-        ).substring(0, 8);
-
-        return PackUtil.packCaH40H8(ADDRESS_VERSION, network, publicKeyHash, checkSum);
-    }
-
-    public Account seed(String seedText) {
-        byte[] seed = createAccountSeed(seedText);
-        KeyPair signKeys = createSignKeys(seed);
-
-        return new Account(
-                new Address(signKeys.getPublicKey().getBase58()),
-                createEncryptKeys(seed),
-                signKeys
-        );
-    }
-
-    public KeyPair convertSignToEncrypt(KeyPair sign) {
-        byte[] privateKey = CryptoUtil.signToEncryptPrivateKey(sign.getPrivateKey().getRaw());
-
-        int last = privateKey.length - 1;
-        privateKey[last] = privateKey[last] % 2 == 1 ? ((byte) ((privateKey[last] | 0x80) & ~0x40)) : privateKey[last];
-
-        PrivateKey encryptPrivateKey = new PrivateKey(privateKey);
-
-        PublicKey encryptPublicKey = new PublicKey(CryptoUtil.signToEncryptPublicKey(sign.getPublicKey().getRaw()));
-
-        return new KeyPair(encryptPublicKey, encryptPrivateKey);
+    public static byte testnetByte() {
+        return 'T';
     }
 
     public KeyPair calcKeys(KeyPair keys) {
@@ -107,88 +54,123 @@ public class AccountFactory {
             return new KeyPair(keys.getPublicKey(), null);
         }
 
-        byte[] privateKey = keys.getPrivateKey().getRaw();
+        PublicKey calcPublicKey = CryptoUtil.publicFromPrivate(keys.getPrivateKey());
 
-        byte[] publicKey = keys.getPublicKey().getType() != Key.KeyType.CURVE25519 ? CryptoUtil.signPublicFromPrivate(privateKey) : CryptoUtil.encryptPublicFromPrivate(privateKey);
-
-        if (keys.getPublicKey() != null && !Arrays.equals(keys.getPublicKey().getRaw(), publicKey)) {
+        if (keys.getPublicKey() != null && !keys.getPublicKey().getBase58().equals(calcPublicKey.getBase58())) {
             throw new InvalidAccountException("Public key doesn't match private key");
         }
 
         return new KeyPair(
-                new PublicKey(publicKey),
-                new PrivateKey(privateKey)
+                calcPublicKey,
+                keys.getPrivateKey()
         );
     }
 
     public KeyPair calcKeys(PrivateKey key) {
-        KeyPair kp = new KeyPair(null, key);
-        return calcKeys(kp);
+        return calcKeys(new KeyPair(null, key));
+    }
+
+    public KeyPair calcKeys(byte[] privateKey, Key.KeyType keyType) {
+        return calcKeys(new PrivateKey(privateKey, keyType));
+    }
+
+    public Address createAddress(PublicKey publicKey) {
+        // if encrypt key
+        if (publicKey.getType() == Key.KeyType.CURVE25519) {
+            throw new IllegalArgumentException("Address can not be created with encrypting key of type Curve25519");
+        }
+
+        byte[] publicKeyHash = Arrays.copyOfRange(SHA256.hash(Blake2b256.hash(publicKey.getRaw())).getBytes(), 0, 20);
+
+        byte[] packed = Bytes.concat(
+                new byte[]{(byte) ADDRESS_VERSION},
+                new byte[]{network},
+                publicKeyHash
+        );
+
+        byte[] checkSum = Arrays.copyOfRange(SHA256.hash(Blake2b256.hash(packed)).getBytes(), 0, 4);
+
+        byte[] addressBytes = Bytes.concat(
+                packed,
+                checkSum
+        );
+
+        String addressString = Encoder.base58Encode(addressBytes);
+
+        return new Address(addressString);
+    }
+
+    public Address createAddress(byte[] publicKey) {
+        return createAddress(new PublicKey(publicKey, Key.KeyType.ED25519));
     }
 
     public Account create(KeyPair sign, KeyPair encrypt, Address address) {
-        KeyPair signKeys = sign != null ? calcKeys(sign) : null;
-        KeyPair encryptKeys = encrypt != null ? calcKeys(encrypt) : (sign != null ? convertSignToEncrypt(signKeys) : null);
+        KeyPair signKeys = calcKeys(sign);
+        KeyPair encryptKeys = calcKeys(encrypt);
 
         return new Account(address, encryptKeys, signKeys);
     }
 
     public Account create(KeyPair sign) {
-        KeyPair signKeys = sign != null ? calcKeys(sign) : null;
-        KeyPair encryptKeys = sign != null ? calcKeys(convertSignToEncrypt(sign)) : null;
+        KeyPair signKeys = calcKeys(sign);
+        KeyPair encryptKeys = calcKeys(CryptoUtil.signToEncryptKeyPair(sign));
+        Address address = createAddress(signKeys.getPublicKey());
 
-        return create(signKeys, encryptKeys, null);
+        return create(signKeys, encryptKeys, address);
     }
 
-    public Account createPublic(PublicKey signPublicKey) {
-        if (signPublicKey == null || signPublicKey.getRaw().length == 0)
-            throw new IllegalArgumentException("Provided signing key is empty");
-        return create(new KeyPair(signPublicKey, null));
+    public Account create(PrivateKey signPrivateKey) {
+        if (signPrivateKey.getType() == Key.KeyType.CURVE25519)
+            throw new IllegalArgumentException("Private key should not be encrypting of type Curve25519");
+        KeyPair signKeys = calcKeys(signPrivateKey);
+        KeyPair encryptKeys = calcKeys(CryptoUtil.signToEncryptKeyPair(signKeys));
+        Address address = createAddress(signKeys.getPublicKey());
+
+        return create(signKeys, encryptKeys, address);
     }
 
-    protected int getNonce() {
-        return nonce++;
+    public Account createFromSeed(byte[] seedText) {
+        KeyPair signKeys = CryptoUtil.signKeypair(seedText);
+        KeyPair encryptKeys = CryptoUtil.signToEncryptKeyPair(signKeys);
+        Address address = createAddress(signKeys.getPublicKey());
+
+        return new Account(
+                address,
+                encryptKeys,
+                signKeys
+        );
     }
 
-    protected KeyPair createSignKeys(byte[] seed) {
-        return CryptoUtil.signKeypair(seed);
+    public Account createFromSeed(String seedText) {
+        return createFromSeed(seedText.getBytes(StandardCharsets.UTF_8));
     }
 
-    protected KeyPair createEncryptKeys(byte[] seed) {
-        return CryptoUtil.cryptoBoxSeedKeypair(seed);
-    }
+    public Account createPublic(PublicKey publicKey) {
+        if (publicKey == null) throw new IllegalArgumentException("Provided signing key is empty");
 
-    protected byte[] calcAddress(byte[] address, KeyPair sign, KeyPair encrypt) {
-        byte[] _address = null;
+        KeyPair sign;
+        KeyPair encrypt;
+        Address address;
 
-        byte[] addrSign = (sign != null && sign.getPublicKey() != null) ? createAddress(sign.getPublicKey()) : null;
-        byte[] addrEncrypt = (encrypt != null && encrypt.getPublicKey() != null) ? createAddress(encrypt.getPublicKey()) : null;
-
-        if (addrSign != null && addrEncrypt != null && !Arrays.equals(addrSign, addrEncrypt)) {
-            throw new InvalidAccountException("Sign key doesn't match encrypt key");
+        switch (publicKey.getType()) {
+            case ED25519:
+                sign = new KeyPair(publicKey, null);
+                encrypt = new KeyPair(CryptoUtil.signToEncryptPublicKey(publicKey.getRaw()), null);
+                address = createAddress(publicKey);
+                return new Account(address, encrypt, sign);
+            case SECP256K1:
+            case SECP256R1:
+                sign = new KeyPair(publicKey, null);
+                return new Account(null, null, sign);
+            case CURVE25519:
+                encrypt = new KeyPair(publicKey, null);
+                return new Account(null, encrypt, null);
+            default:
+                throw new IllegalArgumentException("Unknown curve");
         }
-
-        if (address != null) {
-            if ((addrSign != null && !Arrays.equals(address, addrSign)) || (addrEncrypt != null && !Arrays.equals(address, addrEncrypt))) {
-                throw new InvalidAccountException("Address doesn't match keypair; possible network mismatch");
-            }
-
-            _address = new byte[address.length];
-            System.arraycopy(address, 0, _address, 0, address.length);
-        } else {
-            if (addrSign != null) {
-                _address = new byte[addrSign.length];
-                System.arraycopy(addrSign, 0, _address, 0, addrSign.length);
-            } else if (addrEncrypt != null) {
-                _address = new byte[addrEncrypt.length];
-                System.arraycopy(addrEncrypt, 0, _address, 0, addrEncrypt.length);
-            }
-        }
-        return _address;
     }
 
-    protected byte getNetworkByte() {
-        if (this.network.equals("T")) return (byte) 84;
-        else return (byte) 76;
+    public int getNonce() {
+        return nonce;
     }
 }

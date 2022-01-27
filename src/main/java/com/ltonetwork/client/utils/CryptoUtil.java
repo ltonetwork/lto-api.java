@@ -77,6 +77,13 @@ public class CryptoUtil {
         );
     }
 
+    public static KeyPair signToEncryptKeyPair(KeyPair signKeyPair) {
+        return new KeyPair(
+                new PublicKey(signToEncryptPublicKey(signKeyPair.getPublicKey().getRaw()), Key.KeyType.CURVE25519),
+                new PrivateKey(signToEncryptPrivateKey(signKeyPair.getPrivateKey().getRaw()), Key.KeyType.CURVE25519)
+        );
+    }
+
     public static byte[] signToEncryptPublicKey(byte[] publicKey) {
         byte[] key = new byte[Sign.CURVE25519_PUBLICKEYBYTES];
         sodium.convertPublicKeyEd25519ToCurve25519(key, publicKey);
@@ -115,10 +122,23 @@ public class CryptoUtil {
         return signKeypair(seed, Key.KeyType.ED25519);
     }
 
-    public static byte[] signPublicFromPrivate(byte[] privateKey) {
-        byte[] publicKey = new byte[Sign.ED25519_PUBLICKEYBYTES];
-        sodium.cryptoSignEd25519SkToPk(publicKey, privateKey);
-        return publicKey;
+    public static byte[] publicFromPrivate(byte[] privateKey, Key.KeyType keyType) {
+        switch (keyType) {
+            case ED25519:
+                return new KeyPair(ed25519.keyPairFromSecretKey(privateKey)).getPublicKey().getRaw();
+            case SECP256K1:
+                return new KeyPair(secp256k1.keyPairFromSecretKey(privateKey)).getPublicKey().getRaw();
+            case SECP256R1:
+                return new KeyPair(secp256r1.keyPairFromSecretKey(privateKey)).getPublicKey().getRaw();
+            case CURVE25519:
+                return encryptPublicFromPrivate(privateKey);
+            default:
+                throw new IllegalArgumentException("Unknown curve");
+        }
+    }
+
+    public static PublicKey publicFromPrivate(PrivateKey privateKey) {
+        return new PublicKey(publicFromPrivate(privateKey.getRaw(), privateKey.getType()), privateKey.getType());
     }
 
     public static Signature signDetached(byte[] message, PrivateKey privateKey) {

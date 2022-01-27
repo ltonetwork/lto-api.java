@@ -4,8 +4,6 @@ import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.seasalt.Binary;
 import org.apache.commons.codec.DecoderException;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
@@ -111,19 +109,6 @@ public class Encoder {
 
     public static boolean isHexEncoded(String input) {
         return Pattern.matches("^[a-f0-9]+$", input);
-    }
-
-    static byte[] packN(int value) {
-        byte[] bytes = ByteBuffer.allocate(4).putInt(value).array();
-        return toPositiveByteArray(bytes);
-    }
-
-    static int unpackN(byte[] value) {
-        ByteBuffer buf = ByteBuffer.allocate(4);
-        buf.order(ByteOrder.BIG_ENDIAN);
-        buf.put(value);
-        buf.flip();
-        return buf.getInt();
     }
 
     // converts a byte[] like [0,0,19,-2] to [0,0,19,254]
