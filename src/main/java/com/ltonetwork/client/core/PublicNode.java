@@ -1,6 +1,5 @@
 package com.ltonetwork.client.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ltonetwork.client.core.transaction.*;
 import com.ltonetwork.client.exceptions.BadMethodCallException;
 import com.ltonetwork.client.exceptions.InvalidArgumentException;
@@ -47,10 +46,7 @@ public class PublicNode {
     public Transaction broadcast(Transaction transaction) {
         if (!transaction.isSigned()) throw new BadMethodCallException("Transaction is not signed");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> tx = objectMapper.convertValue(transaction, Map.class);
-
-        HttpResponse<String> resp = HttpClientUtil.post(URI.create(String.format("%s/transactions/broadcast", this.uri.toString())), tx);
+        HttpResponse<String> resp = HttpClientUtil.post(URI.create(String.format("%s/transactions/broadcast", this.uri.toString())), transaction.toJson());
 
         return getTransactionObject(new JsonObject(resp.body()));
     }
@@ -65,7 +61,7 @@ public class PublicNode {
         return new JsonObject(resp.body());
     }
 
-    public JsonObject post(String endpoint, Map<String, Object> params) {
+    public JsonObject post(String endpoint, JsonObject params) {
         HttpResponse<String> resp = HttpClientUtil.post(URI.create(uri.toString() + endpoint), params);
         return new JsonObject(resp.body());
     }
@@ -87,6 +83,8 @@ public class PublicNode {
 
     private Transaction getTransactionObject(JsonObject json) {
         Transaction ret;
+
+        if (!json.has("type")) throw new IllegalArgumentException("Broadcast failed with result " + json);
 
         switch ((int) json.get("type")) {
             case 4:

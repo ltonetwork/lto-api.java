@@ -14,6 +14,7 @@ import org.apache.wink.json4j.JSONArray;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class Transaction {
     protected int height;
@@ -80,13 +81,13 @@ public abstract class Transaction {
 
         if (sender != null) {
             json.put("sender", this.sender.getAddress());
-            json.put("senderKeyType", this.senderPublicKey.getTypeByte());
+            json.put("senderKeyType", this.senderPublicKey.getType().toString().toLowerCase(Locale.ROOT));
             json.put("senderPublicKey", this.senderPublicKey.getBase58());
         }
 
         if (sponsor != null) {
             json.put("sponsor", this.sponsor.getAddress());
-            json.put("sponsorKeyType", this.sponsor.getPublicSignKey().getTypeByte());
+            json.put("sponsorKeyType", this.sponsor.getPublicSignKey().getType().toString().toLowerCase(Locale.ROOT));
             json.put("sponsorPublicKey", this.sponsor.getPublicSignKey().getBase58());
         }
 

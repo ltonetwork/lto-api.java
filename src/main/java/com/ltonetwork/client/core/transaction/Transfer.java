@@ -74,7 +74,7 @@ public class Transfer extends Transaction {
     public JsonObject toJson() {
         JsonObject json = super.toJson();
         json.put("recipient", recipient.getAddress());
-        json.put("amount", String.valueOf(amount));
+        json.put("amount", amount);
         if (!attachment.equals("")) json.put("attachment", attachment);
 
         return json;

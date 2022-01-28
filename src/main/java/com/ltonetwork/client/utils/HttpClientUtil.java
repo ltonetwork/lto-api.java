@@ -2,6 +2,7 @@ package com.ltonetwork.client.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ltonetwork.client.types.JsonObject;
 
 import java.io.IOException;
 import java.net.URI;
@@ -64,17 +65,8 @@ public class HttpClientUtil {
         return sendRequest(request);
     }
 
-    public static HttpResponse<String> post(URI uri, Map<String, Object> params) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String requestBody = "";
-
-        try {
-            requestBody = objectMapper
-                    .writerWithDefaultPrettyPrinter()
-                    .writeValueAsString(params);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+    public static HttpResponse<String> post(URI uri, JsonObject params) {
+        String requestBody = params.toString();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
