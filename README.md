@@ -13,11 +13,10 @@ Accounts
 #### Create an account from seed
 
 ```java
-    import com.ltonetwork.client.core.AccountFactory;
-    String seed = "my seed phrase";
+    String seed = "fragile because fox snap picnic mean art observe vicious program chicken purse text hidden chest";
 
-    AccountFactory af = new AccountFactory('T');
-    Account acc = af.seed(seed);
+    AccountFactory af = new AccountFactory(AccountFactory.testnetByte());
+    Account acc = af.createFromSeed(seed);
 ```
 
 #### Create an account from sign public key
@@ -28,7 +27,7 @@ Accounts
 
     PublicKey signPublicKey = new PublicKey("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp", Encoding.BASE58);
 
-    AccountFactory af = new AccountFactory('T');
+    AccountFactory af = new AccountFactory(AccountFactory.testnetByte());
     Account acc = af.createPublic(signPublicKey);
 ```
 
@@ -41,19 +40,17 @@ Accounts
 
     KeyPair signKeyPair = new KeyPair (
         new PublicKey("wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp", Encoding.BASE58),
-        new PrivateKey("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y", Encoding.BASE58),
-        Key.KeyType.ED25519
+        new PrivateKey("FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y", Encoding.BASE58)
     );
 
     KeyPair encryptKeyPair = new KeyPair (
         new PublicKey("BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6", Encoding.BASE58),
-        new PrivateKey("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN", Encoding.BASE58),
-        Key.KeyType.CURVE25519
+        new PrivateKey("BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN", Encoding.BASE58)
     );
 
     Address address = new Address("3JmCa4jLVv7Yn2XkCnBUGsa7WNFVEMxAfWe");
 
-    AccountFactory af = new AccountFactory('T');
+    AccountFactory af = new AccountFactory(AccountFactory.testnetByte());
     Account acc = af.create(
         signKeyPair,
         encryptKeyPair,
