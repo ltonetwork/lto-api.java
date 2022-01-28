@@ -3,6 +3,8 @@ package com.ltonetwork.client.types;
 import com.google.common.primitives.Bytes;
 import com.ltonetwork.seasalt.Binary;
 
+import java.util.Locale;
+
 public class PublicKey extends Key {
 
     public PublicKey(byte[] valueBytes, Key.KeyType keyType) {
@@ -42,6 +44,15 @@ public class PublicKey extends Key {
             default:
                 throw new IllegalArgumentException("Unknown key type");
         }
+    }
+
+    public JsonObject toJson() {
+        JsonObject json = new JsonObject();
+
+        json.put("keyType", getType().toString().toLowerCase(Locale.ROOT));
+        json.put("publicKey", getBase58());
+
+        return json;
     }
 
     public short keyLengthByType(KeyType type) {

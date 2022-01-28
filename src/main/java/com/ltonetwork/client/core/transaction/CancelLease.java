@@ -47,6 +47,13 @@ public class CancelLease extends Transaction {
         }
     }
 
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+        json.put("leaseId", leaseId);
+
+        return json;
+    }
+
     private byte[] toBinaryV2() {
         return Bytes.concat(
                 new byte[]{this.type},                      // 1b

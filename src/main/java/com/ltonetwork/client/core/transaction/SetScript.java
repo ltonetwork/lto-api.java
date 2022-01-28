@@ -67,6 +67,13 @@ public class SetScript extends Transaction {
         }
     }
 
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+        json.put("script", script);
+
+        return json;
+    }
+
     private byte[] toBinaryV1() {
         byte[] binaryScript = scriptToBinary();
 

@@ -53,6 +53,14 @@ public class Lease extends Transaction {
         }
     }
 
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+        json.put("recipient", recipient.getAddress());
+        json.put("amount", String.valueOf(amount));
+
+        return json;
+    }
+
     private byte[] toBinaryV2() {
         return Bytes.concat(
                 new byte[]{this.type},                              // 1b

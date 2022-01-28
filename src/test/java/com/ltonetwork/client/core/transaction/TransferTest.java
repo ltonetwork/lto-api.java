@@ -127,4 +127,22 @@ public class TransferTest {
 
         tx.sponsorWith(sponsor);
     }
+
+    @Test
+    public void testToJson() {
+        Account account = TestUtil.createAccount();
+        tx.signWith(account);
+
+        JsonObject json = tx.toJson();
+        assertEquals(tx.type, json.get("type"));
+        assertEquals(tx.version, json.get("version"));
+        assertEquals(tx.fee, json.get("fee"));
+        assertEquals(tx.timestamp, json.get("timestamp"));
+        System.out.println(json);
+        assertEquals(tx.sender.getAddress(), json.get("sender"));
+        assertEquals(tx.senderPublicKey.getTypeByte(), json.get("senderKeyType"));
+        assertEquals(tx.senderPublicKey.getBase58(), json.get("senderPublicKey"));
+        String proof = json.get("proofs").toString();
+        assertEquals(tx.proofs.get(0).getBase58(), proof.substring(2, proof.length()-2));
+    }
 }

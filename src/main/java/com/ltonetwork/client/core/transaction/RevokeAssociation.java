@@ -77,6 +77,16 @@ public class RevokeAssociation extends Transaction {
         }
     }
 
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+        json.put("associationType", String.valueOf(associationType));
+        json.put("recipient", party.getAddress());
+
+        if (!hash.equals("")) json.put("hash", hash);
+
+        return json;
+    }
+
     public String getHash(Encoding encoding) {
         if (hash == null)
             throw new BadMethodCallException("Can't get hash; missing");

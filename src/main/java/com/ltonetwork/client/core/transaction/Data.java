@@ -4,6 +4,8 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 import com.ltonetwork.client.types.JsonObject;
+import org.apache.wink.json4j.JSONArray;
+import org.apache.wink.json4j.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,6 +70,23 @@ public class Data extends Transaction {
             default:
                 throw new IllegalArgumentException("Unknown version " + version);
         }
+    }
+
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+
+        JSONArray entriesJsonArray = new JSONArray();
+        for (DataEntry entry : data) {
+            try {
+                entriesJsonArray.put(entry.toJson().getObject());
+            } catch (JSONException e) {
+                throw new IllegalArgumentException("Unable to parse data entry " + entry.getKey() + " to JSON");
+            }
+        }
+
+        json.put("data", entriesJsonArray);
+
+        return json;
     }
 
     private byte[] toBinaryV3() {

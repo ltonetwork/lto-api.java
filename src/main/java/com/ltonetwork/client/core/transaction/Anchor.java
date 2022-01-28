@@ -58,6 +58,13 @@ public class Anchor extends Transaction {
         }
     }
 
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+        json.put("anchors", anchors.toString());
+
+        return json;
+    }
+
     public void addHash(String hash, Encoding encoding) {
         anchors.add(Encoder.base58Encode(Encoder.decode(hash, encoding)));
     }

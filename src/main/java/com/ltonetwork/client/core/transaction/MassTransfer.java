@@ -8,6 +8,8 @@ import com.ltonetwork.client.types.Address;
 import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
+import org.apache.wink.json4j.JSONArray;
+import org.apache.wink.json4j.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,6 +85,24 @@ public class MassTransfer extends Transaction {
             default:
                 throw new IllegalArgumentException("Unknown version " + version);
         }
+    }
+
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+
+        JSONArray transfersJsonArray = new JSONArray();
+        for (TransferShort transfer : transfers) {
+            try {
+                transfersJsonArray.put(transfer.toJson().getObject());
+            } catch (JSONException e) {
+                throw new IllegalArgumentException("Unable to parse transfer entry");
+            }
+        }
+
+        json.put("transfers", transfersJsonArray);
+        if (!attachment.equals("")) json.put("attachment", attachment);
+
+        return json;
     }
 
     private byte[] toBinaryV1() {

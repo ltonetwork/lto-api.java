@@ -8,6 +8,8 @@ import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.types.PublicKey;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.seasalt.Binary;
+import com.ltonetwork.seasalt.sign.Signature;
+import org.apache.wink.json4j.JSONArray;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -66,6 +68,37 @@ public abstract class Transaction {
     }
 
     abstract public byte[] toBinary();
+
+    public JsonObject toJson() {
+        JsonObject json = new JsonObject();
+
+        json.put("type", this.type);
+        json.put("version", this.version);
+        json.put("id", this.id);
+        json.put("fee", this.fee);
+        json.put("timestamp", this.timestamp);
+
+        if (sender != null) {
+            json.put("sender", this.sender.getAddress());
+            json.put("senderKeyType", this.senderPublicKey.getTypeByte());
+            json.put("senderPublicKey", this.senderPublicKey.getBase58());
+        }
+
+        if (sponsor != null) {
+            json.put("sponsor", this.sponsor.getAddress());
+            json.put("sponsorKeyType", this.sponsor.getPublicSignKey().getTypeByte());
+            json.put("sponsorPublicKey", this.sponsor.getPublicSignKey().getBase58());
+        }
+
+        JSONArray jsonProofs = new JSONArray();
+        for (Signature sig : proofs) {
+            jsonProofs.add(sig.getBase58());
+        }
+
+        json.put("proofs", jsonProofs);
+
+        return json;
+    }
 
     public boolean isSigned() {
         return !(sender == null);

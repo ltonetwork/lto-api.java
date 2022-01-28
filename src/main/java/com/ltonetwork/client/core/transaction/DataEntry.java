@@ -3,10 +3,15 @@ package com.ltonetwork.client.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import com.ltonetwork.client.types.JsonObject;
+import com.ltonetwork.client.utils.JsonUtil;
+import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
-public class DataEntry<T> {
+public class DataEntry<T extends Serializable> {
     private final DataEntryType type;
     private final String key;
     private final T value;
@@ -66,6 +71,37 @@ public class DataEntry<T> {
             default:
                 throw new IllegalArgumentException("Unknown DataEntry type");
         }
+    }
+
+    public JsonObject toJson() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        switch (type) {
+            case INTEGER:
+                sb.append("'type': int").append(", ");
+                sb.append("'key': ").append(key).append(", ");
+                sb.append("'value': ").append(value).append(", ");
+                break;
+            case BINARY:
+                byte[] serialized = SerializationUtils.serialize(value);
+                sb.append("'type': binary").append(", ");
+                sb.append("'key': ").append(key).append(", ");
+                sb.append("'value': ").append(Arrays.toString(serialized)).append(", ");
+                break;
+            case BOOLEAN:
+                sb.append("'type': boolean").append(", ");
+                sb.append("'key': ").append(key).append(", ");
+                sb.append("'value': ").append(value).append(", ");
+                break;
+            case STRING:
+                sb.append("'type': string").append(", ");
+                sb.append("'key': ").append(key).append(", ");
+                sb.append("'value': ").append(value).append(", ");
+                break;
+        }
+        sb.append("}");
+
+        return JsonUtil.jsonDecode(sb.toString());
     }
 
     public enum DataEntryType {

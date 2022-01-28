@@ -163,6 +163,17 @@ public class JsonObject {
         }
     }
 
+    public void put(String key, Object value) {
+        try {
+            if (type == OBJECT) {
+                object.put(key, value);
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public void putByte(String key, byte[] value) {
         try {
             if (type == OBJECT) {

@@ -55,6 +55,21 @@ public abstract class Key {
         return type;
     }
 
+    public byte getTypeByte() {
+        switch (type) {
+            case ED25519:
+                return (byte) 1;
+            case SECP256K1:
+                return (byte) 2;
+            case SECP256R1:
+                return (byte) 3;
+            case CURVE25519:
+                return (byte) 4;
+            default:
+                throw new IllegalArgumentException("Unknown curve");
+        }
+    }
+
     private Binary valueToBinary(String value, Encoding encoding) {
         try {
             switch (encoding) {

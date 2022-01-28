@@ -7,6 +7,8 @@ import com.ltonetwork.client.types.Encoding;
 import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.types.Key;
 import com.ltonetwork.client.types.PublicKey;
+import org.apache.wink.json4j.JSONArray;
+import org.apache.wink.json4j.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +65,23 @@ public class Register extends Transaction {
             default:
                 throw new IllegalArgumentException("Unknown version " + version);
         }
+    }
+
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+
+        JSONArray keysJsonArray = new JSONArray();
+        for (PublicKey key : accounts) {
+            try {
+                keysJsonArray.put(key.toJson().getObject());
+            } catch (JSONException e) {
+                throw new IllegalArgumentException("Unable to parse publickey " + key.getBase58() + " to JSON");
+            }
+        }
+
+        json.put("data", keysJsonArray);
+
+        return json;
     }
 
     private byte[] toBinaryV3() {

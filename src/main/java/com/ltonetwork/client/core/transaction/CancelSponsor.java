@@ -48,6 +48,13 @@ public class CancelSponsor extends Transaction {
         }
     }
 
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+        json.put("recipient", recipient.getAddress());
+
+        return json;
+    }
+
     private byte[] toBinaryV1() {
         return Bytes.concat(
                 new byte[]{this.type},                              // 1b
