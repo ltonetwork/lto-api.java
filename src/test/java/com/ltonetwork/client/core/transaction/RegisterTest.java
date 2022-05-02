@@ -18,8 +18,8 @@ public class RegisterTest {
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
     Register tx;
-    // type + version + chainId + timestamp + publicKey + fee + accountsEntriesLength
-    int DEFAULT_BINARY_LENGTH = 1 + 1 + 1 + 8 + 32 + 8 + 2;
+    // type + version + chainId + timestamp + publicKeyType + publicKey + fee + accountsEntriesLength
+    int DEFAULT_BINARY_LENGTH = 1 + 1 + 1 + 8 + 1 + 32 + 8 + 2;
 
     @Before
     public void init() {

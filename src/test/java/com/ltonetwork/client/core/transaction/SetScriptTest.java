@@ -23,7 +23,16 @@ public class SetScriptTest {
     }
 
     @Test
-    public void testToBinary() {
+    public void testToBinaryV1() {
+        Account account = TestUtil.createAccount();
+        SetScript txV1 = new SetScript("script", (byte) 1);
+        tx.signWith(account);
+
+        assertEquals(58, tx.toBinary().length);
+    }
+
+    @Test
+    public void testToBinaryV3() {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 

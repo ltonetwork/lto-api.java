@@ -24,11 +24,20 @@ public class CancelSponsorTest {
     }
 
     @Test
-    public void testToBinary() {
+    public void testToBinaryV1() {
+        Account account = TestUtil.createAccount();
+        CancelSponsor txV1 = new CancelSponsor(new Address("3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx"), (byte) 1);
+        txV1.signWith(account);
+
+        assertEquals(77, txV1.toBinary().length);
+    }
+
+    @Test
+    public void testToBinaryV3() {
         Account account = TestUtil.createAccount();
         tx.signWith(account);
 
-        assertEquals(77, tx.toBinary().length);
+        assertEquals(78, tx.toBinary().length);
     }
 
     @Test

@@ -9,24 +9,35 @@ import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.utils.Encoder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Anchor extends Transaction {
     private final static long MINIMUM_FEE = 35_000_000;
     private final static byte TYPE = 15;
-    private final static byte VERSION = 1;
+    private final static List<Byte> SUPPORTED_VERSIONS = Arrays.asList((byte) 1, (byte) 3);
     private final ArrayList<String> anchors;
 
-    public Anchor(String hash, Encoding encoding) {
-        super(TYPE, VERSION, MINIMUM_FEE);
+    public Anchor(String hash, Encoding encoding, byte version) {
+        super(TYPE, version, MINIMUM_FEE);
+
+        checkVersion(SUPPORTED_VERSIONS);
+
         anchors = new ArrayList<>();
         addHash(hash, encoding);
     }
 
+    public Anchor(String hash, Encoding encoding) {
+        this(hash, encoding, (byte) 3);
+    }
+
     public Anchor(JsonObject json) {
         super(json);
+
+        checkVersion(SUPPORTED_VERSIONS);
+
         JsonObject jsonAnchors = new JsonObject(json.get("anchors").toString(), true);
         ArrayList<String> anchors = new ArrayList<>();
-
         for (int i = 0; i < jsonAnchors.length(); i++) {
             anchors.add(jsonAnchors.get(i));
         }
@@ -35,34 +46,16 @@ public class Anchor extends Transaction {
     }
 
     public byte[] toBinary() {
-        if (this.senderPublicKey == null) {
-            throw new BadMethodCallException("Sender public key not set");
-        }
+        checkToBinary();
 
-        if (this.timestamp == 0) {
-            throw new BadMethodCallException("Timestamp not set");
+        switch (version) {
+            case (byte) 1:
+                return toBinaryV1();
+            case (byte) 3:
+                return toBinaryV3();
+            default:
+                throw new IllegalArgumentException("Unknown version " + version);
         }
-
-        ArrayList<Byte> anchorsBytes = new ArrayList<>();
-        for (String anchor : anchors) {
-            byte[] decodedAnchor = Encoder.base58Decode(anchor);
-            byte[] ancLen = Shorts.toByteArray((short) decodedAnchor.length);
-            anchorsBytes.add(ancLen[0]);
-            anchorsBytes.add(ancLen[1]);
-            for (Byte anc : decodedAnchor) {
-                anchorsBytes.add(anc);
-            }
-        }
-
-        return Bytes.concat(
-                new byte[]{this.type},
-                new byte[]{this.version},
-                this.senderPublicKey.getRaw(),
-                Shorts.toByteArray((short) anchors.size()),
-                Bytes.toArray(anchorsBytes), // includes each anchor's length and value
-                Longs.toByteArray(this.timestamp),
-                Longs.toByteArray(this.fee)
-        );
     }
 
     public void addHash(String hash, Encoding encoding) {
@@ -93,4 +86,43 @@ public class Anchor extends Transaction {
         return hashes;
     }
 
+    // includes each anchor's length and value
+    private ArrayList<Byte> anchorsBytes() {
+        ArrayList<Byte> anchorsBytes = new ArrayList<>();
+        for (String anchor : anchors) {
+            byte[] decodedAnchor = Encoder.base58Decode(anchor);
+            byte[] ancLen = Shorts.toByteArray((short) decodedAnchor.length);
+            anchorsBytes.add(ancLen[0]);
+            anchorsBytes.add(ancLen[1]);
+            for (Byte anc : decodedAnchor) {
+                anchorsBytes.add(anc);
+            }
+        }
+        return anchorsBytes;
+    }
+
+    private byte[] toBinaryV1() {
+        return Bytes.concat(
+                new byte[]{this.type},                      // 1b
+                new byte[]{this.version},                   // 1b
+                this.senderPublicKey.getRaw(),              // 32b
+                Shorts.toByteArray((short) anchors.size()), // 2b
+                Bytes.toArray(anchorsBytes()),              // (2b + mb)*nb
+                Longs.toByteArray(this.timestamp),          // 8b
+                Longs.toByteArray(this.fee)                 // 8b
+        );
+    }
+
+    private byte[] toBinaryV3() {
+        return Bytes.concat(
+                new byte[]{this.type},                      // 1b
+                new byte[]{this.version},                   // 1b
+                new byte[]{this.getNetwork()},              // 1b
+                Longs.toByteArray(this.timestamp),          // 8b
+                this.senderPublicKey.toBinary(),            // 33b|34b
+                Longs.toByteArray(this.fee),                // 8b
+                Shorts.toByteArray((short) anchors.size()), // 2b
+                Bytes.toArray(anchorsBytes())               // (2b + mb)*nb
+        );
+    }
 }

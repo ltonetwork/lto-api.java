@@ -11,6 +11,7 @@ import com.ltonetwork.seasalt.Binary;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Transaction {
     protected int height;
@@ -82,12 +83,21 @@ public abstract class Transaction {
         return this.proofs;
     }
 
+    protected void checkToBinary() {
+        if (this.senderPublicKey == null) throw new BadMethodCallException("Sender public key not set");
+        if (this.timestamp == 0) throw new BadMethodCallException("Timestamp not set");
+    }
+
+    protected void checkVersion(List<Byte> supportedVersions) {
+        if (!supportedVersions.contains(version))
+            throw new IllegalArgumentException("Unknown version " + version + ", supported versions are: " + supportedVersions);
+    }
+
     private ArrayList<com.ltonetwork.seasalt.sign.Signature> fetchProofs(JsonObject jsonProofs) {
         ArrayList<com.ltonetwork.seasalt.sign.Signature> proofs = new ArrayList<>();
 
-        for (int i = 0; i < jsonProofs.length(); i++) {
+        for (int i = 0; i < jsonProofs.length(); i++)
             proofs.add(new com.ltonetwork.seasalt.sign.Signature(Binary.fromBase58(jsonProofs.get(i)).getBytes()));
-        }
 
         return proofs;
     }
