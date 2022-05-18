@@ -16,7 +16,7 @@ import java.util.List;
 public class Burn extends Transaction {
     private final static long MINIMUM_FEE = 100_000_000;
     private final static byte TYPE = 21;
-    private final static List<Byte> SUPPORTED_VERSIONS = Arrays.asList((byte) 1, (byte) 3);
+    private final static List<Byte> SUPPORTED_VERSIONS = Arrays.asList((byte) 3);
     private final long amount;
 
     public Burn(int amount, byte version) {
