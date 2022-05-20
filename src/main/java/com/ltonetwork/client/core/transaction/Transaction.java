@@ -8,6 +8,7 @@ import com.ltonetwork.client.types.JsonObject;
 import com.ltonetwork.client.types.PublicKey;
 import com.ltonetwork.client.utils.CryptoUtil;
 import com.ltonetwork.seasalt.Binary;
+import com.ltonetwork.client.types.Key.KeyType;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,7 +41,8 @@ public abstract class Transaction {
         this.timestamp = Long.parseLong(json.get("timestamp").toString());
         if (json.has("id")) this.id = new TransactionId(json.get("id").toString());
         this.sender = new Address(json.get("sender").toString());
-        this.senderPublicKey = new PublicKey(json.get("senderPublicKey").toString(), Encoding.BASE58);
+        this.senderPublicKey = new PublicKey(json.get("senderPublicKey").toString(), Encoding.BASE58,
+        KeyType.(json.get("senderKeyType").toString()));
         if (json.has("proofs")) this.proofs = fetchProofs(new JsonObject(json.get("proofs").toString(), true));
     }
 
