@@ -41,8 +41,13 @@ public abstract class Transaction {
         this.timestamp = Long.parseLong(json.get("timestamp").toString());
         if (json.has("id")) this.id = new TransactionId(json.get("id").toString());
         this.sender = new Address(json.get("sender").toString());
-        this.senderPublicKey = new PublicKey(json.get("senderPublicKey").toString(), Encoding.BASE58,
+        if (json.has("senderKeyType")){
+            this.senderPublicKey = new PublicKey(json.get("senderPublicKey").toString(), Encoding.BASE58,
         KeyType.valueOf(json.get("senderKeyType").toString().toUpperCase()));
+        }
+        else {
+            this.senderPublicKey = new PublicKey(json.get("senderPublicKey").toString(), Encoding.BASE58);
+        }
         if (json.has("proofs")) this.proofs = fetchProofs(new JsonObject(json.get("proofs").toString(), true));
     }
 
