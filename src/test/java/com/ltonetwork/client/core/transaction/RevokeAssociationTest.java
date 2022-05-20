@@ -98,6 +98,7 @@ public class RevokeAssociationTest {
                         "  \"type\": 17,\n" +
                         "  \"id\": \"oYv8LBTsLRyAq1w7n9UXudAf5Luu9CuRXkYSnxLX2oa\",\n" +
                         "  \"sender\": \"3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx\",\n" +
+                        "  \"senderKeyType\": \"ed25519\",\n" +
                         "  \"senderPublicKey\": \"8wFR3b8WnbFaxQEdRnogTqC5doYUrotm3P7upvxPaWUo\",\n" +
                         "  \"fee\": 100000,\n" +
                         "  \"timestamp\": 1538728794530,\n" +
@@ -124,6 +125,7 @@ public class RevokeAssociationTest {
                         "  \"type\": 17,\n" +
                         "  \"id\": \"oYv8LBTsLRyAq1w7n9UXudAf5Luu9CuRXkYSnxLX2oa\",\n" +
                         "  \"sender\": \"3MsE8Jfjkh2zaZ1LCGqaDzB5nAYw5FXhfCx\",\n" +
+                        "  \"senderKeyType\": \"ed25519\",\n" +
                         "  \"senderPublicKey\": \"FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y\",\n" +
                         "  \"fee\": 100000,\n" +
                         "  \"timestamp\": 1538728794530,\n" +
