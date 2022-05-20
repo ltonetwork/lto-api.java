@@ -42,7 +42,7 @@ public abstract class Transaction {
         if (json.has("id")) this.id = new TransactionId(json.get("id").toString());
         this.sender = new Address(json.get("sender").toString());
         this.senderPublicKey = new PublicKey(json.get("senderPublicKey").toString(), Encoding.BASE58,
-        KeyType.(json.get("senderKeyType").toString()));
+        KeyType.valueOf(json.get("senderKeyType").toString().toUpperCase()));
         if (json.has("proofs")) this.proofs = fetchProofs(new JsonObject(json.get("proofs").toString(), true));
     }
 
